@@ -16,5 +16,10 @@ import 'package:neuconnectz_dynea/src/shared/inventory/domain/repositories/plant
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/usecases/get_user_plants_usecase.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/usecases/get_user_warehouses_usecase.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/presentation/blocs/plant_warehouse_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/data/datasources/remote/grn_list_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/data/repositories/grn_list_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/repositories/grn_list_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_list_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 
 part 'di_container.dart';

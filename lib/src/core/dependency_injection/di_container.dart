@@ -29,6 +29,7 @@ Future<void> _initAuthDependencies() async {
   _registerAuthUsecases();
   _registerAuthBloc();
   _registerInventoryDependencies();
+  _registerGrnListDependencies();
 }
 
 void _registerAuthRemoteDatasources() {
@@ -97,6 +98,28 @@ void _registerInventoryDependencies() {
     () => PlantWarehouseBloc(
       getUserPlantsUseCase: sl(),
       getUserWarehousesUseCase: sl(),
+    ),
+  );
+}
+
+/// ------------------------
+/// GRN DEPENDENCIES
+/// ------------------------
+void _registerGrnListDependencies() {
+  // Data sources
+  sl.registerLazySingleton<GrnListRemoteDataSource>(
+    () => GrnListRemoteDataSourceImpl(dio: sl()),
+  );
+  // Repositories
+  sl.registerLazySingleton<GrnListRepository>(
+    () => GrnListRepositoryImpl(remoteDataSource: sl()),
+  );
+  // Use cases
+  sl.registerLazySingleton(() => GetGrnListUseCase(sl()));
+  // Blocs
+  sl.registerFactory(
+    () => GrnBloc(
+      getGrnListUseCase: sl(),
     ),
   );
 }

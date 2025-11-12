@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/params/plant_warehouse_params.dart';
@@ -13,6 +14,8 @@ import 'package:neuconnectz_dynea/src/widgets/inline_linear_loader.dart';
 import 'package:neuconnectz_dynea/src/widgets/scanner_and_auto_scan_toggle_widgets.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import '../../../../../widgets/custom_toast.dart';
+import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_widget.dart';
 
 class PutAwayFromGrn extends StatefulWidget {
   const PutAwayFromGrn({super.key});
@@ -25,6 +28,7 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
   int currentStep = 0;
   PlantEntity? _selectedPlant;
   WarehouseEntity? _selectedWarehouse;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -33,6 +37,12 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
       ..add(const LoadPlantsEvent())
       ..add(const LoadWarehousesEvent());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,24 +63,27 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
         appBar: CustomAppBar(title: AppTexts.putAwayFromGr),
         body: Stack(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-              child: BlocConsumer<PlantWarehouseBloc, WarehouseAndPlantState>(
-                listener: (context, state) {
-                  if (state.hasError) {
-                    CustomToast.error(context, state.errorMessage ?? "");
-                  }
-                },
-                builder: (context, state) {
-                  if (currentStep == 0) {
-                    return _buildStepOne(context, state);
-                  } else if (currentStep == 1) {
-                    return _buildStepTwo(context);
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
+            BlocConsumer<PlantWarehouseBloc, WarehouseAndPlantState>(
+              listener: (context, state) {
+                if (state.hasError) {
+                  CustomToast.error(context, state.errorMessage ?? "");
+                }
+              },
+              builder: (context, state) {
+                if (currentStep == 0) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
+                    child: _buildStepOne(context, state),
+                  );
+                } else if (currentStep == 1) {
+                  return _buildStepTwo(context);
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
             ),
             BlocBuilder<PlantWarehouseBloc, WarehouseAndPlantState>(
               builder: (context, state) {
@@ -165,23 +178,17 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
 
   /// STEP 2: Next step after selecting Plant & Warehouse
   Widget _buildStepTwo(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        32.verticalSpace,
-        CustomText(
-          text:
-              'Step 2 - Proceed with Put Away Process for\n${_selectedWarehouse?.name ?? ''}',
-          fontWeight: FontWeight.w600,
-          fontSize: 16.sp,
-          textAlign: TextAlign.center,
-        ),
-        24.verticalSpace,
-        CustomButton.bordered(
-          text: 'Back to Step 1',
-          onPressed: () => setState(() => currentStep = 0),
-        ),
-      ],
+    if (_selectedPlant == null || _selectedWarehouse == null) {
+      return const SizedBox.shrink();
+    }
+
+    return BlocProvider(
+      create: (context) => sl<GrnBloc>(),
+      child: GrnListWidget(
+        selectedPlant: _selectedPlant!,
+        selectedWarehouse: _selectedWarehouse!,
+        scrollController: _scrollController,
+      ),
     );
   }
 }

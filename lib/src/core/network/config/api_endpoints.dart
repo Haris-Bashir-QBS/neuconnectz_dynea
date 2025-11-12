@@ -1,5 +1,6 @@
 var _auth = "Auth-Dynea-Stg/IAuthFeature";
 var _dashboard = "ZCAPI-Dynea-Stg/IDashboardFeature";
+var _putAway = "ZCAPI-Dynea-Stg/IPutAwayFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -21,7 +22,10 @@ enum ApiEndpoints {
   verifyOtp,
 
   /// ========================  Dashboard =========================
-  getDashboardAnalytics;
+  getDashboardAnalytics,
+
+  /// ========================  Put Away =========================
+  listAllGrDocFromSAP;
 
   String get value {
     switch (this) {
@@ -58,6 +62,10 @@ enum ApiEndpoints {
       /// ======================== Get Dashboard Analytics =========================
       case ApiEndpoints.getDashboardAnalytics:
         return "$_dashboard/GetDashboardAnalytics";
+
+      /// ======================== Put Away =========================
+      case ApiEndpoints.listAllGrDocFromSAP:
+        return "$_putAway/ListAllGrDocFromSAP";
     }
   }
 }

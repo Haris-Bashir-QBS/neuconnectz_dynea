@@ -12,7 +12,7 @@ import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/reset_pas
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/splash_page.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/verify_otp_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt/presentation/pages/putaway_from_grn.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/putaway_from_grn.dart';
 import 'package:neuconnectz_dynea/src/widgets/connectivity_overlay.dart';
 
 final GoRouter appRouter = GoRouter(

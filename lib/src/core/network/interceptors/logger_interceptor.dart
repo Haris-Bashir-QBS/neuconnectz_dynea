@@ -1,0 +1,50 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
+import 'package:logger/logger.dart';
+
+class LoggerInterceptor extends Interceptor {
+  final Logger logger = Logger();
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    logger.i(''' 
+    🚀 REQUEST: ${options.method} ${options.uri}
+    Headers: ${options.headers}
+    Data: ${options.data}
+    QueryParams: ${options.queryParameters}
+    ''');
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    logger.i('''
+     ""
+    ✅ RESPONSE: ${response.requestOptions.uri}
+    Status Code: ${response.statusCode}
+    Endpoint: ${response.requestOptions.path.split('/').last}
+   
+    Data: ${response.data}
+    ''');
+    log(response.data.toString());
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.type == DioExceptionType.cancel) {
+      // Skip logging for cancelled requests to avoid noisy logs during rapid searches
+      handler.next(err);
+      return;
+    }
+    logger.e('''
+    ❌ ERROR: ${err.requestOptions.uri}
+    Exception: ${err.error}
+    Status Code: ${err.response?.statusCode}
+    Endpoint: ${err.requestOptions.uri.path.split('/').last}
+    data : ${err.response?.data}
+    ''');
+    handler.next(err);
+  }
+}

@@ -13,5 +13,6 @@ class AppRoutes {
   static const String settings = 'settings';
   static const String dashboard = 'dashboard';
   // ============================ PutAway ============================
-static const putAwayFromGr = 'putAway_from_gr';
+  static const putAwayFromGr = 'putAway_from_gr';
+  static const grnItems = 'grn_items';
 }

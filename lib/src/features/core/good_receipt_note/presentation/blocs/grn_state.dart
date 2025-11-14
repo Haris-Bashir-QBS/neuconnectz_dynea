@@ -16,20 +16,22 @@ class PendingGrnLoading extends GrnState {
 }
 
 class PendingGrnSuccess extends GrnState {
-  final List<GrnListItemEntity> items;
-  final int currentPage;
-  final bool hasMore;
+  final List<GrnEntity> items;
+  final int totalRows;
+  final int skipRecords;
   final bool isLoadingMore;
 
   const PendingGrnSuccess({
     required this.items,
-    required this.currentPage,
-    required this.hasMore,
+    required this.totalRows,
+    required this.skipRecords,
     this.isLoadingMore = false,
   });
 
+  bool get hasMore => items.length < totalRows;
+
   @override
-  List<Object?> get props => [items, currentPage, hasMore, isLoadingMore];
+  List<Object?> get props => [items, totalRows, skipRecords, isLoadingMore];
 }
 
 class PendingGrnFailure extends GrnState {
@@ -41,3 +43,34 @@ class PendingGrnFailure extends GrnState {
   List<Object?> get props => [message];
 }
 
+class GrnItemsLoading extends GrnState {
+  const GrnItemsLoading();
+}
+
+class GrnItemsSuccess extends GrnState {
+  final List<GrnItemEntity> items;
+  final int totalRows;
+  final int skipRecords;
+  final bool isLoadingMore;
+
+  const GrnItemsSuccess({
+    required this.items,
+    required this.totalRows,
+    required this.skipRecords,
+    this.isLoadingMore = false,
+  });
+
+  bool get hasMore => items.length < totalRows;
+
+  @override
+  List<Object?> get props => [items, totalRows, skipRecords, isLoadingMore];
+}
+
+class GrnItemsFailure extends GrnState {
+  final String message;
+
+  const GrnItemsFailure({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

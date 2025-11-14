@@ -5,7 +5,7 @@ class GrnListResponseModel {
   final bool isRequestSuccess;
   final int statusCode;
   final String message;
-  final List<GrnListItemModel> data;
+  final GrnListDataModel? data;
   final List<dynamic> exception;
 
   GrnListResponseModel({
@@ -13,7 +13,7 @@ class GrnListResponseModel {
     required this.isRequestSuccess,
     required this.statusCode,
     required this.message,
-    required this.data,
+    this.data,
     required this.exception,
   });
 
@@ -23,22 +23,45 @@ class GrnListResponseModel {
       isRequestSuccess: json['isRequestSuccess'] ?? false,
       statusCode: json['statusCode'] ?? 0,
       message: json['message'] ?? '',
-      data: (json['data'] as List<dynamic>?)
-              ?.map((e) => GrnListItemModel.fromJson(e))
-              .toList() ??
-          [],
+      data:
+          json['data'] != null
+              ? GrnListDataModel.fromJson(json['data'] as Map<String, dynamic>)
+              : null,
       exception: json['exception'] ?? [],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'isApiHandled': isApiHandled,
-        'isRequestSuccess': isRequestSuccess,
-        'statusCode': statusCode,
-        'message': message,
-        'data': data.map((e) => e.toJson()).toList(),
-        'exception': exception,
-      };
+    'isApiHandled': isApiHandled,
+    'isRequestSuccess': isRequestSuccess,
+    'statusCode': statusCode,
+    'message': message,
+    'data': data?.toJson(),
+    'exception': exception,
+  };
+}
+
+class GrnListDataModel {
+  final int totalRows;
+  final List<GrnListItemModel> data;
+
+  GrnListDataModel({required this.totalRows, required this.data});
+
+  factory GrnListDataModel.fromJson(Map<String, dynamic> json) {
+    return GrnListDataModel(
+      totalRows: json['totalRows'] ?? 0,
+      data:
+          (json['data'] as List<dynamic>?)
+              ?.map((e) => GrnListItemModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'totalRows': totalRows,
+    'data': data.map((e) => e.toJson()).toList(),
+  };
 }
 
 class GrnListItemModel {
@@ -120,56 +143,55 @@ class GrnListItemModel {
     );
   }
 
-  GrnListItemEntity toEntity() => GrnListItemEntity(
-        warehouseNumber: warehouseNumber,
-        trNumber: trNumber,
-        headerStatus: headerStatus,
-        shipmentType: shipmentType,
-        user: user,
-        createdOn: createdOn,
-        timeOfCreation: timeOfCreation,
-        requirementType: requirementType,
-        requirementNumber: requirementNumber,
-        movementType: movementType,
-        sourceStorageType: sourceStorageType,
-        sourceStorageBin: sourceStorageBin,
-        dynamicSourceBin: dynamicSourceBin,
-        destStorageType: destStorageType,
-        destStorageBin: destStorageBin,
-        dynamicStorageBin: dynamicStorageBin,
-        materialDocument: materialDocument,
-        materialDocYear: materialDocYear,
-        numberOfItems: numberOfItems,
-        reservation: reservation,
-        supplier: supplier,
-        name: name,
-        purchaseOrder: purchaseOrder,
-      );
+  GrnEntity toEntity() => GrnEntity(
+    warehouseNumber: warehouseNumber,
+    trNumber: trNumber,
+    headerStatus: headerStatus,
+    shipmentType: shipmentType,
+    user: user,
+    createdOn: createdOn,
+    timeOfCreation: timeOfCreation,
+    requirementType: requirementType,
+    requirementNumber: requirementNumber,
+    movementType: movementType,
+    sourceStorageType: sourceStorageType,
+    sourceStorageBin: sourceStorageBin,
+    dynamicSourceBin: dynamicSourceBin,
+    destStorageType: destStorageType,
+    destStorageBin: destStorageBin,
+    dynamicStorageBin: dynamicStorageBin,
+    materialDocument: materialDocument,
+    materialDocYear: materialDocYear,
+    numberOfItems: numberOfItems,
+    reservation: reservation,
+    supplier: supplier,
+    name: name,
+    purchaseOrder: purchaseOrder,
+  );
 
   Map<String, dynamic> toJson() => {
-        'warehouseNumber': warehouseNumber,
-        'trNumber': trNumber,
-        'headerStatus': headerStatus,
-        'shipmentType': shipmentType,
-        'user': user,
-        'createdOn': createdOn,
-        'timeOfCreation': timeOfCreation,
-        'requirementType': requirementType,
-        'requirementNumber': requirementNumber,
-        'movementType': movementType,
-        'sourceStorageType': sourceStorageType,
-        'sourceStorageBin': sourceStorageBin,
-        'dynamicSourceBin': dynamicSourceBin,
-        'destStorageType': destStorageType,
-        'destStorageBin': destStorageBin,
-        'dynamicStorageBin': dynamicStorageBin,
-        'materialDocument': materialDocument,
-        'materialDocYear': materialDocYear,
-        'numberOfItems': numberOfItems,
-        'reservation': reservation,
-        'supplier': supplier,
-        'name': name,
-        'purchaseOrder': purchaseOrder,
-      };
+    'warehouseNumber': warehouseNumber,
+    'trNumber': trNumber,
+    'headerStatus': headerStatus,
+    'shipmentType': shipmentType,
+    'user': user,
+    'createdOn': createdOn,
+    'timeOfCreation': timeOfCreation,
+    'requirementType': requirementType,
+    'requirementNumber': requirementNumber,
+    'movementType': movementType,
+    'sourceStorageType': sourceStorageType,
+    'sourceStorageBin': sourceStorageBin,
+    'dynamicSourceBin': dynamicSourceBin,
+    'destStorageType': destStorageType,
+    'destStorageBin': destStorageBin,
+    'dynamicStorageBin': dynamicStorageBin,
+    'materialDocument': materialDocument,
+    'materialDocYear': materialDocYear,
+    'numberOfItems': numberOfItems,
+    'reservation': reservation,
+    'supplier': supplier,
+    'name': name,
+    'purchaseOrder': purchaseOrder,
+  };
 }
-

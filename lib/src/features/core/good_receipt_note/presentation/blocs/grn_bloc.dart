@@ -1,19 +1,23 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_list_item_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_list_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_list_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_items_usecase.dart';
 
 part 'grn_event.dart';
 part 'grn_state.dart';
 
 class GrnBloc extends Bloc<GrnEvent, GrnState> {
   final GetGrnListUseCase getGrnListUseCase;
+  final GetGrnItemsUseCase getGrnItemsUseCase;
 
-  GrnBloc({
-    required this.getGrnListUseCase,
-  }) : super(GrnInitial()) {
+  GrnBloc({required this.getGrnListUseCase, required this.getGrnItemsUseCase})
+    : super(GrnInitial()) {
     on<LoadPendingGrnEvent>(_onLoadPendingGrn);
+    on<LoadGrnItemsEvent>(_onLoadGrnItems);
   }
 
   Future<void> _onLoadPendingGrn(
@@ -21,14 +25,14 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
     Emitter<GrnState> emit,
   ) async {
     if (event.refresh) {
-      // Refresh: reset to page 1
+      // Refresh: reset skipRecords to 0
       emit(PendingGrnLoading());
 
       final params = GrnListParams(
         plant: event.params.plant,
         location: event.params.location,
-        pageSize: event.params.pageSize,
-        pageNumber: 1,
+        lastCount: event.params.lastCount,
+        skipRecords: 0,
         keyword: event.params.keyword,
       );
 
@@ -38,12 +42,12 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         (failure) {
           emit(PendingGrnFailure(message: failure.message));
         },
-        (items) {
+        (result) {
           emit(
             PendingGrnSuccess(
-              items: items,
-              currentPage: 1,
-              hasMore: items.length >= event.params.pageSize,
+              items: result.items,
+              totalRows: result.totalRows,
+              skipRecords: result.items.length,
             ),
           );
         },
@@ -57,18 +61,18 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
       emit(
         PendingGrnSuccess(
           items: currentState.items,
-          currentPage: currentState.currentPage,
-          hasMore: currentState.hasMore,
+          totalRows: currentState.totalRows,
+          skipRecords: currentState.skipRecords,
           isLoadingMore: true,
         ),
       );
 
-      final nextPage = currentState.currentPage + 1;
+      final nextSkipRecords = currentState.skipRecords;
       final params = GrnListParams(
         plant: event.params.plant,
         location: event.params.location,
-        pageSize: event.params.pageSize,
-        pageNumber: nextPage,
+        lastCount: event.params.lastCount,
+        skipRecords: nextSkipRecords,
         keyword: event.params.keyword,
       );
 
@@ -79,20 +83,109 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
           emit(
             PendingGrnSuccess(
               items: currentState.items,
-              currentPage: currentState.currentPage,
-              hasMore: currentState.hasMore,
+              totalRows: currentState.totalRows,
+              skipRecords: currentState.skipRecords,
               isLoadingMore: false,
             ),
           );
           // Could emit failure here, but keeping items visible
         },
-        (newItems) {
-          final updatedItems = [...currentState.items, ...newItems];
+        (newResult) {
+          final updatedItems = [...currentState.items, ...newResult.items];
           emit(
             PendingGrnSuccess(
               items: updatedItems,
-              currentPage: nextPage,
-              hasMore: newItems.length >= event.params.pageSize,
+              totalRows: newResult.totalRows,
+              skipRecords: updatedItems.length,
+              isLoadingMore: false,
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _onLoadGrnItems(
+    LoadGrnItemsEvent event,
+    Emitter<GrnState> emit,
+  ) async {
+    if (event.refresh) {
+      // Always emit loading state first when refreshing
+      emit(GrnItemsLoading());
+
+      final params = GrnItemParams(
+        plant: event.params.plant,
+        location: event.params.location,
+        materialDoc: event.params.materialDoc,
+        materialDocYear: event.params.materialDocYear,
+        lastCount: event.params.lastCount,
+        skipRecords: 0, // Start from beginning
+      );
+
+      final result = await getGrnItemsUseCase(params);
+
+      result.fold(
+        (failure) {
+          emit(GrnItemsFailure(message: failure.message));
+        },
+        (result) {
+          emit(
+            GrnItemsSuccess(
+              items: result.items,
+              totalRows: result.totalRows,
+              skipRecords: result.items.length, // Track how many items we have
+            ),
+          );
+        },
+      );
+    } else {
+      // Load more - pagination logic
+      final currentState = state;
+      if (currentState is! GrnItemsSuccess) return;
+      if (currentState.isLoadingMore || !currentState.hasMore) return;
+
+      // Show loading indicator for pagination
+      emit(
+        GrnItemsSuccess(
+          items: currentState.items,
+          totalRows: currentState.totalRows,
+          skipRecords: currentState.skipRecords,
+          isLoadingMore: true,
+        ),
+      );
+
+      final params = GrnItemParams(
+        plant: event.params.plant,
+        location: event.params.location,
+        materialDoc: event.params.materialDoc,
+        materialDocYear: event.params.materialDocYear,
+        lastCount: event.params.lastCount,
+        skipRecords:
+            currentState.skipRecords, // Continue from where we left off
+      );
+
+      final result = await getGrnItemsUseCase(params);
+
+      result.fold(
+        (failure) {
+          // Revert to previous state on failure
+          emit(
+            GrnItemsSuccess(
+              items: currentState.items,
+              totalRows: currentState.totalRows,
+              skipRecords: currentState.skipRecords,
+              isLoadingMore: false,
+            ),
+          );
+        },
+        (newResult) {
+          // Append new items to existing list
+          final updatedItems = [...currentState.items, ...newResult.items];
+          emit(
+            GrnItemsSuccess(
+              items: updatedItems,
+              totalRows: newResult.totalRows,
+              skipRecords: updatedItems.length, // Update skip count
               isLoadingMore: false,
             ),
           );
@@ -101,4 +194,3 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
     }
   }
 }
-

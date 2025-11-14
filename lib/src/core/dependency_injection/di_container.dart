@@ -107,19 +107,45 @@ void _registerInventoryDependencies() {
 /// ------------------------
 void _registerGrnListDependencies() {
   // Data sources
-  sl.registerLazySingleton<GrnListRemoteDataSource>(
-    () => GrnListRemoteDataSourceImpl(dio: sl()),
+  sl.registerLazySingleton<GrnRemoteDataSource>(
+    () => GrnRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<PutAwayRemoteDataSource>(
+    () => PutAwayRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<BinRemoteDataSource>(
+    () => BinRemoteDataSourceImpl(dio: sl()),
   );
   // Repositories
-  sl.registerLazySingleton<GrnListRepository>(
-    () => GrnListRepositoryImpl(remoteDataSource: sl()),
+  sl.registerLazySingleton<GrnRepository>(
+    () => GrnRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<PutAwayRepository>(
+    () => PutAwayRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<BinRepository>(
+    () => BinRepositoryImpl(remoteDataSource: sl()),
   );
   // Use cases
   sl.registerLazySingleton(() => GetGrnListUseCase(sl()));
+  sl.registerLazySingleton(() => GetGrnItemsUseCase(sl()));
+  sl.registerLazySingleton(() => CreatePutAwayAgainstGrUseCase(sl()));
+  sl.registerLazySingleton(() => GetBinsUseCase(sl()));
   // Blocs
   sl.registerFactory(
     () => GrnBloc(
       getGrnListUseCase: sl(),
+      getGrnItemsUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => PutAwayBloc(
+      createPutAwayUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => BinBloc(
+      getBinsUseCase: sl(),
     ),
   );
 }

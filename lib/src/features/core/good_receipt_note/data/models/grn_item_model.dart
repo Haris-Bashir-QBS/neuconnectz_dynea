@@ -1,0 +1,146 @@
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
+
+class GrnItemResponseModel {
+  final bool isApiHandled;
+  final bool isRequestSuccess;
+  final int statusCode;
+  final String message;
+  final GrnItemDataModel? data;
+  final List<dynamic> exception;
+
+  GrnItemResponseModel({
+    required this.isApiHandled,
+    required this.isRequestSuccess,
+    required this.statusCode,
+    required this.message,
+    this.data,
+    required this.exception,
+  });
+
+  factory GrnItemResponseModel.fromJson(Map<String, dynamic> json) {
+    return GrnItemResponseModel(
+      isApiHandled: json['isApiHandled'] ?? false,
+      isRequestSuccess: json['isRequestSuccess'] ?? false,
+      statusCode: json['statusCode'] ?? 0,
+      message: json['message'] ?? '',
+      data: json['data'] != null && json['data'] is Map<String, dynamic>
+          ? GrnItemDataModel.fromJson(json['data'] as Map<String, dynamic>)
+          : null,
+      exception: json['exception'] ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'isApiHandled': isApiHandled,
+    'isRequestSuccess': isRequestSuccess,
+    'statusCode': statusCode,
+    'message': message,
+    'data': data?.toJson(),
+    'exception': exception,
+  };
+}
+
+class GrnItemDataModel {
+  final int totalRows;
+  final List<GrnItemModel> data;
+
+  GrnItemDataModel({required this.totalRows, required this.data});
+
+  factory GrnItemDataModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return GrnItemDataModel(
+        totalRows: json['totalRecords'] ?? json['totalRows'] ?? 0,
+        data: json['data'] != null && json['data'] is List<dynamic>
+            ? (json['data'] as List<dynamic>)
+                .map((e) => GrnItemModel.fromJson(e as Map<String, dynamic>))
+                .toList()
+            : [],
+      );
+    } catch (e) {
+      // Return empty data if parsing fails
+      return GrnItemDataModel(totalRows: 0, data: []);
+    }
+  }
+
+  Map<String, dynamic> toJson() => {
+    'totalRecords': totalRows,
+    'data': data.map((e) => e.toJson()).toList(),
+  };
+}
+
+class GrnItemModel {
+  final String materialDocument;
+  final int materialDocYear;
+  final int materialDocItem;
+  final String movementType;
+  final String material;
+  final String materialDescription;
+  final String plant;
+  final String storageLocation;
+  final String batch;
+  final String specialStock;
+  final double quantity;
+  final String baseUOM;
+
+  GrnItemModel({
+    required this.materialDocument,
+    required this.materialDocYear,
+    required this.materialDocItem,
+    required this.movementType,
+    required this.material,
+    required this.materialDescription,
+    required this.plant,
+    required this.storageLocation,
+    required this.batch,
+    required this.specialStock,
+    required this.quantity,
+    required this.baseUOM,
+  });
+
+  factory GrnItemModel.fromJson(Map<String, dynamic> json) {
+    return GrnItemModel(
+      materialDocument: json['materialDocument'] ?? '',
+      materialDocYear: json['materialDocYear'] ?? 0,
+      materialDocItem: json['materialDocItem'] ?? 0,
+      movementType: json['movementType'] ?? '',
+      material: json['material'] ?? '',
+      materialDescription: json['materialDescription'] ?? '',
+      plant: json['plant'] ?? '',
+      storageLocation: json['storageLocation'] ?? '',
+      batch: json['batch'] ?? '',
+      specialStock: json['specialStock'] ?? '',
+      quantity: (json['quantity'] ?? 0).toDouble(),
+      baseUOM: json['baseUOM'] ?? '',
+    );
+  }
+
+  GrnItemEntity toEntity() => GrnItemEntity(
+    materialDocument: materialDocument,
+    materialDocYear: materialDocYear,
+    materialDocItem: materialDocItem,
+    movementType: movementType,
+    material: material,
+    materialDescription: materialDescription,
+    plant: plant,
+    storageLocation: storageLocation,
+    batch: batch,
+    specialStock: specialStock,
+    quantity: quantity,
+    baseUOM: baseUOM,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'materialDocument': materialDocument,
+    'materialDocYear': materialDocYear,
+    'materialDocItem': materialDocItem,
+    'movementType': movementType,
+    'material': material,
+    'materialDescription': materialDescription,
+    'plant': plant,
+    'storageLocation': storageLocation,
+    'batch': batch,
+    'specialStock': specialStock,
+    'quantity': quantity,
+    'baseUOM': baseUOM,
+  };
+}

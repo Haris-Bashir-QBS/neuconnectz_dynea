@@ -1,6 +1,7 @@
 var _auth = "Auth-Dynea-Stg/IAuthFeature";
 var _dashboard = "ZCAPI-Dynea-Stg/IDashboardFeature";
 var _putAway = "ZCAPI-Dynea-Stg/IPutAwayFeature";
+var _binManagement = "ZCAPI-Dynea-Stg/IBinManagementFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -25,7 +26,10 @@ enum ApiEndpoints {
   getDashboardAnalytics,
 
   /// ========================  Put Away =========================
-  listAllGrDocFromSAP;
+  listAllGrDocFromSAP,
+  listAllGrItemsFromSAP,
+  listAllBins,
+  createPutAwayAgainstGr;
 
   String get value {
     switch (this) {
@@ -66,6 +70,12 @@ enum ApiEndpoints {
       /// ======================== Put Away =========================
       case ApiEndpoints.listAllGrDocFromSAP:
         return "$_putAway/ListAllGrDocFromSAP";
+      case ApiEndpoints.listAllGrItemsFromSAP:
+        return "$_putAway/ListAllItemsOfGrFromSAP";
+      case ApiEndpoints.listAllBins:
+        return "$_binManagement/ListAllBinsByWarehouseAndStorageType";
+      case ApiEndpoints.createPutAwayAgainstGr:
+        return "$_putAway/CreatePutAwayAgainstGr";
     }
   }
 }

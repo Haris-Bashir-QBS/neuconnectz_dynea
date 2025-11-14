@@ -2,30 +2,36 @@ import 'package:neuconnectz_dynea/src/core/errors/api_exceptions.dart';
 import 'package:neuconnectz_dynea/src/core/network/client/dio_client.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/api_endpoints.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/error_handler.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/data/models/grn_item_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/data/models/grn_list_model.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_list_params.dart';
 
-abstract class GrnListRemoteDataSource {
+abstract class GrnRemoteDataSource {
   Future<GrnListResponseModel> listAllGrDocFromSAP({
     required GrnListParams params,
   });
+
+  Future<GrnItemResponseModel> listAllGrItemsFromSAP({
+    required GrnItemParams params,
+  });
 }
 
-class GrnListRemoteDataSourceImpl implements GrnListRemoteDataSource {
+class GrnRemoteDataSourceImpl implements GrnRemoteDataSource {
   final DioClient dio;
 
-  GrnListRemoteDataSourceImpl({required this.dio});
+  GrnRemoteDataSourceImpl({required this.dio});
 
   @override
   Future<GrnListResponseModel> listAllGrDocFromSAP({
     required GrnListParams params,
-  }) {
+  }) async {
     return ApiErrorHandler.executeGuarded(() async {
       final queryParams = {
         'plant': params.plant,
         'location': params.location,
-        'pageSize': params.pageSize,
-        'pageNumber': params.pageNumber,
+        'lastCount': params.lastCount,
+        'skipRecords': params.skipRecords,
         if (params.keyword != null && params.keyword!.isNotEmpty)
           'keyword': params.keyword,
       };
@@ -35,6 +41,28 @@ class GrnListRemoteDataSourceImpl implements GrnListRemoteDataSource {
         queryParams: queryParams,
       );
       return GrnListResponseModel.fromJson(response.data ?? {});
+    });
+  }
+
+  @override
+  Future<GrnItemResponseModel> listAllGrItemsFromSAP({
+    required GrnItemParams params,
+  }) async {
+    return ApiErrorHandler.executeGuarded(() async {
+      final queryParams = {
+        'plant': params.plant,
+        'location': params.location,
+        'materialdoc': params.materialDoc,
+        'year': params.materialDocYear,
+        'lastCount': params.lastCount,
+        'skipRecords': params.skipRecords,
+      };
+
+      final response = await dio.get(
+        endpoint: ApiEndpoints.listAllGrItemsFromSAP.value,
+        queryParams: queryParams,
+      );
+      return GrnItemResponseModel.fromJson(response.data ?? {});
     });
   }
 }

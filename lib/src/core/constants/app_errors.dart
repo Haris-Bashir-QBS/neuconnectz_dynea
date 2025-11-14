@@ -13,4 +13,6 @@ final class AppErrors {
   static const String sessionExpired = "Session Expired";
   static const String pleaseLoginAgain = "Please log in again.";
   static const String noSecretKeyFound = "No Secret Key Found.Regenerate Key.";
+  static const String barcodeRequired = "Barcode is required";
+  static const String noItemsFound = "No items found";
 }

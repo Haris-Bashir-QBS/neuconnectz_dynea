@@ -12,13 +12,15 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentati
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
+import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
+import 'package:go_router/go_router.dart';
 
-class GrnListWidget extends StatefulWidget {
+class GrnListingPage extends StatefulWidget {
   final PlantEntity selectedPlant;
   final WarehouseEntity selectedWarehouse;
   final ScrollController? scrollController;
 
-  const GrnListWidget({
+  const GrnListingPage({
     super.key,
     required this.selectedPlant,
     required this.selectedWarehouse,
@@ -26,10 +28,10 @@ class GrnListWidget extends StatefulWidget {
   });
 
   @override
-  State<GrnListWidget> createState() => _GrnListWidgetState();
+  State<GrnListingPage> createState() => _GrnListingPageState();
 }
 
-class _GrnListWidgetState extends State<GrnListWidget> {
+class _GrnListingPageState extends State<GrnListingPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
   int _selectedTab = 0; // 0 = Pending, 1 = Complete
@@ -78,8 +80,8 @@ class _GrnListWidgetState extends State<GrnListWidget> {
     final params = GrnListParams(
       plant: widget.selectedPlant.code,
       location: widget.selectedWarehouse.storageLocationCode ?? '',
-      pageSize: 10,
-      pageNumber: 1,
+      lastCount: 4,
+      skipRecords: 0,
       keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
     );
     context.read<GrnBloc>().add(
@@ -93,15 +95,15 @@ class _GrnListWidgetState extends State<GrnListWidget> {
     if (widget.scrollController!.position.pixels ==
         widget.scrollController!.position.maxScrollExtent) {
       final state = context.read<GrnBloc>().state;
-      if (state is PendingGrnSuccess && 
-          state.hasMore && 
-          !state.isLoadingMore && 
+      if (state is PendingGrnSuccess &&
+          state.hasMore &&
+          !state.isLoadingMore &&
           _selectedTab == 0) {
         final params = GrnListParams(
           plant: widget.selectedPlant.code,
           location: widget.selectedWarehouse.storageLocationCode ?? '',
-          pageSize: 10,
-          pageNumber: state.currentPage + 1,
+          lastCount: 4,
+          skipRecords: state.skipRecords,
           keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
         );
         context.read<GrnBloc>().add(
@@ -242,9 +244,9 @@ class _GrnListWidgetState extends State<GrnListWidget> {
     return BlocConsumer<GrnBloc, GrnState>(
       listener: (context, state) {
         if (state is PendingGrnFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       builder: (context, state) {
@@ -356,88 +358,102 @@ class _GrnListWidgetState extends State<GrnListWidget> {
     );
   }
 
-  Widget _buildListItem(GrnListItemEntity item) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Icon
-          Container(
-            width: 40.w,
-            height: 40.w,
-            decoration: BoxDecoration(
-              color: AppPalette.primaryColor,
-              shape: BoxShape.circle,
+  Widget _buildListItem(GrnEntity item) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to GRN items screen
+        context.pushNamed(
+          AppRoutes.grnItems,
+          extra: {
+            'grnItem': item,
+            'plant': widget.selectedPlant.code,
+            'location': widget.selectedWarehouse.storageLocationCode ?? '',
+            'warehouse': widget.selectedWarehouse.code,
+          },
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(Icons.description, color: Colors.white, size: 20.sp),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: CustomText(
-                        text: item.user,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon
+            Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: AppPalette.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.description, color: Colors.white, size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: CustomText(
+                          text: item.user,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    CustomText(
-                      text: item.warehouseNumber,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                // TR Number and Quantity
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(
-                      text: 'TR Number: TR-${item.trNumber}',
-                      fontSize: 12.sp,
-                      color: AppPalette.greyColor,
-                    ),
-                    CustomText(
-                      text: 'Qty: ${item.numberOfItems.formatWithCommas}',
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                // Details
-                _buildDetailRow(
-                  'Created On: ${_formatDate(item.createdOn, item.timeOfCreation)}',
-                ),
-                SizedBox(height: 4.h),
-                _buildDetailRow('Supplier: ${item.name}'),
-                SizedBox(height: 4.h),
-                _buildDetailRow('Material Doc: ${item.materialDocument}'),
-                SizedBox(height: 4.h),
-                _buildDetailRow('Purchase Order: ${item.purchaseOrder}'),
-              ],
+                      CustomText(
+                        text: item.warehouseNumber,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  // TR Number and Quantity
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomText(
+                        text: 'TR Number: TR-${item.trNumber}',
+                        fontSize: 12.sp,
+                        color: AppPalette.greyColor,
+                      ),
+                      CustomText(
+                        text: 'Qty: ${item.numberOfItems.formatWithCommas}',
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  // Details
+                  _buildDetailRow(
+                    'Created On: ${_formatDate(item.createdOn, item.timeOfCreation)}',
+                  ),
+                  SizedBox(height: 4.h),
+                  _buildDetailRow('Supplier: ${item.name}'),
+                  SizedBox(height: 4.h),
+                  _buildDetailRow('Material Doc: ${item.materialDocument}'),
+                  SizedBox(height: 4.h),
+                  _buildDetailRow('Purchase Order: ${item.purchaseOrder}'),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

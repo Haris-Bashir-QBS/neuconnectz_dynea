@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class GrnListItemEntity extends Equatable {
+class GrnEntity extends Equatable {
   final String warehouseNumber;
   final int trNumber;
   final String headerStatus;
@@ -25,7 +25,7 @@ class GrnListItemEntity extends Equatable {
   final String name;
   final String purchaseOrder;
 
-  const GrnListItemEntity({
+  const GrnEntity({
     required this.warehouseNumber,
     required this.trNumber,
     required this.headerStatus,
@@ -53,29 +53,28 @@ class GrnListItemEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        warehouseNumber,
-        trNumber,
-        headerStatus,
-        shipmentType,
-        user,
-        createdOn,
-        timeOfCreation,
-        requirementType,
-        requirementNumber,
-        movementType,
-        sourceStorageType,
-        sourceStorageBin,
-        dynamicSourceBin,
-        destStorageType,
-        destStorageBin,
-        dynamicStorageBin,
-        materialDocument,
-        materialDocYear,
-        numberOfItems,
-        reservation,
-        supplier,
-        name,
-        purchaseOrder,
-      ];
+    warehouseNumber,
+    trNumber,
+    headerStatus,
+    shipmentType,
+    user,
+    createdOn,
+    timeOfCreation,
+    requirementType,
+    requirementNumber,
+    movementType,
+    sourceStorageType,
+    sourceStorageBin,
+    dynamicSourceBin,
+    destStorageType,
+    destStorageBin,
+    dynamicStorageBin,
+    materialDocument,
+    materialDocYear,
+    numberOfItems,
+    reservation,
+    supplier,
+    name,
+    purchaseOrder,
+  ];
 }
-

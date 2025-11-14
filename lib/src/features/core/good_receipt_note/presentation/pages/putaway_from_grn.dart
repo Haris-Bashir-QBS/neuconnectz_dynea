@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_listing_page.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/params/plant_warehouse_params.dart';
@@ -15,7 +16,6 @@ import 'package:neuconnectz_dynea/src/widgets/scanner_and_auto_scan_toggle_widge
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import '../../../../../widgets/custom_toast.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_widget.dart';
 
 class PutAwayFromGrn extends StatefulWidget {
   const PutAwayFromGrn({super.key});
@@ -184,7 +184,7 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
 
     return BlocProvider(
       create: (context) => sl<GrnBloc>(),
-      child: GrnListWidget(
+      child: GrnListingPage(
         selectedPlant: _selectedPlant!,
         selectedWarehouse: _selectedWarehouse!,
         scrollController: _scrollController,

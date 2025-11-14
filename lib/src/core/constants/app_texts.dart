@@ -150,4 +150,11 @@ final class AppTexts {
   static const String inboundDelivery = "Inbound Delivery";
   static const String reservation = "Reservation";
   static const String stockTransferOrder = "Stock Transfer Order";
+  static const String tapToProcess = "Tap to process";
+  static const String addToList = "Add to List";
+  static const String barcode = "Barcode";
+  static const String barcodeRequired = "Barcode Required";
+  static const String scanAndType = "Scan/Type";
+  static const String typeHere = "Type Here";
+  static const String binCode = "Bin Code";
 }

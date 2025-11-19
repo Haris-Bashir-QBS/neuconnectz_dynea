@@ -15,19 +15,17 @@ class PlantQueryParams extends Equatable {
 
 class WarehouseQueryParams extends Equatable {
   final String? userId;
-  final String? plantId;
+  final String? plantCode;
 
-  const WarehouseQueryParams({this.userId, this.plantId});
+  const WarehouseQueryParams({this.userId, this.plantCode});
 
   WarehouseQueryParams copyWith({String? userId, String? plantId}) {
     return WarehouseQueryParams(
       userId: userId ?? this.userId,
-      plantId: plantId ?? this.plantId,
+      plantCode: plantId ?? this.plantCode,
     );
   }
 
   @override
-  List<Object?> get props => [userId, plantId];
+  List<Object?> get props => [userId, plantCode];
 }
-
-

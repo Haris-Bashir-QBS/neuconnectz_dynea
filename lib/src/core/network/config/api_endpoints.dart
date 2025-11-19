@@ -2,6 +2,8 @@ var _auth = "Auth-Dynea-Stg/IAuthFeature";
 var _dashboard = "ZCAPI-Dynea-Stg/IDashboardFeature";
 var _putAway = "ZCAPI-Dynea-Stg/IPutAwayFeature";
 var _binManagement = "ZCAPI-Dynea-Stg/IBinManagementFeature";
+var _plant = "ZCAPI-Dynea-Stg/IPlantFeature";
+var _warehouse = "ZCAPI-Dynea-Stg/IWarehouseFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -29,7 +31,11 @@ enum ApiEndpoints {
   listAllGrDocFromSAP,
   listAllGrItemsFromSAP,
   listAllBins,
-  createPutAwayAgainstGr;
+  createPutAwayAgainstGr,
+
+  /// ========================  Plant/Warehouse =========================
+  listAllPlantsAssignedToUser,
+  listAllWarehousesByUserPlants;
 
   String get value {
     switch (this) {
@@ -76,6 +82,12 @@ enum ApiEndpoints {
         return "$_binManagement/ListAllBinsByWarehouseAndStorageType";
       case ApiEndpoints.createPutAwayAgainstGr:
         return "$_putAway/CreatePutAwayAgainstGr";
+
+      /// ======================== Plant/Warehouse =========================
+      case ApiEndpoints.listAllPlantsAssignedToUser:
+        return "$_plant/ListAllPlantsAssignedToUser";
+      case ApiEndpoints.listAllWarehousesByUserPlants:
+        return "$_warehouse/ListAllWarehousesByUserPlants";
     }
   }
 }

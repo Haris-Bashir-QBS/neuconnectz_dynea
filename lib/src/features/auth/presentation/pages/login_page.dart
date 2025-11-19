@@ -125,7 +125,7 @@ class _LoginPageState extends State<LoginPage>
               38.verticalSpace,
               _logoWidget(),
               //50.verticalSpace,
-              SizedBox(height: 0.1.sh),
+              SizedBox(height: 0.06.sh),
               _formWidget(context),
               20.verticalSpace,
             ],

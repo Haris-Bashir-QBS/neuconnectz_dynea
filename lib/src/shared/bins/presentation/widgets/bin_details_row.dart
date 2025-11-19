@@ -10,12 +10,14 @@ import '../../../../widgets/custom_text.dart';
 class BinDetailRow extends StatelessWidget {
   final BinEntity bin;
   final TextEditingController controller;
+  final FocusNode focusNode;
   final VoidCallback onDelete;
 
   const BinDetailRow({
     super.key,
     required this.bin,
     required this.controller,
+    required this.focusNode,
     required this.onDelete,
   });
 
@@ -38,12 +40,16 @@ class BinDetailRow extends StatelessWidget {
         children: [
           Expanded(
             flex: 3,
-            child: CustomText(text: bin.binCode, fontSize: 12.sp),
+            child: CustomText(
+              text: bin.binCode,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           Expanded(
             flex: 2,
             child: Container(
-              height: 40.h,
+              height: 45.h,
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               decoration: BoxDecoration(
                 border: Border.all(color: context.primaryColor, width: 1),
@@ -56,7 +62,8 @@ class BinDetailRow extends StatelessWidget {
                     decimal: true,
                   ),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11.sp, height: 1),
+                  focusNode: focusNode,
+                  style: TextStyle(fontSize: 14.sp, height: 2),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(
                       AppStaticData.quantityFieldMaxLength,

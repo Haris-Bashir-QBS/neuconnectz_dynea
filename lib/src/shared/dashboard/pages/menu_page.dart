@@ -37,12 +37,12 @@ class _MenuPageState extends State<MenuPage> {
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       children: [
-        18.verticalSpace,
+        24.verticalSpace,
         //ManualAppVersionWidget(versionLabel: "Version 5"),
-        _sectionHeading(AppTexts.profile),
-        10.verticalSpace,
-        _userTile(),
-        16.verticalSpace,
+        // _sectionHeading(AppTexts.profile),
+        // 10.verticalSpace,
+        //  _userTile(),
+        //  16.verticalSpace,
         _sectionHeading(AppTexts.modules),
         10.verticalSpace,
         ...AppStaticData.moduleItems.map((module) => _moduleTile(module)),

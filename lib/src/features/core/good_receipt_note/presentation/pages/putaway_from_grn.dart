@@ -33,9 +33,8 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
   @override
   void initState() {
     final bloc = context.read<PlantWarehouseBloc>();
-    bloc
-      ..add(const LoadPlantsEvent())
-      ..add(const LoadWarehousesEvent());
+    bloc.add(const LoadPlantsEvent());
+    //  ..add(const LoadWarehousesEvent());
     super.initState();
   }
 
@@ -60,7 +59,7 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar(title: AppTexts.putAwayFromGr),
+        appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
         body: Stack(
           children: [
             BlocConsumer<PlantWarehouseBloc, WarehouseAndPlantState>(
@@ -104,74 +103,95 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
     final isButtonEnabled =
         _selectedPlant != null && _selectedWarehouse != null;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ScannerAndAutoScanToggleWidget(
-            isScannerConnected: false,
-            isAutoScan: false,
-            onScannerConnectedChanged: (_) {},
-            onAutoScanChanged: (_) {},
-          ),
-          16.verticalSpace,
-          CustomText(
-            text: AppTexts.selectPlantAndWarehouse,
-            fontWeight: FontWeight.w600,
-            fontSize: 16.sp,
-          ),
-          12.verticalSpace,
-          Container(
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<PlantWarehouseBloc>().add(const LoadPlantsEvent());
+        if (_selectedPlant != null) {
+          context.read<PlantWarehouseBloc>().add(
+            SelectPlantEvent(
+              params: WarehouseQueryParams(plantCode: _selectedPlant!.code),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomDropdown<PlantEntity>(
-                  hint: AppTexts.selectPlant,
-                  headingText: AppTexts.selectPlant,
-                  items: plants,
-                  selectedValue: _selectedPlant,
-                  displayItem: (p) => p.name,
-                  onChanged: (plant) {
-                    setState(() {
-                      _selectedPlant = plant;
-                      _selectedWarehouse = null;
-                    });
-                    if (plant != null) {
-                      context.read<PlantWarehouseBloc>().add(
-                        SelectPlantEvent(
-                          params: WarehouseQueryParams(plantId: plant.id),
-                        ),
-                      );
-                    }
-                  },
-                ),
-                16.verticalSpace,
-                CustomDropdown<WarehouseEntity>(
-                  hint: AppTexts.selectWarehouse,
-                  headingText: AppTexts.selectWarehouse,
-                  items: warehouses,
-                  selectedValue: _selectedWarehouse,
-                  displayItem: (w) => w.name,
-                  onChanged: (wh) {
-                    setState(() => _selectedWarehouse = wh);
-                  },
-                ),
-              ],
+          );
+        }
+      },
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            10.verticalSpace,
+            ScannerAndAutoScanToggleWidget(
+              isScannerConnected: false,
+              isAutoScan: false,
+              onScannerConnectedChanged: (_) {},
+              onAutoScanChanged: (_) {},
             ),
-          ),
-          64.verticalSpace,
-          CustomButton.bordered(
-            icon: Icons.arrow_forward_rounded,
-            onPressed:
-                isButtonEnabled ? () => setState(() => currentStep = 1) : () {},
-            text: AppTexts.apply,
-          ),
-        ],
+            16.verticalSpace,
+            CustomText(
+              text: AppTexts.selectPlantAndWarehouse,
+              fontWeight: FontWeight.w600,
+              fontSize: 16.sp,
+            ),
+            12.verticalSpace,
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomDropdown<PlantEntity>(
+                    hint: AppTexts.selectPlant,
+                    headingText: AppTexts.selectPlant,
+                    items: plants,
+                    selectedValue: _selectedPlant,
+                    displayItem: (p) => p.name,
+                    onChanged: (plant) {
+                      setState(() {
+                        _selectedPlant = plant;
+                        _selectedWarehouse = null;
+                      });
+                      if (plant != null) {
+                        context.read<PlantWarehouseBloc>().add(
+                          SelectPlantEvent(
+                            params: WarehouseQueryParams(plantCode: plant.code),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  16.verticalSpace,
+                  CustomDropdown<WarehouseEntity>(
+                    hint: AppTexts.selectWarehouse,
+                    headingText: AppTexts.selectWarehouse,
+                    items: warehouses,
+                    selectedValue: _selectedWarehouse,
+                    displayItem: (w) => w.name,
+                    onChanged: (wh) {
+                      setState(() => _selectedWarehouse = wh);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            64.verticalSpace,
+            CustomButton.bordered(
+              icon: Icons.arrow_forward_rounded,
+              onPressed:
+                  isButtonEnabled
+                      ? () => setState(() => currentStep = 1)
+                      : () {
+                        CustomToast.error(
+                          context,
+                          "Please select both Plant and Warehouse to proceed.",
+                        );
+                      },
+              text: AppTexts.apply,
+            ),
+          ],
+        ),
       ),
     );
   }

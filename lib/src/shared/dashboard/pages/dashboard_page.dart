@@ -221,13 +221,13 @@ class _DashboardPageState extends State<DashboardPage> {
       title: AppStaticData.dashboardTitles[_selectedIndex],
       leading: const SizedBox.shrink(),
       actions: [
-        if (_selectedIndex == 0)
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              // _openAddShortcutSheet();
-            },
-          ),
+        // if (_selectedIndex == 0)
+        //   IconButton(
+        //     icon: const Icon(Icons.add),
+        //     onPressed: () {
+        //       // _openAddShortcutSheet();
+        //     },
+        //   ),
       ],
     );
   }

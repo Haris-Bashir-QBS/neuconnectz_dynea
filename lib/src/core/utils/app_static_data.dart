@@ -66,21 +66,21 @@ final class AppStaticData {
 
   static final bottomBarTitles = [
     AppTexts.home,
-    AppTexts.po,
-    AppTexts.itr,
+    AppTexts.reservation,
+    AppTexts.grn,
     AppTexts.menu,
   ];
   static final bottomBarIcons = [
     AppAssets.homeNewIcon,
-    AppAssets.productionOrderIcon,
+    AppAssets.purchaseOrderIcon,
     AppAssets.stockTransferOrder,
     AppAssets.menuIcon,
   ];
 
   static final dashboardTitles = [
-    AppTexts.dashboard,
-    AppTexts.productionOrders,
-    AppTexts.itrList,
+    AppTexts.home,
+    AppTexts.reservation,
+    AppTexts.grn,
     AppTexts.menu,
   ];
 
@@ -90,57 +90,52 @@ final class AppStaticData {
       iconPath: AppAssets.purchaseOrderIcon,
       subItems: [
         SubModuleItem(
-          title: AppTexts.purchaseOrder,
-          subtitle: "Create Put-away from Purchase Order",
+          title: AppTexts.goodReceiptNote,
+          subtitle: "Manage & create putaway against good receipt note",
           iconPath: AppAssets.menuItIcon,
         ),
-        // SubModuleItem(
-        //   title: AppTexts.inboundDelivery,
-        //   subtitle: "Create Putaway from Inbound Delivery",
-        //   iconPath: AppAssets.menuItIcon,
-        // ),
-        // SubModuleItem(
-        //   title: AppTexts.reservation,
-        //   subtitle: "Create Putaway from Reservation",
-        //   iconPath: AppAssets.menuItIcon,
-        // ),
-        // SubModuleItem(
-        //   title: AppTexts.stockTransferOrder,
-        //   subtitle: "Create Putaway from Stock Transfer Order",
-        //   iconPath: AppAssets.menuItIcon,
-        // ),
+        SubModuleItem(
+          title: "Inbound Delivery",
+          subtitle: "Manage & create putaway against inbound delivery",
+          iconPath: AppAssets.menuItIcon,
+        ),
       ],
       onTap: null,
       onItemTap: (context, item) {
-        if (item == AppTexts.purchaseOrder) {
+        if (item == AppTexts.goodReceiptNote) {
           context.pushNamed(AppRoutes.putAwayFromGr);
         }
       },
     ),
-    // ModuleItem(
-    //   title: "${AppTexts.sales} & ${AppTexts.delivery}",
-    //   iconPath: AppAssets.purchaseOrderIcon,
-    //   subItems: [
-    //     SubModuleItem(
-    //       title: AppTexts.salesOrder,
-    //       subtitle: AppTexts.manageAndCreateSalesOrders,
-    //       iconPath: AppAssets.menuItIcon,
-    //     ),
-    //     SubModuleItem(
-    //       title: AppTexts.delivery,
-    //       subtitle: AppTexts.manageGrns,
-    //       iconPath: AppAssets.menuItrIcon,
-    //     ),
-    //   ],
-    //   onTap: null,
-    //   onItemTap: (context, item) {
-    //     if (item == AppTexts.salesOrder) {
-    //       context.pushNamed(AppRoutes.salesOrderListing);
-    //     } else if (item == AppTexts.delivery) {
-    //       context.pushNamed(AppRoutes.deliveryOrderListing);
-    //     }
-    //   },
-    // ),
+    ModuleItem(
+      title: AppTexts.picking,
+      iconPath: AppAssets.purchaseOrderIcon,
+      subItems: [
+        SubModuleItem(
+          title: AppTexts.reservation,
+          subtitle: "Manage & create picking against reservation",
+          iconPath: AppAssets.menuItIcon,
+        ),
+        SubModuleItem(
+          title: "Outbound Delivery (STO)",
+          subtitle: "Manage & create picking against STO",
+          iconPath: AppAssets.menuItrIcon,
+        ),
+        SubModuleItem(
+          title: "Outbound Delivery (Sales)",
+          subtitle: "Manage & create picking against sales",
+          iconPath: AppAssets.menuItrIcon,
+        ),
+      ],
+      onTap: null,
+      onItemTap: (context, item) {
+        // if (item == AppTexts.salesOrder) {
+        //   context.pushNamed(AppRoutes.salesOrderListing);
+        // } else if (item == AppTexts.delivery) {
+        //   context.pushNamed(AppRoutes.deliveryOrderListing);
+        // }
+      },
+    ),
     // ModuleItem(
     //   //  title: AppTexts.stockMovement,
     //   title: AppTexts.inventoryMovement,
@@ -224,16 +219,26 @@ final class AppStaticData {
     //     }
     //   },
     // ),
-    // ModuleItem(
-    //   title: AppTexts.physicalStockCheck,
-    //   iconPath: AppAssets.stockCheckIcon,
-    //   onTap: (context) {
-    //     context.pushNamed(AppRoutes.physicalStockCheck);
-    //   },
-    //   onItemTap: (context, item) {
-    //     context.pushNamed(AppRoutes.physicalStockCheck);
-    //   },
-    // ),
+    ModuleItem(
+      title: "Bin to Bin",
+      iconPath: AppAssets.binToBinIcon,
+      onTap: (context) {
+        //context.pushNamed(AppRoutes.physicalStockCheck);
+      },
+      onItemTap: (context, item) {
+        // context.pushNamed(AppRoutes.physicalStockCheck);
+      },
+    ),
+    ModuleItem(
+      title: AppTexts.physicalStockCheck,
+      iconPath: AppAssets.stockCheckIcon,
+      onTap: (context) {
+        //context.pushNamed(AppRoutes.physicalStockCheck);
+      },
+      onItemTap: (context, item) {
+        // context.pushNamed(AppRoutes.physicalStockCheck);
+      },
+    ),
   ];
 
   // static final List<StatCardData> statCardRows = [

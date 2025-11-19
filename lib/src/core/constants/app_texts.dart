@@ -1,6 +1,6 @@
 final class AppTexts {
   AppTexts._();
-  static const String appTitle = "New-Connect";
+  static const String appTitle = "NeuConnectz";
   static const String forgetPassword = "Forgot Password";
   static const String signUpTitle = "Sign up";
   static const String actualQty = "Actual Qty";
@@ -131,6 +131,8 @@ final class AppTexts {
   static const String itrList = "Inventory Transfer Request List";
   static const String menu = "Menu";
   static const String po = "PO";
+  static const String reservation = "Reservation";
+  static const String grn = "GRN";
   static const String itr = "ITR";
   static const String home = "Home";
   static const String GR = "GR";
@@ -140,15 +142,14 @@ final class AppTexts {
   static const String selectWarehouse = "Select Warehouse";
   static const String items = "Items";
   static const String search = "Search";
-  static const String putAwayFromGr = "Put Away from GR";
-  static const String putAway = "Put Away";
+  static const String putAwayAgainstGrn = "Put Away Against GRN";
+  static const String putAway = "Putaway";
   static const String proceed = "Proceed";
   static const String apply = "Apply";
   static const String selectPlantAndWarehouse = 'Select Plant & Warehouse';
   static const String selectPlant = 'Select Plant';
   static const String purchaseOrder = "Purchase Order";
   static const String inboundDelivery = "Inbound Delivery";
-  static const String reservation = "Reservation";
   static const String stockTransferOrder = "Stock Transfer Order";
   static const String tapToProcess = "Tap to process";
   static const String addToList = "Add to List";
@@ -157,4 +158,18 @@ final class AppTexts {
   static const String scanAndType = "Scan/Type";
   static const String typeHere = "Type Here";
   static const String binCode = "Bin Code";
+  static const String goodReceiptNote = "Good Receipt Note";
+  static const String itemName = "Item Name";
+  static const String itemCode = "Item Code";
+  static const String supplierName = "Supplier Name";
+  static const String poNumber = "PO Number";
+  static const String welcome = "Welcome!";
+  static const String connected = "Connected";
+  static const String disconnected = "Disconnected";
+  static const String picking = "Picking";
+  static const String physicalStockCheck = "Physical Stock Check";
+  static const String outboundDeliverySto = "Outbound Delivery STO";
+  static const String outboundDeliverySales = "Outbound Delivery (Sales)";
+  static const String checkStock = "Check Stock";
+  static const String checkingConnection = "Checking connection...";
 }

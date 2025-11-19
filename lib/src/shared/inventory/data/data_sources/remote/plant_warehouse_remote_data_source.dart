@@ -1,5 +1,6 @@
 import 'package:neuconnectz_dynea/src/core/errors/api_exceptions.dart';
 import 'package:neuconnectz_dynea/src/core/network/client/dio_client.dart';
+import 'package:neuconnectz_dynea/src/core/network/config/api_endpoints.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/error_handler.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/data/models/plant_model.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/data/models/warehouse_model.dart';
@@ -30,8 +31,7 @@ class PlantWarehouseRemoteDataSourceImpl
         throw UnknownException(message: 'User id is required to fetch plants.');
       }
       final response = await dio.get(
-        endpoint:
-            'ZCAPI-Dynea-Stg/IPlantFeature/ListAllPlantsAssignedToUser',
+        endpoint: ApiEndpoints.listAllPlantsAssignedToUser.value,
         queryParams: {'userId': userId},
       );
       final List<dynamic> items = (response.data?['data']?['data']) ?? [];
@@ -51,11 +51,11 @@ class PlantWarehouseRemoteDataSourceImpl
         );
       }
       final response = await dio.get(
-        endpoint:
-            'ZCAPI-Dynea-Stg/IWarehouseFeature/ListAllWarehousesByUserPlants',
+        endpoint: ApiEndpoints.listAllWarehousesByUserPlants.value,
         queryParams: {
           'userId': userId,
-          if ((params.plantId ?? '').isNotEmpty) 'plantId': params.plantId,
+          if ((params.plantCode ?? '').isNotEmpty)
+            'plantCode': params.plantCode,
         },
       );
       final List<dynamic> items = (response.data?['data']?['data']) ?? [];
@@ -63,4 +63,3 @@ class PlantWarehouseRemoteDataSourceImpl
     });
   }
 }
-

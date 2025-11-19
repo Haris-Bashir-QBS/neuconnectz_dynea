@@ -1,441 +1,398 @@
-// import 'dart:math' as math;
-//
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:logger/logger.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:neuconnectz_dynea/src/core/enums/component_type.dart';
-// import 'package:neuconnectz_dynea/src/core/models/dashboard_component_model.dart';
-// import 'package:neuconnectz_dynea/src/core/services/session_service.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/domain/entities/dashboard_analytics_entity.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/blocs/home_bloc.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/add_shortcut_bottom_sheet.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/dashboard_dynamic_component_widget.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/dashboard_error_widget.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/empty_dashboard_shortcuts_widget.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/purchase_order_carousel.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/stock_slider_widget.dart';
-// import 'package:neuconnectz_dynea/src/features/core/home/presentation/widgets/stock_transfer_order_widget.dart';
-//
-// import '../../../../../core/utils/utils.dart';
-// import '../widgets/home_dashboard_shimmer.dart';
-//
-// class HomePage extends StatefulWidget {
-//   const HomePage({super.key});
-//
-//   @override
-//   State<HomePage> createState() => _HomePageState();
-// }
-//
-// class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-//   bool _isEditMode = false;
-//   late AnimationController _shakeController;
-//   final Map<ComponentType, AnimationController> _shakeControllers = {};
-//   List<String>? _optimisticStockTransferOrder;
-//   final Map<String, List<String>> _optimisticSubItemLists = {};
-//   final List<ComponentType> _optimisticRemovedComponents = [];
-//   List<String>? _optimisticComponentOrder;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _shakeController = AnimationController(
-//       duration: const Duration(milliseconds: 500),
-//       vsync: this,
-//     );
-//     _loadComponentOrder();
-//     _fetchDashboardAnalyticsEvent();
-//   }
-//
-//   Future<void> _saveComponentOrder(List<DashboardComponent> components) async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final order = components.map((c) => c.type.name).toList();
-//     await prefs.setStringList('dashboard_shortcut_order', order);
-//     debugPrint('Saved dashboard_shortcut_order: $order');
-//     Logger().i("Saved dashboard_shortcut_order: $order");
-//   }
-//
-//   Future<void> _loadComponentOrder() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final saved = prefs.getStringList('dashboard_shortcut_order');
-//     if (saved != null && mounted) {
-//       setState(() {
-//         _optimisticComponentOrder = saved;
-//       });
-//     }
-//   }
-//
-//   void _toggleEditMode() {
-//     setState(() {
-//       _isEditMode = !_isEditMode;
-//       if (_isEditMode) {
-//         _shakeController.repeat(reverse: true);
-//       } else {
-//         _shakeController.stop();
-//         for (var controller in _shakeControllers.values) {
-//           controller.stop();
-//         }
-//       }
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<DashboardAnalyticsBloc, HomeState>(
-//       builder: (context, state) {
-//         if (state is HomeDashboardWithShortcutsState) {
-//           final dashboardShortcuts = state.dashboardShortcuts;
-//           return _buildDashboard(state.data, dashboardShortcuts);
-//         } else if (state is DashboardShortcutsLoadedState) {
-//           final dashboardShortcuts = state.dashboardShortcuts;
-//           return _buildDashboard(null, dashboardShortcuts);
-//         } else if (state is HomeShimmerState) {
-//           return _sliderWithShimmer();
-//         } else if (state is HomeErrorState) {
-//           return _dashboardErrorWidget(state);
-//         } else if (state is HomeNoDataState) {
-//           return _sliderWithShimmer();
-//         }
-//         return const SizedBox.shrink();
-//       },
-//     );
-//   }
-//
-//   Widget _dashboardErrorWidget(HomeErrorState state) {
-//     return DashboardErrorWidget(
-//       message: state.message,
-//       onRetry: _fetchDashboardAnalyticsEvent,
-//     );
-//   }
-//
-//   Widget _sliderWithShimmer() {
-//     return Padding(
-//       padding: EdgeInsets.symmetric(horizontal: 10.w),
-//       child: Column(
-//         children: [
-//           SizedBox(height: 16.h),
-//           StockSliderWidget(),
-//           Expanded(
-//             child: Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 10.w),
-//               child: HomeDashboardShimmer(),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildDashboard(
-//     DashboardAnalyticsEntity? data,
-//     List<DashboardComponent> dashboardShortcuts,
-//   ) {
-//     final filteredShortcuts =
-//         dashboardShortcuts
-//             .where((c) => !_optimisticRemovedComponents.contains(c.type))
-//             .toList();
-//     // Apply optimistic/saved order if available
-//     final orderedShortcuts = List<DashboardComponent>.from(filteredShortcuts);
-//     final savedOrder = _optimisticComponentOrder;
-//     if (savedOrder != null && savedOrder.isNotEmpty) {
-//       final unknown =
-//           orderedShortcuts
-//               .where((c) => !savedOrder.contains(c.type.name))
-//               .toList();
-//       final known =
-//           orderedShortcuts
-//               .where((c) => savedOrder.contains(c.type.name))
-//               .toList()
-//             ..sort((a, b) {
-//               final aIndex = savedOrder.indexOf(a.type.name);
-//               final bIndex = savedOrder.indexOf(b.type.name);
-//               return aIndex.compareTo(bIndex);
-//             });
-//       orderedShortcuts
-//         ..clear()
-//         ..addAll(unknown)
-//         ..addAll(known);
-//     }
-//     return GestureDetector(
-//       onTap: () {
-//         if (_isEditMode) {
-//           _toggleEditMode();
-//         }
-//       },
-//       child: Padding(
-//         padding: EdgeInsets.symmetric(horizontal: 10.w),
-//         child: Column(
-//           children: [
-//             16.verticalSpace,
-//             StockSliderWidget(),
-//             16.verticalSpace,
-//             if (filteredShortcuts.isEmpty)
-//               Expanded(
-//                 child: EmptyDashboardShortcutsWidget(
-//                   onAddPressed: _openAddShortcutSheet,
-//                 ),
-//               )
-//             else
-//               _componentsList(data, orderedShortcuts),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _componentsList(
-//     DashboardAnalyticsEntity? data,
-//     List<DashboardComponent> dashboardShortcuts,
-//   ) {
-//     return Expanded(
-//       child: ReorderableListView(
-//         padding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 24.h),
-//         onReorder: (oldIndex, newIndex) async {
-//           setState(() {
-//             if (newIndex > oldIndex) {
-//               newIndex -= 1;
-//             }
-//             final item = dashboardShortcuts.removeAt(oldIndex);
-//             dashboardShortcuts.insert(newIndex, item);
-//             _isEditMode = false;
-//             _shakeController.stop();
-//             for (var controller in _shakeControllers.values) {
-//               controller.stop();
-//             }
-//             _optimisticComponentOrder =
-//                 dashboardShortcuts.map((c) => c.type.name).toList();
-//           });
-//           await _saveComponentOrder(dashboardShortcuts);
-//         },
-//         onReorderStart: (index) {
-//           if (!_isEditMode) {
-//             _toggleEditMode();
-//           }
-//         },
-//         children: [
-//           ...dashboardShortcuts.map((component) {
-//             return _component(component, data, dashboardShortcuts);
-//           }),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _component(
-//     DashboardComponent component,
-//     DashboardAnalyticsEntity? data, [
-//     List<DashboardComponent>? dashboardShortcuts,
-//   ]) {
-//     return Material(
-//       key: ValueKey('padding_${component.type.toString()}'),
-//       color: Colors.transparent,
-//       shadowColor: Colors.transparent,
-//       elevation: 0,
-//       borderRadius: BorderRadius.circular(8.r),
-//       child: Stack(
-//         children: [
-//           Padding(
-//             padding: EdgeInsets.only(bottom: 10),
-//             child:
-//                 component.type == ComponentType.stockTransferOrder
-//                     ? AnimatedBuilder(
-//                       animation: _shakeController,
-//                       builder:
-//                           (context, child) => Transform.rotate(
-//                             angle:
-//                                 _isEditMode
-//                                     ? math.sin(
-//                                           _shakeController.value * 2 * math.pi,
-//                                         ) *
-//                                         0.008
-//                                     : 0,
-//                             child: child,
-//                           ),
-//                       child: Builder(
-//                         builder: (context) {
-//                           final visibleSubItems =
-//                               _optimisticStockTransferOrder ??
-//                               component.subItems.map((e) => e.name).toList();
-//                           return StockTransferOrderWidget(
-//                             transferStatisticsEntity: data!.transferStatistics!,
-//                             visibleSubItems: visibleSubItems,
-//                             onReorder: (newOrder) {
-//                               setState(() {
-//                                 _optimisticStockTransferOrder = newOrder;
-//                               });
-//                               BlocProvider.of<DashboardAnalyticsBloc>(
-//                                 context,
-//                               ).add(
-//                                 ReorderStockTransferOrderSubItemsEvent(
-//                                   group: component.type.name,
-//                                   newOrder: newOrder,
-//                                 ),
-//                               );
-//                             },
-//                             onRemoveSubitem: (subitemName) {
-//                               BlocProvider.of<DashboardAnalyticsBloc>(
-//                                 context,
-//                               ).add(
-//                                 RemoveDashboardShortcutEvent(
-//                                   group: component.type.name,
-//                                   subItems: [subitemName],
-//                                 ),
-//                               );
-//                             },
-//                             editMode: _isEditMode,
-//                           );
-//                         },
-//                       ),
-//                     )
-//                     : component.type == ComponentType.purchaseOrder
-//                     ? AnimatedBuilder(
-//                       animation: _shakeController,
-//                       builder:
-//                           (context, child) => Transform.rotate(
-//                             angle:
-//                                 _isEditMode
-//                                     ? math.sin(
-//                                           _shakeController.value * 2 * math.pi,
-//                                         ) *
-//                                         0.008
-//                                     : 0,
-//                             child: child,
-//                           ),
-//                       child: Builder(
-//                         builder: (context) {
-//                           final visibleSubItems =
-//                               _optimisticSubItemLists[component.type.name] ??
-//                               component.subItems.map((e) => e.name).toList();
-//                           return PurchaseOrderCarousel(
-//                             grnStatisticsModel: data!.grnStatistics!,
-//                             visibleSubItems: visibleSubItems,
-//                             onReorder: (newOrder) {
-//                               // Not implemented for this component
-//                             },
-//                             onRemoveSubitem: (subitemName) {
-//                               final currentList =
-//                                   _optimisticSubItemLists[component
-//                                       .type
-//                                       .name] ??
-//                                   component.subItems
-//                                       .map((e) => e.name)
-//                                       .toList();
-//                               final newList = List<String>.from(currentList)
-//                                 ..remove(subitemName);
-//                               setState(() {
-//                                 _optimisticSubItemLists[component.type.name] =
-//                                     newList;
-//                               });
-//                               BlocProvider.of<DashboardAnalyticsBloc>(
-//                                 context,
-//                               ).add(
-//                                 RemoveDashboardShortcutEvent(
-//                                   group: component.type.name,
-//                                   subItems: [subitemName],
-//                                 ),
-//                               );
-//                             },
-//                           );
-//                         },
-//                       ),
-//                     )
-//                     : DashboardDynamicComponentWidget(
-//                       component: component,
-//                       data: data,
-//                       isAnimation: _isEditMode,
-//                       animationController:
-//                           _shakeControllers[component.type] ?? _shakeController,
-//                     ),
-//           ),
-//           if (_isEditMode)
-//             _removeComponentWidget(component, dashboardShortcuts),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _removeComponentWidget(
-//     DashboardComponent component,
-//     List<DashboardComponent>? dashboardShortcuts,
-//   ) {
-//     return Utils.removeComponentWidget(
-//       component: component,
-//       onRemove: () {
-//         _removeDashboardShortcutEvent(component);
-//         if ((dashboardShortcuts?.length ?? 1) <= 1) {
-//           setState(() {
-//             _isEditMode = false;
-//           });
-//         }
-//       },
-//     );
-//   }
-//
-//   void _openAddShortcutSheet() {
-//     showModalBottomSheet(
-//       context: context,
-//       isScrollControlled: true,
-//       useSafeArea: true,
-//       builder: (BuildContext context) {
-//         return AddShortcutBottomSheet();
-//       },
-//     );
-//   }
-//
-//   /// ======================= Events ======================
-//
-//   void _removeDashboardShortcutEvent(DashboardComponent component) {
-//     setState(() {
-//       _optimisticRemovedComponents.add(component.type);
-//     });
-//     context.read<DashboardAnalyticsBloc>().add(
-//       RemoveDashboardShortcutEvent(
-//         group: component.type.name,
-//         subItems:
-//             component.subItems.isEmpty
-//                 ? [component.type.name]
-//                 : component.subItems.map((e) => e.name).toList(),
-//       ),
-//     );
-//   }
-//
-//   void _fetchDashboardAnalyticsEvent() {
-//     final userId = SessionManager.userId;
-//     context.read<DashboardAnalyticsBloc>().add(
-//       LoadDashboardAnalyticsEvent(userId ?? ""),
-//     );
-//   }
-//
-//   @override
-//   void didChangeDependencies() {
-//     super.didChangeDependencies();
-//     final homeState = context.watch<DashboardAnalyticsBloc>().state;
-//     if (homeState is HomeDashboardWithShortcutsState ||
-//         homeState is DashboardShortcutsLoadedState) {
-//       _optimisticStockTransferOrder = null;
-//       _optimisticSubItemLists.clear();
-//       _optimisticRemovedComponents.clear();
-//     }
-//   }
-//
-//   @override
-//   void dispose() {
-//     _shakeController.dispose();
-//     for (var controller in _shakeControllers.values) {
-//       controller.dispose();
-//     }
-//     super.dispose();
-//   }
-// }
+import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
+import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
+import 'package:neuconnectz_dynea/src/core/constants/asset_paths.dart';
+import 'package:neuconnectz_dynea/src/core/services/connectivity_service.dart';
+import 'package:neuconnectz_dynea/src/core/services/session_service.dart';
+import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 
-class HomePage extends StatelessWidget {
+import '../../../../core/router/app_routes.dart';
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool? _isConnected;
+  StreamSubscription<(ConnectivityResult, bool)>? _connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initConnectivityListener();
+  }
+
+  Future<void> _initConnectivityListener() async {
+    final initialStatus = await ConnectivityService.instance.isConnected;
+    if (mounted) {
+      setState(() => _isConnected = initialStatus);
+    }
+    _connectivitySubscription = ConnectivityService
+        .instance
+        .connectionStatusStream
+        .listen((event) {
+          final connected = event.$1 != ConnectivityResult.none;
+          if (mounted) {
+            setState(() => _isConnected = connected);
+          }
+        });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
+  }
+
+  String get _userName =>
+      SessionManager.currentUser?.name ?? AppTexts.welcomeBack;
+  String get _userInitial {
+    final name = SessionManager.currentUser?.name ?? AppTexts.welcomeBack;
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return 'U';
+    return trimmed[0].toUpperCase();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container();
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          10.verticalSpace,
+          HomeWelcomeCard(
+            userName: _userName,
+            userInitial: _userInitial,
+            isConnected: _isConnected,
+          ),
+          24.verticalSpace,
+          const PutawaySection(),
+          16.verticalSpace,
+          const PickingSection(),
+          16.verticalSpace,
+          const PhysicalStockCheckSection(),
+        ],
+      ),
+    );
+  }
+}
+
+class HomeWelcomeCard extends StatelessWidget {
+  const HomeWelcomeCard({
+    super.key,
+    required this.userName,
+    required this.userInitial,
+    required this.isConnected,
+  });
+
+  final String userName;
+  final String userInitial;
+  final bool? isConnected;
+
+  @override
+  Widget build(BuildContext context) {
+    final connectionStatus = isConnected;
+    final isOnline = connectionStatus ?? false;
+    final statusText =
+        connectionStatus == null
+            ? AppTexts.checkingConnection
+            : isOnline
+            ? AppTexts.connected
+            : AppTexts.disconnected;
+    final statusColor =
+        connectionStatus == null
+            ? AppPalette.yellowColor
+            : isOnline
+            ? AppPalette.lightGreenColor
+            : Colors.redAccent;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: AppPalette.whiteColor,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56.w,
+            height: 56.w,
+            decoration: BoxDecoration(
+              color: AppPalette.lightGreyColor,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: CustomText(
+              text: userInitial,
+              fontSize: 22.sp,
+              fontWeight: FontWeight.w600,
+              color: AppPalette.darkGreyColor,
+            ),
+          ),
+          16.horizontalSpace,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  text: AppTexts.welcome,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppPalette.darkGreyColor,
+                ),
+                2.verticalSpace,
+                CustomText(
+                  text: userName,
+                  fontSize: 16.sp,
+                  color: AppPalette.greyColor,
+                  fontWeight: FontWeight.w400,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 10.w,
+            height: 10.w,
+            decoration: BoxDecoration(
+              color: statusColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PutawaySection extends StatelessWidget {
+  const PutawaySection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeSection(
+      title: AppTexts.putAway,
+      actions: [
+        HomeActionCardData(
+          title: AppTexts.goodReceiptNote,
+          iconBackgroundColor: AppPalette.d4Color,
+          iconColor: AppPalette.lightGreenColor,
+          onTap: () {
+            context.pushNamed(AppRoutes.putAwayFromGr);
+          },
+        ),
+        HomeActionCardData(
+          title: AppTexts.inboundDelivery,
+          iconBackgroundColor: AppPalette.d3Color,
+          iconColor: AppPalette.yellowColor,
+          iconPath: AppAssets.pendingIcon,
+        ),
+      ],
+    );
+  }
+}
+
+class PickingSection extends StatelessWidget {
+  const PickingSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeSection(
+      title: AppTexts.picking,
+      actions: [
+        HomeActionCardData(
+          title: AppTexts.reservation,
+          iconBackgroundColor: AppPalette.d5Color,
+          iconColor: AppPalette.primaryColor,
+        ),
+        HomeActionCardData(
+          title: AppTexts.outboundDeliverySto,
+          iconBackgroundColor: AppPalette.d8Color,
+          iconColor: Color(0xFF8E5BF7),
+          iconPath: AppAssets.pendingIcon,
+        ),
+        HomeActionCardData(
+          title: AppTexts.outboundDeliverySales,
+          iconBackgroundColor: AppPalette.d9Color,
+          iconColor: Color(0xFFFF8A65),
+          iconPath: AppAssets.grnAddTwoIcon,
+          spanFullWidth: true,
+        ),
+      ],
+    );
+  }
+}
+
+class PhysicalStockCheckSection extends StatelessWidget {
+  const PhysicalStockCheckSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeSection(
+      title: AppTexts.physicalStockCheck,
+      actions: [
+        HomeActionCardData(
+          title: AppTexts.checkStock,
+          iconBackgroundColor: AppPalette.d2Color,
+          iconColor: Color(0xFF5C6BC0),
+          iconPath: AppAssets.stockCheckIcon,
+          spanFullWidth: true,
+        ),
+      ],
+    );
+  }
+}
+
+class HomeSection extends StatelessWidget {
+  const HomeSection({super.key, required this.title, required this.actions});
+
+  final String title;
+  final List<HomeActionCardData> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: AppPalette.whiteColor,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomText(
+            text: title,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: AppPalette.darkBlueColor,
+          ),
+          12.verticalSpace,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final spacing = 12.w;
+              final halfWidth = (constraints.maxWidth - spacing) / 2;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children:
+                    actions.map((action) {
+                      final itemWidth =
+                          action.spanFullWidth
+                              ? constraints.maxWidth
+                              : halfWidth;
+                      return SizedBox(
+                        width: itemWidth,
+                        child: HomeActionCard(data: action),
+                      );
+                    }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class HomeActionCardData {
+  final String title;
+  final String iconPath;
+  final bool spanFullWidth;
+  final VoidCallback? onTap;
+  final Color? backgroundColor;
+  final Color? iconBackgroundColor;
+  final Color? iconColor;
+
+  const HomeActionCardData({
+    required this.title,
+    this.iconPath = AppAssets.purchaseOrderIcon,
+    this.spanFullWidth = false,
+    this.onTap,
+    this.backgroundColor,
+    this.iconBackgroundColor,
+    this.iconColor,
+  });
+}
+
+class HomeActionCard extends StatelessWidget {
+  const HomeActionCard({super.key, required this.data});
+
+  final HomeActionCardData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: data.onTap,
+        borderRadius: BorderRadius.circular(16.r),
+        child: Ink(
+          padding: EdgeInsets.all(10.w),
+          decoration: BoxDecoration(
+            color: data.backgroundColor ?? AppPalette.scaffoldBackgroundColor,
+            borderRadius: BorderRadius.circular(16.r),
+            // border: Border.all(color: AppPalette.lightGreyColor),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 34.w,
+                height: 34.w,
+                decoration: BoxDecoration(
+                  color: data.iconBackgroundColor ?? AppPalette.primaryColor,
+                  // borderRadius: BorderRadius.circular(16.r),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: EdgeInsets.all(0),
+                  child: Image.asset(
+                    data.iconPath,
+                    width: 20.w,
+                    height: 20.w,
+                    // color: data.iconColor,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              10.verticalSpace,
+              CustomText(
+                text: data.title,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w500,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

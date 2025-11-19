@@ -9,6 +9,7 @@ import '../../../../widgets/custom_text.dart';
 class BinDetailsSection extends StatelessWidget {
   final List<BinEntity> bins;
   final List<TextEditingController> controllers;
+  final List<FocusNode> focusNodes;
   final void Function(int index) onDelete;
 
   const BinDetailsSection({
@@ -16,6 +17,7 @@ class BinDetailsSection extends StatelessWidget {
     required this.bins,
     required this.controllers,
     required this.onDelete,
+    required this.focusNodes,
   });
 
   @override
@@ -68,6 +70,7 @@ class BinDetailsSection extends StatelessWidget {
               child: BinDetailRow(
                 bin: bins[index],
                 controller: controllers[index],
+                focusNode: focusNodes[index],
                 onDelete: () => onDelete(index),
               ),
             ),

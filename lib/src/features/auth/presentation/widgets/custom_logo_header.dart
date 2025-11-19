@@ -13,7 +13,7 @@ class CustomLogoHeader extends StatelessWidget {
       children: [
         _backWidget(context),
         Spacer(flex: 2),
-        SizedBox(height: 56.h, width: 1.sw),
+        // SizedBox(height: 56.h, width: 1.sw),
         // Image.asset(AppAssets.timePressLogo, height: 56.h, width: 210.w),
         Spacer(flex: 3),
       ],

@@ -96,6 +96,7 @@ final class AppAssets {
   static const String stockTransferOrderIcon5 = '$_iconPath/ic_sto5.png';
   static const String clockIcon = '$_iconPath/ic_clock_square.png';
   static const String grnAddIcon = '$_iconPath/ic_grn_add.png';
+  static const String grnAddTwoIcon = '$_iconPath/ic_grn_dashbaord.png';
   static const String sliderCheck = '$_iconPath/ic_slider_check.png';
   static const String viewIcon = '$_iconPath/ic_view_two.png';
 
@@ -128,7 +129,7 @@ final class AppAssets {
   static const String tvIcon = '$_iconPath/ic_tv.png';
   static const String putInIcon = '$_iconPath/ic_putin.png';
   static const String putAwayIcon = '$_iconPath/ic_putaway.png';
-  static const String timePressLogo = '$_iconPath/ic_timepress_logo.png';
+  static const String clientLogo = '$_iconPath/ic_client_logo.png';
 
   static const List<String> purchaseOrderIcons = [
     openProductionOrderIcon,

@@ -15,6 +15,7 @@ import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/putaway_from_grn.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_list_item_entity.dart';
+import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
 import 'package:neuconnectz_dynea/src/widgets/connectivity_overlay.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -49,7 +50,16 @@ List<GoRoute> authRoutes = [
   _forgotPassword(),
   _resetPassword(),
   _changePassword(),
+  _settings(),
 ];
+
+GoRoute _settings() {
+  return GoRoute(
+    path: '/${AppRoutes.settings}',
+    name: AppRoutes.settings,
+    builder: (context, state) => SettingsPage(),
+  );
+}
 
 GoRoute _dashboard() {
   return GoRoute(

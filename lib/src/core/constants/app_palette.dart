@@ -17,13 +17,21 @@ final class AppPalette {
   static const Color hintColor = Color(0xFF909090);
   static const Color primaryGreyColor = Color(0xFFf3f7fa);
   static const Color searchFieldHintColor = Color(0xFF8BA3CB);
-  static const Color d7Color = Color(0xFFFF8A8A);
 
   static const List<Color> stockTransferOrderColors = [
     Color(0xFF789EFF),
-    Color(0xFFD5A5FF),
+    d8Color,
     d7Color,
     Color(0xFFFAD76A),
-    Color(0xFFFFA261),
   ];
+
+  static const Color d1Color = Color(0xFFFA5A7D);
+  static const Color d2Color = Color(0xFF5181FF);
+  static const Color d3Color = Color(0xFFFFBB38);
+  static const Color d4Color = Color(0xFF3CD856);
+  static const Color d5Color = Color(0xFF77BDFF);
+  static const Color d6Color = Color(0xFFFAD76A);
+  static const Color d7Color = Color(0xFFFF8A8A);
+  static const Color d8Color = Color(0xFFD5A5FF);
+  static const Color d9Color = Color(0xFFFFA261);
 }

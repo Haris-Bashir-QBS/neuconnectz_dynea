@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:neuconnectz_dynea/src/core/enums/scan_type.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
-import 'package:neuconnectz_dynea/src/core/utils/app_static_data.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/data/models/create_putaway_request_model.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/entities/bin_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
@@ -53,9 +51,12 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
   final FocusNode _binCodeFocusNode = FocusNode();
   final _binCodeController = TextEditingController();
   final _binSearchController = TextEditingController();
+  final _remainingQuantityController = TextEditingController();
 
-  List<BinEntity> _selectedBins = [];
+  final List<BinEntity> _selectedBins = [];
   final List<TextEditingController> _binQuantityControllers = [];
+  final _binQuantityFocusNodes = <FocusNode>[];
+
   String _binSearchQuery = '';
 
   double get _totalSelectedQuantity => _selectedBins.fold<double>(
@@ -78,17 +79,13 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
   void initState() {
     super.initState();
     _quantityController.text = widget.item?.quantity.toString() ?? '';
-    _quantityFocusNode.addListener(_onQuantityFieldFocus);
+    _updateRemainingQuantity();
   }
 
-  void _onQuantityFieldFocus() {
-    if (_quantityFocusNode.hasFocus) {
-      Future.delayed(Duration(milliseconds: 350), () {
-        if (_scrollController.hasClients) {
-          _scrollController.jumpTo(400);
-        }
-      });
-    }
+  void _updateRemainingQuantity() {
+    final actualQuantity = widget.item?.quantity ?? 0.0;
+    final remaining = actualQuantity - _totalSelectedQuantity;
+    _remainingQuantityController.text = remaining.formatWithCommas;
   }
 
   @override
@@ -230,12 +227,28 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
       focusNode: _binCodeFocusNode,
       readOnly: true,
       onTap: () {
+        // Scroll to top when bin field is tapped
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            0,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
         _showBinSelectionDialog();
       },
       suffixIcon: IconButton(
         icon: Icon(Icons.search),
         color: context.primaryColor,
         onPressed: () {
+          // Scroll to top when search icon is tapped
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              0,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
           _showBinSelectionDialog();
         },
       ),
@@ -298,6 +311,7 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
                   onSelected: (bin) {
                     Navigator.pop(context);
                     _onBinSelected(bin);
+                    _scrollController.jumpTo(700);
                   },
                 );
               },
@@ -316,9 +330,6 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
           baseOffset: controller.text.length,
           extentOffset: controller.text.length,
         );
-        Future.delayed(const Duration(milliseconds: 100), () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        });
       }
       return;
     }
@@ -328,7 +339,20 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
       text:
           newBin.selectedQuantity > 0 ? newBin.selectedQuantity.toString() : '',
     );
+    final quantityFocusNode = FocusNode();
+    _binQuantityFocusNodes.add(quantityFocusNode);
 
+    quantityFocusNode.addListener(() {
+      if (quantityFocusNode.hasFocus) {
+        Future.delayed(Duration(milliseconds: 300), () {
+          if (_scrollController.hasClients) {
+            final index = _selectedBins.indexWhere((b) => b.id == newBin.id);
+            final offset = index * 80.0;
+            _scrollController.jumpTo(700);
+          }
+        });
+      }
+    });
     quantityController.addListener(() {
       _updateBinQuantity(newBin.id, quantityController.text);
     });
@@ -352,6 +376,8 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
         selectedQuantity: quantity,
       );
     });
+
+    _updateRemainingQuantity();
   }
 
   void _removeBin(int index) {
@@ -361,6 +387,7 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
         _selectedBins.removeAt(index);
         _binQuantityControllers.removeAt(index);
       });
+      _updateRemainingQuantity();
     }
   }
 
@@ -368,6 +395,7 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
     return BinDetailsSection(
       bins: _selectedBins,
       controllers: _binQuantityControllers,
+      focusNodes: _binQuantityFocusNodes,
       onDelete: (index) => _removeBin(index),
     );
   }
@@ -570,7 +598,7 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
     );
   }
 
-  Container _quantityDetailsSection() {
+  Widget _quantityDetailsSection() {
     return Container(
       decoration: BoxDecoration(
         color: AppPalette.whiteColor,
@@ -581,6 +609,7 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
         spacing: 10.h,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: CustomTextFormField(
@@ -595,24 +624,10 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
               Expanded(
                 child: CustomTextFormField(
                   label: "Remaining Quantity",
+                  readOnly: true,
+                  controller: _remainingQuantityController,
                   fillColor: AppPalette.lightGreyColor,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(
-                      AppStaticData.quantityFieldMaxLength,
-                    ),
-                    TextInputFormatter.withFunction((oldValue, newValue) {
-                      if (newValue.text.isEmpty) return newValue;
-                      final regex = RegExp(r'^\d*\.?\d{0,3}$');
-                      if (regex.hasMatch(newValue.text)) {
-                        return newValue;
-                      }
-                      return oldValue;
-                    }),
-                  ],
-                  controller: _quantityController,
-                  focusNode: _quantityFocusNode,
-                  validator: _getQuantityError,
+                  enabled: false,
                 ),
               ),
             ],
@@ -646,15 +661,23 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
 
   @override
   void dispose() {
+    _disposeResources();
+    super.dispose();
+  }
+
+  void _disposeResources() {
     _scrollController.dispose();
     _quantityFocusNode.dispose();
     _quantityController.dispose();
     _binCodeController.dispose();
     _binSearchController.dispose();
     _binCodeFocusNode.dispose();
+    _remainingQuantityController.dispose();
     for (var controller in _binQuantityControllers) {
       controller.dispose();
     }
-    super.dispose();
+    for (var node in _binQuantityFocusNodes) {
+      node.dispose();
+    }
   }
 }

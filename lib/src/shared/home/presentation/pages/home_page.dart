@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           10.verticalSpace,
           HomeWelcomeCard(
-            userName: _userName,
+            userName: _userName.capitalize,
             userInitial: _userInitial,
             isConnected: _isConnected,
           ),

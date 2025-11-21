@@ -196,7 +196,7 @@ class PutawaySection extends StatelessWidget {
           iconBackgroundColor: AppPalette.d4Color,
           iconColor: AppPalette.lightGreenColor,
           onTap: () {
-            context.pushNamed(AppRoutes.putAwayFromGr);
+            context.pushNamed(AppRoutes.warehouseAndPlantSelection);
           },
         ),
         HomeActionCardData(

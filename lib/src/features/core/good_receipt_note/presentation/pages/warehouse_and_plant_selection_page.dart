@@ -17,14 +17,16 @@ import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import '../../../../../widgets/custom_toast.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 
-class PutAwayFromGrn extends StatefulWidget {
-  const PutAwayFromGrn({super.key});
+class WarehouseAndPlantSelectionPage extends StatefulWidget {
+  const WarehouseAndPlantSelectionPage({super.key});
 
   @override
-  State<PutAwayFromGrn> createState() => _PutAwayFromGrnState();
+  State<WarehouseAndPlantSelectionPage> createState() =>
+      _WarehouseAndPlantSelectionPageState();
 }
 
-class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
+class _WarehouseAndPlantSelectionPageState
+    extends State<WarehouseAndPlantSelectionPage> {
   int currentStep = 0;
   PlantEntity? _selectedPlant;
   WarehouseEntity? _selectedWarehouse;
@@ -34,7 +36,6 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
   void initState() {
     final bloc = context.read<PlantWarehouseBloc>();
     bloc.add(const LoadPlantsEvent());
-    //  ..add(const LoadWarehousesEvent());
     super.initState();
   }
 
@@ -50,16 +51,15 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        if (currentStep > 0) {
-          setState(() {
-            currentStep--;
-          });
-        } else {
-          Navigator.of(context).pop();
-        }
+        _handleBackNavigation(context);
       },
       child: Scaffold(
-        appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
+        appBar: CustomAppBar(
+          title: AppTexts.putAwayAgainstGrn,
+          onTapLeading: () {
+            _handleBackNavigation(context);
+          },
+        ),
         body: Stack(
           children: [
             BlocConsumer<PlantWarehouseBloc, WarehouseAndPlantState>(
@@ -93,6 +93,16 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
         ),
       ),
     );
+  }
+
+  void _handleBackNavigation(BuildContext context) {
+    if (currentStep > 0) {
+      setState(() {
+        currentStep--;
+      });
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   /// STEP 1: Select Plant and Warehouse
@@ -169,6 +179,8 @@ class _PutAwayFromGrnState extends State<PutAwayFromGrn> {
                     items: warehouses,
                     selectedValue: _selectedWarehouse,
                     displayItem: (w) => w.name,
+                    subtitleBuilder:
+                        (w) => "SLC Code: ${w.storageLocationCode ?? ""}",
                     onChanged: (wh) {
                       setState(() => _selectedWarehouse = wh);
                     },

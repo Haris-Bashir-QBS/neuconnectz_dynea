@@ -16,6 +16,7 @@ class CustomDropdown<T> extends StatelessWidget {
   final bool? showHeading;
   final void Function(T?)? onChanged;
   final String Function(T) displayItem;
+  final String Function(T)? subtitleBuilder;
   final String? Function(T?)? validator;
 
   const CustomDropdown({
@@ -25,6 +26,7 @@ class CustomDropdown<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     required this.displayItem,
+    this.subtitleBuilder,
     this.selectedValue,
     this.headingText,
     this.dropdownKey,
@@ -75,7 +77,29 @@ class CustomDropdown<T> extends StatelessWidget {
                   clearButtonProps: const ClearButtonProps(isVisible: false),
                 ),
 
+                // ----------------------------
+                // POPUP ITEM BUILDER (with subtitle)
+                // ----------------------------
                 popupProps: PopupProps.menu(
+                  itemBuilder: (context, item, isDisabled, isSelected) {
+                    return ListTile(
+                      dense: true,
+                      title: Text(
+                        displayItem(item),
+                        style: TextStyle(fontSize: 14.sp),
+                      ),
+                      subtitle:
+                          subtitleBuilder != null
+                              ? Text(
+                                subtitleBuilder!(item),
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: AppPalette.greyColor,
+                                ),
+                              )
+                              : null,
+                    );
+                  },
                   showSearchBox: (items.isNotEmpty && items.length > 1),
                   scrollbarProps: ScrollbarProps(
                     thumbVisibility: true,
@@ -90,6 +114,32 @@ class CustomDropdown<T> extends StatelessWidget {
                   searchFieldProps: buildTextFieldProps(),
                   containerBuilder: containerBuilder,
                 ),
+
+                // How selected item appears in closed dropdown
+                dropdownBuilder: (context, selectedItem) {
+                  if (selectedItem == null) {
+                    return SizedBox();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayItem(selectedItem),
+                        style: TextStyle(fontSize: 15.sp),
+                      ),
+                      if (subtitleBuilder != null)
+                        Text(
+                          subtitleBuilder!(selectedItem),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: AppPalette.greyColor,
+                          ),
+                        ),
+                    ],
+                  );
+                },
+
                 items: (filter, infiniteScrollProps) => items,
                 itemAsString: displayItem,
                 onChanged: onChanged,
@@ -107,9 +157,6 @@ class CustomDropdown<T> extends StatelessWidget {
                   ).toLowerCase().contains(filter.toLowerCase());
                 },
                 decoratorProps: buildDropDownDecoratorProps(),
-                // dropdownBuilder: (context, _) {
-                // return
-                // }
               ),
             ),
           ],
@@ -127,7 +174,6 @@ class CustomDropdown<T> extends StatelessWidget {
           color: Colors.white,
           border: Border.all(color: AppPalette.lightGreyColor, width: 1.5),
           borderRadius: BorderRadius.all(Radius.circular(radius)),
-          boxShadow: [],
         ),
         child: popupWidget,
       ),
@@ -137,7 +183,6 @@ class CustomDropdown<T> extends StatelessWidget {
   MenuProps buildMenuProps() {
     return MenuProps(
       backgroundColor: Colors.transparent,
-      // shadowColor: Colors.red,
       positionCallback: positionCallBack,
     );
   }

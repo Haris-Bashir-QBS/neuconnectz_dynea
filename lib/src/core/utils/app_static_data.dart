@@ -103,7 +103,7 @@ final class AppStaticData {
       onTap: null,
       onItemTap: (context, item) {
         if (item == AppTexts.goodReceiptNote) {
-          context.pushNamed(AppRoutes.putAwayFromGr);
+          context.pushNamed(AppRoutes.warehouseAndPlantSelection);
         }
       },
     ),

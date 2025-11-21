@@ -13,6 +13,6 @@ class AppRoutes {
   static const String settings = 'settings';
   static const String dashboard = 'dashboard';
   // ============================ PutAway ============================
-  static const putAwayFromGr = 'putAway_from_gr';
+  static const warehouseAndPlantSelection = 'warehouse_and_plant_selection';
   static const grnItems = 'grn_items';
 }

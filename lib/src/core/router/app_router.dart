@@ -11,8 +11,8 @@ import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/login_pag
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/reset_password.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/splash_page.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/verify_otp_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/warehouse_and_plant_selection_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/putaway_from_grn.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_list_item_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
@@ -127,9 +127,9 @@ GoRoute _verifyOtp() {
 
 GoRoute _putAwayFromGr() {
   return GoRoute(
-    path: '/${AppRoutes.putAwayFromGr}',
-    name: AppRoutes.putAwayFromGr,
-    builder: (context, state) => PutAwayFromGrn(),
+    path: '/${AppRoutes.warehouseAndPlantSelection}',
+    name: AppRoutes.warehouseAndPlantSelection,
+    builder: (context, state) => WarehouseAndPlantSelectionPage(),
   );
 }
 

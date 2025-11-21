@@ -1,4 +1,4 @@
-class GrnItemParams {
+class GrnItemQueryParams {
   final String plant;
   final String location;
   final String materialDoc;
@@ -6,7 +6,7 @@ class GrnItemParams {
   final int lastCount;
   final int skipRecords;
 
-  const GrnItemParams({
+  const GrnItemQueryParams({
     required this.plant,
     required this.location,
     required this.materialDoc,

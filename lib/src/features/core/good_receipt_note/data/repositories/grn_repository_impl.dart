@@ -35,10 +35,12 @@ class GrnRepositoryImpl implements GrnRepository {
 
   @override
   Future<Either<Failure, GrnItemResultEntity>> listAllGrItemsFromSAP(
-    GrnItemParams params,
+    GrnItemQueryParams params,
   ) async {
     try {
-      final model = await remoteDataSource.listAllGrItemsFromSAP(params: params);
+      final model = await remoteDataSource.listAllGrItemsFromSAP(
+        params: params,
+      );
       if (model.data == null) {
         return right(const GrnItemResultEntity(items: [], totalRows: 0));
       }
@@ -48,10 +50,7 @@ class GrnRepositoryImpl implements GrnRepository {
               : model.data!.data.map((item) => item.toEntity()).toList();
 
       return right(
-        GrnItemResultEntity(
-          items: items,
-          totalRows: model.data!.totalRows,
-        ),
+        GrnItemResultEntity(items: items, totalRows: model.data!.totalRows),
       );
     } on Failure catch (failure) {
       return left(failure);
@@ -60,4 +59,3 @@ class GrnRepositoryImpl implements GrnRepository {
     }
   }
 }
-

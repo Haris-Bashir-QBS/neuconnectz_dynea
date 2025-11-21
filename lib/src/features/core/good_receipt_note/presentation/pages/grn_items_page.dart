@@ -8,6 +8,7 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/ent
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/putaway_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_widget.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/quanitity_bottom_sheet.dart';
@@ -21,18 +22,9 @@ import '../../../../../core/constants/app_texts.dart';
 import '../../../../../widgets/custom_toast.dart';
 
 class GrnItemsPage extends StatefulWidget {
-  final GrnEntity grn;
-  final String plant;
-  final String warehouseCode;
-  final String location;
+  final GrnItemsPageParams params;
 
-  const GrnItemsPage({
-    super.key,
-    required this.grn,
-    required this.plant,
-    required this.location,
-    required this.warehouseCode,
-  });
+  const GrnItemsPage({super.key, required this.params});
 
   @override
   State<GrnItemsPage> createState() => _GrnItemsPageState();
@@ -63,11 +55,11 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   void _loadInitialData() {
     if (_selectedTab == 1) return;
 
-    final params = GrnItemParams(
-      plant: widget.plant,
-      location: widget.location,
-      materialDoc: widget.grn.materialDocument,
-      materialDocYear: widget.grn.materialDocYear,
+    final params = GrnItemQueryParams(
+      plant: widget.params.plant,
+      location: widget.params.location,
+      materialDoc: widget.params.grn.materialDocument,
+      materialDocYear: widget.params.grn.materialDocYear,
       lastCount: 10,
       skipRecords: 0,
     );
@@ -81,12 +73,12 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
         _scrollController.position.maxScrollExtent) {
       final state = _grnBloc.state;
       if (state is GrnItemsSuccess && state.hasMore && !state.isLoadingMore) {
-        final params = GrnItemParams(
-          plant: widget.plant,
-          location: widget.location,
-          materialDoc: widget.grn.materialDocument,
-          materialDocYear: widget.grn.materialDocYear,
-          lastCount: 4,
+        final params = GrnItemQueryParams(
+          plant: widget.params.plant,
+          location: widget.params.location,
+          materialDoc: widget.params.grn.materialDocument,
+          materialDocYear: widget.params.grn.materialDocYear,
+          lastCount: 10,
           skipRecords: state.skipRecords,
         );
         _grnBloc.add(LoadGrnItemsEvent(params: params, refresh: false));
@@ -106,7 +98,7 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
             create: (_) => sl<PutAwayBloc>(),
             child: GrnQuantityBottomSheet(
               item: item,
-              grn: widget.grn,
+              grn: widget.params.grn,
               showLoader: false,
               onBinsSelected: (bins) {
                 debugPrint(

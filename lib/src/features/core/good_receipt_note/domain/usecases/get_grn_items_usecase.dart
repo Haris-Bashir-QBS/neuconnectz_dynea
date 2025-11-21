@@ -5,16 +5,14 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/ent
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/repositories/grn_repository.dart';
 
-class GetGrnItemsUseCase extends UseCase<GrnItemResultEntity, GrnItemParams> {
+class GetGrnItemsUseCase
+    extends UseCase<GrnItemResultEntity, GrnItemQueryParams> {
   final GrnRepository repository;
 
   GetGrnItemsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, GrnItemResultEntity>> call(
-    GrnItemParams params,
-  ) {
+  Future<Either<Failure, GrnItemResultEntity>> call(GrnItemQueryParams params) {
     return repository.listAllGrItemsFromSAP(params);
   }
 }
-

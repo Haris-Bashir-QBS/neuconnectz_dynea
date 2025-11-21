@@ -113,7 +113,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
       // Always emit loading state first when refreshing
       emit(GrnItemsLoading());
 
-      final params = GrnItemParams(
+      final params = GrnItemQueryParams(
         plant: event.params.plant,
         location: event.params.location,
         materialDoc: event.params.materialDoc,
@@ -154,7 +154,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         ),
       );
 
-      final params = GrnItemParams(
+      final params = GrnItemQueryParams(
         plant: event.params.plant,
         location: event.params.location,
         materialDoc: event.params.materialDoc,

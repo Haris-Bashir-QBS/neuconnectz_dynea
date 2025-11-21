@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_widget.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/item_listing_header_shimmer.dart';
@@ -257,19 +258,7 @@ class _GrnListingPageState extends State<GrnListingPage> {
                       return GrnListItemWidget(
                         item: state.items[index],
                         onTap: () {
-                          context.pushNamed(
-                            AppRoutes.grnItems,
-                            extra: {
-                              'grnItem': state.items[index],
-                              'plant': widget.selectedPlant.code,
-                              'location':
-                                  widget
-                                      .selectedWarehouse
-                                      .storageLocationCode ??
-                                  '',
-                              'warehouse': widget.selectedWarehouse.code,
-                            },
-                          );
+                          _navigateToGrnItemsListingPage(context, state, index);
                         },
                         formattedDate: _formatDate(
                           state.items[index].createdOn,
@@ -286,6 +275,22 @@ class _GrnListingPageState extends State<GrnListingPage> {
 
         return const SizedBox.shrink();
       },
+    );
+  }
+
+  void _navigateToGrnItemsListingPage(
+    BuildContext context,
+    PendingGrnSuccess state,
+    int index,
+  ) {
+    context.pushNamed(
+      AppRoutes.grnItems,
+      extra: GrnItemsPageParams(
+        grn: state.items[index],
+        plant: widget.selectedPlant.code,
+        warehouseCode: widget.selectedWarehouse.code,
+        location: widget.selectedWarehouse.storageLocationCode ?? '',
+      ),
     );
   }
 

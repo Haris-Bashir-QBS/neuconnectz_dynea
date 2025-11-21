@@ -11,7 +11,6 @@ abstract class GrnRepository {
   );
 
   Future<Either<Failure, GrnItemResultEntity>> listAllGrItemsFromSAP(
-    GrnItemParams params,
+    GrnItemQueryParams params,
   );
 }
-

@@ -13,7 +13,7 @@ abstract class GrnRemoteDataSource {
   });
 
   Future<GrnItemResponseModel> listAllGrItemsFromSAP({
-    required GrnItemParams params,
+    required GrnItemQueryParams params,
   });
 }
 
@@ -46,7 +46,7 @@ class GrnRemoteDataSourceImpl implements GrnRemoteDataSource {
 
   @override
   Future<GrnItemResponseModel> listAllGrItemsFromSAP({
-    required GrnItemParams params,
+    required GrnItemQueryParams params,
   }) async {
     return ApiErrorHandler.executeGuarded(() async {
       final queryParams = {
@@ -66,4 +66,3 @@ class GrnRemoteDataSourceImpl implements GrnRemoteDataSource {
     });
   }
 }
-

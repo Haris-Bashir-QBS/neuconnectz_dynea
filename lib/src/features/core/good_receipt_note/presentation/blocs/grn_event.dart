@@ -16,7 +16,7 @@ class LoadPendingGrnEvent extends GrnEvent {
 }
 
 class LoadGrnItemsEvent extends GrnEvent {
-  final GrnItemParams params;
+  final GrnItemQueryParams params;
   final bool refresh;
 
   LoadGrnItemsEvent({required this.params, this.refresh = false});

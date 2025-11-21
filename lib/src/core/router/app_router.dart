@@ -12,6 +12,7 @@ import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/reset_pas
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/splash_page.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/verify_otp_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/warehouse_and_plant_selection_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_list_item_entity.dart';
@@ -138,14 +139,8 @@ GoRoute _grnItems() {
     path: '/${AppRoutes.grnItems}',
     name: AppRoutes.grnItems,
     builder: (context, state) {
-      final args = state.extra as Map<String, dynamic>? ?? {};
-      final grnItem = args['grnItem'] as GrnEntity?;
-      return GrnItemsPage(
-        grn: grnItem!,
-        plant: args['plant'] as String? ?? '',
-        location: args['location'] as String? ?? '',
-        warehouseCode: args['warehouseCode'] as String? ?? '',
-      );
+      final args = state.extra as GrnItemsPageParams;
+      return GrnItemsPage(params: args);
     },
   );
 }

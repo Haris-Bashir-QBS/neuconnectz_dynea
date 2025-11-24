@@ -1,4 +1,3 @@
-// import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/observers/navigator_observer.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
@@ -15,17 +14,13 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentati
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_items_page.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_list_item_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
 import 'package:neuconnectz_dynea/src/widgets/connectivity_overlay.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/${AppRoutes.splash}',
   navigatorKey: SessionManager.navigatorKey,
-  observers: [
-    //ChuckerFlutter.navigatorObserver,
-    UnFocusOnNavigateObserver(),
-  ],
+  observers: [UnFocusOnNavigateObserver()],
   routes: [
     /// ====================== Auth Routes ======================
     ...authRoutes,

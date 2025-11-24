@@ -11,7 +11,11 @@ class PutAwayInitial extends PutAwayState {}
 
 class CreatePutAwayLoading extends PutAwayState {}
 
-class CreatePutAwaySuccess extends PutAwayState {}
+class CreatePutAwaySuccess extends PutAwayState {
+  final ApiResponse<bool> response;
+
+  const CreatePutAwaySuccess({required this.response});
+}
 
 class CreatePutAwayFailure extends PutAwayState {
   final String message;
@@ -21,4 +25,3 @@ class CreatePutAwayFailure extends PutAwayState {
   @override
   List<Object?> get props => [message];
 }
-

@@ -230,6 +230,7 @@ class _GrnListingPageState extends State<GrnListingPage> {
               child: CustomText(
                 text: 'No items found',
                 fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
                 color: AppPalette.greyColor,
               ),
             );

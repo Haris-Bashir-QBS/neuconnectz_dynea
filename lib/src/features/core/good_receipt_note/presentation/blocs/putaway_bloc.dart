@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/data/models/create_putaway_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/create_putaway_against_gr_usecase.dart';
 
@@ -9,8 +10,7 @@ part 'putaway_state.dart';
 class PutAwayBloc extends Bloc<PutAwayEvent, PutAwayState> {
   final CreatePutAwayAgainstGrUseCase createPutAwayUseCase;
 
-  PutAwayBloc({required this.createPutAwayUseCase})
-      : super(PutAwayInitial()) {
+  PutAwayBloc({required this.createPutAwayUseCase}) : super(PutAwayInitial()) {
     on<CreatePutAwayAgainstGrEvent>(_onCreatePutAway);
   }
 
@@ -22,8 +22,8 @@ class PutAwayBloc extends Bloc<PutAwayEvent, PutAwayState> {
     final result = await createPutAwayUseCase(event.request);
     result.fold(
       (failure) => emit(CreatePutAwayFailure(message: failure.message)),
-      (_) => emit(CreatePutAwaySuccess()),
+      (ApiResponse<bool> response) =>
+          emit(CreatePutAwaySuccess(response: response)),
     );
   }
 }
-

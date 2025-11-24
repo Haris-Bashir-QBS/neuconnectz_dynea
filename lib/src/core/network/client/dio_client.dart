@@ -1,10 +1,14 @@
 // import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:alice/model/alice_configuration.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:neuconnectz_dynea/src/core/barrels/auth_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/api_base.dart';
 import 'package:neuconnectz_dynea/src/core/network/interceptors/auth_interceptor.dart';
 import 'package:neuconnectz_dynea/src/core/network/interceptors/connectivity_intereceptor.dart';
 import 'package:neuconnectz_dynea/src/core/network/interceptors/logger_interceptor.dart';
+import 'package:alice/alice.dart';
+import 'package:neuconnectz_dynea/src/core/services/http_inspector_service.dart';
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();
@@ -29,6 +33,7 @@ class DioClient {
       ConnectivityInterceptor(),
       AuthInterceptor(dio: _dio),
       if (kDebugMode) LoggerInterceptor(),
+      HttpInspectorService().aliceDioAdapter,
       // ChuckerDioInterceptor(),
       // chuck.dioInterceptor,
     ]);

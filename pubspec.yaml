@@ -41,7 +41,7 @@ dependencies:
   device_preview: ^1.2.0
   dotted_border: ^2.1.0
   sentry_flutter: ^8.14.2
-#  chucker_flutter: 1.8.2
+  #chucker_flutter: 1.8.5
   toastification: ^3.0.2
   qr: ^3.0.2
   qr_flutter: ^4.1.0
@@ -57,6 +57,8 @@ dependencies:
   shorebird_code_push: ^2.0.4
   flutter_flavorizr: ^2.4.1
   terminate_restart: ^1.0.11
+  alice: ^1.0.0
+  alice_dio: ^1.0.7
   simple_barcode_scanner:
     path: simple_barcode_scanner_0.3.0
 
@@ -65,6 +67,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+
+dependency_overrides:
+  permission_handler: ^12.0.1
+
+
 
 flutter_launcher_icons:
   android: "launcher_icon"

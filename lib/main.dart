@@ -1,4 +1,3 @@
-// import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/observers/app_bloc_observer.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_router.dart';
+import 'package:neuconnectz_dynea/src/core/services/http_inspector_service.dart';
 import 'package:neuconnectz_dynea/src/core/theme/cubits/theme_cubit.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/cubits/user_cubit.dart';
@@ -28,16 +28,12 @@ Future<void> main() async {
     Bloc.observer = AppBlocObserver();
   }
 
-  //ChuckerFlutter.showOnRelease = true;
-  //ChuckerFlutter.showNotification = false;
+  HttpInspectorService().setup();
   await initializeDI();
 
   _runApp();
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarIconBrightness: Brightness.light,
-      //statusBarColor: Colors.white,
-    ),
+    const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
   );
 }
 

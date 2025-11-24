@@ -1,4 +1,3 @@
-// import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_errors.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
+import 'package:neuconnectz_dynea/src/core/services/http_inspector_service.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_circular_progress_indicator.dart';
@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
   GetSecretKeyResponseModel? _secretKeyResponse;
   bool isEnabled = false;
   String _appVersion = '';
-  //bool showChuckerNotification = ChuckerFlutter.showNotification;
+  // bool showChuckerNotification = ChuckerFlutter.showNotification;
 
   @override
   void initState() {
@@ -113,7 +113,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       _changeTheme(context),
                       _changeFontStyle(context),
                       _changePassword(context),
-                      //_checkNetworkLogs(context),
+                      _checkNetworkLogs(context),
                       //_chuckerNotificationToggle(),
                       _twoFactorAuthenticationWidget(state),
                     ],
@@ -189,8 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
       radius: 5,
       text: AppTexts.checkNetworkLogs,
       onPressed: () {
-        //  ChuckerFlutter.showChuckerScreen();
-        //Chuck().showInspector();
+        HttpInspectorService().alice.showInspector();
       },
     );
   }

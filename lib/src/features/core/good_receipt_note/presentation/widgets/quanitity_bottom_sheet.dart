@@ -93,22 +93,9 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
     return BlocConsumer<PutAwayBloc, PutAwayState>(
       listener: (context, state) {
         if (state is CreatePutAwayFailure) {
-          showDialog<void>(
-            context: context,
-            builder:
-                (context) => AlertDialog(
-                  title: const Text('Put Away Failed'),
-                  content: Text(state.message),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ),
-          );
+          CustomToast.error(context, state.message);
         } else if (state is CreatePutAwaySuccess) {
-          CustomToast.success(context, 'Put Away created successfully.');
+          CustomToast.success(context, state.response.message);
           Navigator.of(context).pop(true);
         }
       },

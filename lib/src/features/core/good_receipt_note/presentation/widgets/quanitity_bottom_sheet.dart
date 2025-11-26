@@ -240,6 +240,10 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
       hint: AppTexts.scanAndType,
       controller: _binCodeController,
       focusNode: _binCodeFocusNode,
+      onTap: () {
+        _binSearchController.clear();
+        _showBinSelectionDialog();
+      },
       //readOnly: false,
       //onTap: () {
       // Scroll to top when bin field is tapped
@@ -252,22 +256,22 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
       // }
       //  _showBinSelectionDialog();
       // },
-      suffixIcon: IconButton(
-        icon: Icon(Icons.list),
-        //color: context.primaryColor,
-        onPressed: () {
-          // // Scroll to top when search icon is tapped
-          // if (_scrollController.hasClients) {
-          //   _scrollController.animateTo(
-          //     0,
-          //     duration: Duration(milliseconds: 300),
-          //     curve: Curves.easeOut,
-          //   );
-          // }
-          _binSearchController.clear();
-          _showBinSelectionDialog();
-        },
-      ),
+      // suffixIcon: IconButton(
+      //   icon: Icon(Icons.list),
+      //   //color: context.primaryColor,
+      //   onPressed: () {
+      //     // // Scroll to top when search icon is tapped
+      //     // if (_scrollController.hasClients) {
+      //     //   _scrollController.animateTo(
+      //     //     0,
+      //     //     duration: Duration(milliseconds: 300),
+      //     //     curve: Curves.easeOut,
+      //     //   );
+      //     // }
+      //     _binSearchController.clear();
+      //     _showBinSelectionDialog();
+      //   },
+      // ),
       rightActionWidget: ScanButton(
         onTap: () async {
           await openScanner(scanType: FieldScanType.barcode);

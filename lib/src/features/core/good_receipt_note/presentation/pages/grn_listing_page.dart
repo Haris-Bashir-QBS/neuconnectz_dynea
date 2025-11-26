@@ -220,6 +220,7 @@ class _GrnListingPageState extends State<GrnListingPage> {
                   onRefresh: () async => _loadInitialData(),
                   child: ListView.builder(
                     controller: widget.scrollController,
+                    physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 15.w),
                     itemCount:
                         state.items.length + (state.isLoadingMore ? 1 : 0),

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/movement_type_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/movement_type_bloc.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/params/plant_warehouse_params.dart';
@@ -12,13 +14,19 @@ import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_dropdown.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/inline_linear_loader.dart';
-import 'package:neuconnectz_dynea/src/widgets/scanner_and_auto_scan_toggle_widgets.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import '../../../../../widgets/custom_toast.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 
+enum SelectionFlow { putAwayAgainstGrn, reservationAgainstPicking }
+
 class WarehouseAndPlantSelectionPage extends StatefulWidget {
-  const WarehouseAndPlantSelectionPage({super.key});
+  final SelectionFlow flow;
+
+  const WarehouseAndPlantSelectionPage({
+    super.key,
+    this.flow = SelectionFlow.putAwayAgainstGrn,
+  });
 
   @override
   State<WarehouseAndPlantSelectionPage> createState() =>
@@ -30,6 +38,7 @@ class _WarehouseAndPlantSelectionPageState
   int currentStep = 0;
   PlantEntity? _selectedPlant;
   WarehouseEntity? _selectedWarehouse;
+  MovementTypeEntity? _selectedMovementType;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -47,6 +56,9 @@ class _WarehouseAndPlantSelectionPageState
 
   @override
   Widget build(BuildContext context) {
+    final isReservationFlow =
+        widget.flow == SelectionFlow.reservationAgainstPicking;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -55,7 +67,10 @@ class _WarehouseAndPlantSelectionPageState
       },
       child: Scaffold(
         appBar: CustomAppBar(
-          title: AppTexts.putAwayAgainstGrn,
+          title:
+              isReservationFlow
+                  ? AppTexts.pickingAgainstReservation
+                  : AppTexts.putAwayAgainstGrn,
           onTapLeading: () {
             _handleBackNavigation(context);
           },
@@ -105,13 +120,17 @@ class _WarehouseAndPlantSelectionPageState
     }
   }
 
-  /// STEP 1: Select Plant and Warehouse
+  /// STEP 1: Select Plant, Warehouse and (optionally) Movement Type
   Widget _buildStepOne(BuildContext context, WarehouseAndPlantState state) {
+    final isReservationFlow =
+        widget.flow == SelectionFlow.reservationAgainstPicking;
     final plants = state.plants;
     final warehouses = state.warehouses;
 
     final isButtonEnabled =
-        _selectedPlant != null && _selectedWarehouse != null;
+        _selectedPlant != null &&
+        _selectedWarehouse != null &&
+        (!isReservationFlow || _selectedMovementType != null);
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -138,7 +157,10 @@ class _WarehouseAndPlantSelectionPageState
             // ),
             //16.verticalSpace,
             CustomText(
-              text: AppTexts.selectPlantAndWarehouse,
+              text:
+                  isReservationFlow
+                      ? AppTexts.selectPlantWarehouseAndMovementType
+                      : AppTexts.selectPlantAndWarehouse,
               fontWeight: FontWeight.w600,
               fontSize: 16.sp,
             ),
@@ -185,6 +207,56 @@ class _WarehouseAndPlantSelectionPageState
                       setState(() => _selectedWarehouse = wh);
                     },
                   ),
+                  if (isReservationFlow) ...[
+                    16.verticalSpace,
+                    BlocProvider(
+                      create:
+                          (_) =>
+                              sl<MovementTypeBloc>()
+                                ..add(const LoadMovementTypesEvent()),
+                      child: BlocBuilder<MovementTypeBloc, MovementTypeState>(
+                        builder: (context, mState) {
+                          final isLoading = mState is MovementTypeLoading;
+                          final hasError = mState is MovementTypeFailure;
+                          final items =
+                              mState is MovementTypeSuccess
+                                  ? mState.items
+                                  : <MovementTypeEntity>[];
+
+                          if (hasError) {
+                            CustomToast.error(context, (mState).message);
+                          }
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomDropdown<MovementTypeEntity>(
+                                hint: AppTexts.selectMovementType,
+                                headingText: AppTexts.selectMovementType,
+                                items: items,
+                                selectedValue: _selectedMovementType,
+                                displayItem:
+                                    (m) =>
+                                        "${m.movementType} - ${m.description}",
+                                onChanged:
+                                    isLoading
+                                        ? null
+                                        : (mt) {
+                                          setState(
+                                            () => _selectedMovementType = mt,
+                                          );
+                                        },
+                              ),
+                              if (isLoading) ...[
+                                8.verticalSpace,
+                                const LinearProgressIndicator(),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

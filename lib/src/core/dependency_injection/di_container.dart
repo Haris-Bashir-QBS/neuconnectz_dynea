@@ -30,6 +30,7 @@ Future<void> _initAuthDependencies() async {
   _registerAuthBloc();
   _registerInventoryDependencies();
   _registerGrnListDependencies();
+  _registerReservationDependencies();
 }
 
 void _registerAuthRemoteDatasources() {
@@ -148,6 +149,43 @@ void _registerGrnListDependencies() {
   sl.registerFactory(
     () => BinBloc(
       getBinsUseCase: sl(),
+    ),
+  );
+}
+
+/// ------------------------
+/// RESERVATION DEPENDENCIES
+/// ------------------------
+void _registerReservationDependencies() {
+  // Data sources
+  sl
+    ..registerLazySingleton<ReservationRemoteDataSource>(
+      () => ReservationRemoteDataSourceImpl(dio: sl()),
+    )
+    ..registerLazySingleton<MovementTypeRemoteDataSource>(
+      () => MovementTypeRemoteDataSourceImpl(dio: sl()),
+    );
+
+  // Repositories
+  sl
+    ..registerLazySingleton<ReservationRepository>(
+      () => ReservationRepositoryImpl(remoteDataSource: sl()),
+    )
+    ..registerLazySingleton<MovementTypeRepository>(
+      () => MovementTypeRepositoryImpl(remoteDataSource: sl()),
+    );
+
+  // Use cases
+  sl
+    ..registerLazySingleton(() => GetReservationListUseCase(sl()))
+    ..registerLazySingleton(() => GetReservationItemsUseCase(sl()))
+    ..registerLazySingleton(() => GetCompletedReservationItemsUseCase(sl()))
+    ..registerLazySingleton(() => GetMovementTypesUseCase(sl()));
+
+  // Blocs
+  sl.registerFactory(
+    () => MovementTypeBloc(
+      getMovementTypesUseCase: sl(),
     ),
   );
 }

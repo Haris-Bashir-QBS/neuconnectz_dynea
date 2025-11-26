@@ -34,7 +34,6 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   final ScrollController _pendingScrollController = ScrollController();
   final ScrollController _completedScrollController = ScrollController();
   int _selectedTab = 0;
-  bool _completedLoadedOnce = false;
 
   @override
   void initState() {
@@ -43,7 +42,10 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
     _pendingScrollController.addListener(_onPendingScroll);
     _completedScrollController.addListener(_onCompletedScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadInitialData();
+      if (mounted) {
+        _loadPendingData();
+        _loadCompletedData();
+      }
     });
   }
 
@@ -55,9 +57,7 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
     super.dispose();
   }
 
-  void _loadInitialData() {
-    if (_selectedTab == 1) return;
-
+  void _loadPendingData() {
     final params = GrnItemQueryParams(
       plant: widget.params.plant,
       location: widget.params.location,
@@ -70,19 +70,17 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   }
 
   void _onPendingScroll() {
-    if (_selectedTab == 1) return;
-
     if (_pendingScrollController.position.pixels ==
         _pendingScrollController.position.maxScrollExtent) {
       final state = _grnBloc.state;
-      if (state is GrnItemsSuccess && state.hasMore && !state.isLoadingMore) {
+      if (state.pendingSection.hasMore && !state.pendingSection.isLoadingMore) {
         final params = GrnItemQueryParams(
           plant: widget.params.plant,
           location: widget.params.location,
           materialDoc: widget.params.grn.materialDocument,
           materialDocYear: widget.params.grn.materialDocYear,
           lastCount: 10,
-          skipRecords: state.skipRecords,
+          skipRecords: state.pendingSection.skipRecords,
         );
         _grnBloc.add(LoadGrnItemsEvent(params: params, refresh: false));
       }
@@ -90,8 +88,6 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   }
 
   void _loadCompletedData({bool refresh = true}) {
-    if (_selectedTab == 0) return;
-
     final params = GrnItemQueryParams(
       plant: widget.params.plant,
       location: widget.params.location,
@@ -102,25 +98,21 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
     );
 
     _grnBloc.add(LoadCompletedGrnItemsEvent(params: params, refresh: refresh));
-    _completedLoadedOnce = true;
   }
 
   void _onCompletedScroll() {
-    if (_selectedTab == 0) return;
-
     if (_completedScrollController.position.pixels ==
         _completedScrollController.position.maxScrollExtent) {
       final state = _grnBloc.state;
-      if (state is CompletedGrnItemsSuccess &&
-          state.hasMore &&
-          !state.isLoadingMore) {
+      if (state.completedSection.hasMore &&
+          !state.completedSection.isLoadingMore) {
         final params = GrnItemQueryParams(
           plant: widget.params.plant,
           location: widget.params.location,
           materialDoc: widget.params.grn.materialDocument,
           materialDocYear: widget.params.grn.materialDocYear,
           lastCount: 10,
-          skipRecords: state.skipRecords,
+          skipRecords: state.completedSection.skipRecords,
         );
         _grnBloc.add(
           LoadCompletedGrnItemsEvent(params: params, refresh: false),
@@ -130,7 +122,7 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   }
 
   Future<void> _showQuantityBottomSheet(GrnItemEntity item) async {
-    final shouldRefresh = await showModalBottomSheet<bool>(
+    await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -157,42 +149,64 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
 
     if (!mounted) return;
 
-    if (_selectedTab == 0) {
-      _loadInitialData();
-    } else if (_completedLoadedOnce) {
-      _loadCompletedData();
-    }
+    _loadPendingData();
+    _loadCompletedData();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _grnBloc,
-      child: Scaffold(
-        appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
-        body: Column(
-          children: [
-            //CustomSearchField(controller: TextEditingController()),
-            Row(
-              children: [
-                Expanded(child: _buildTab(0, AppTexts.pending)),
-                Expanded(child: _buildTab(1, AppTexts.completed)),
-              ],
-            ),
-            10.verticalSpace,
-            ItemListingHeader(
-              leftHeading: AppTexts.materialName,
-              rightHeading: AppTexts.quantity,
-            ),
-            SizedBox(height: 8.h),
-            Expanded(
-              child:
-                  _selectedTab == 0
-                      ? _buildPendingList()
-                      : _buildCompleteList(),
-            ),
-            //_markAsCompleteButton(),
-          ],
+      child: BlocListener<GrnBloc, GrnState>(
+        listenWhen: (previous, current) {
+          final pendingChanged =
+              previous.pendingSection.errorMessage !=
+                  current.pendingSection.errorMessage;
+          final completedChanged =
+              previous.completedSection.errorMessage !=
+                  current.completedSection.errorMessage;
+          return pendingChanged || completedChanged;
+        },
+        listener: (context, state) {
+          final pendingError = state.pendingSection.errorMessage;
+          final completedError = state.completedSection.errorMessage;
+          if (pendingError != null && pendingError.isNotEmpty) {
+            CustomToast.error(context, pendingError);
+          } else if (completedError != null && completedError.isNotEmpty) {
+            CustomToast.error(context, completedError);
+          }
+        },
+        child: BlocBuilder<GrnBloc, GrnState>(
+          builder: (context, state) {
+            final pendingSection = state.pendingSection;
+            final completedSection = state.completedSection;
+
+            return Scaffold(
+              appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
+              body: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: _buildTab(0, AppTexts.pending)),
+                      Expanded(child: _buildTab(1, AppTexts.completed)),
+                    ],
+                  ),
+                  10.verticalSpace,
+                  ItemListingHeader(
+                    leftHeading: AppTexts.materialName,
+                    rightHeading: AppTexts.quantity,
+                  ),
+                  SizedBox(height: 8.h),
+                  Expanded(
+                    child:
+                        _selectedTab == 0
+                            ? _buildPendingList(pendingSection)
+                            : _buildCompleteList(completedSection),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -225,161 +239,140 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
     );
   }
 
-  Widget _buildPendingList() {
-    return BlocConsumer<GrnBloc, GrnState>(
-      listener: (context, state) {
-        if (state is GrnItemsFailure) CustomToast.error(context, state.message);
-      },
-      builder: (context, state) {
-        if (state is GrnItemsLoading) {
-          return ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 6,
-            itemBuilder: (_, __) => const GrnItemShimmer(),
-          );
-        }
+  Widget _buildPendingList(GrnItemsSectionState pendingState) {
+    if (pendingState.isLoading && pendingState.items.isEmpty) {
+      return ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        itemCount: 6,
+        itemBuilder: (_, __) => const GrnItemShimmer(),
+      );
+    }
 
-        if (state is GrnItemsFailure) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomText(
-                  text: state.message,
-                  fontSize: 16.sp,
-                  color: AppPalette.greyColor,
-                ),
-                SizedBox(height: 16.h),
-                ElevatedButton(
-                  onPressed: _loadInitialData,
-                  child: const Text('Retry'),
-                ),
-              ],
+    if (pendingState.errorMessage != null && pendingState.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomText(
+              text: pendingState.errorMessage!,
+              fontSize: 16.sp,
+              color: AppPalette.greyColor,
             ),
-          );
-        }
+            SizedBox(height: 16.h),
+            ElevatedButton(
+              onPressed: _loadPendingData,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
 
-        if (state is GrnItemsSuccess) {
-          if (state.items.isEmpty) {
-            return Center(
-              child: CustomText(
-                text: 'No items found',
-                fontSize: 16.sp,
-                color: AppPalette.greyColor,
-              ),
+    if (pendingState.items.isEmpty) {
+      return Center(
+        child: CustomText(
+          text: 'No items found',
+          fontSize: 16.sp,
+          color: AppPalette.greyColor,
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async => _loadPendingData(),
+      child: ListView.builder(
+        controller: _pendingScrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        itemCount:
+            pendingState.items.length + (pendingState.isLoadingMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == pendingState.items.length) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: const Center(child: CircularProgressIndicator()),
             );
           }
-
-          return RefreshIndicator(
-            onRefresh: () async => _loadInitialData(),
-            child: ListView.builder(
-              controller: _pendingScrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == state.items.length)
-                  return const CircularProgressIndicator();
-                return GrnItemWidget(
-                  item: state.items[index],
-                  onTap: () => _showQuantityBottomSheet(state.items[index]),
-                );
-              },
-            ),
+          final item = pendingState.items[index];
+          return GrnItemWidget(
+            item: item,
+            onTap: () => _showQuantityBottomSheet(item),
           );
-        }
-
-        return const Center(child: CircularProgressIndicator());
-      },
+        },
+      ),
     );
   }
 
-  Widget _buildCompleteList() {
-    return BlocConsumer<GrnBloc, GrnState>(
-      listener: (context, state) {
-        if (state is CompletedGrnItemsFailure) {
-          CustomToast.error(context, state.message);
-        }
-      },
-      builder: (context, state) {
-        if (state is CompletedGrnItemsLoading) {
-          return ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 6,
-            itemBuilder: (_, __) => const GrnItemShimmer(),
-          );
-        }
+  Widget _buildCompleteList(GrnItemsSectionState completedState) {
+    if (completedState.isLoading && completedState.items.isEmpty) {
+      return ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        itemCount: 6,
+        itemBuilder: (_, __) => const GrnItemShimmer(),
+      );
+    }
 
-        if (state is CompletedGrnItemsFailure) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomText(
-                  text: state.message,
-                  fontSize: 16.sp,
-                  color: AppPalette.greyColor,
-                ),
-                SizedBox(height: 16.h),
-                ElevatedButton(
-                  onPressed: () => _loadCompletedData(),
-                  child: const Text('Retry'),
-                ),
-              ],
+    if (completedState.errorMessage != null && completedState.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomText(
+              text: completedState.errorMessage!,
+              fontSize: 16.sp,
+              color: AppPalette.greyColor,
             ),
-          );
-        }
+            SizedBox(height: 16.h),
+            ElevatedButton(
+              onPressed: () => _loadCompletedData(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
 
-        if (state is CompletedGrnItemsSuccess) {
-          if (state.items.isEmpty) {
-            return Center(
-              child: CustomText(
-                text: 'No completed items found',
-                fontSize: 16.sp,
-                color: AppPalette.greyColor,
-              ),
+    if (completedState.items.isEmpty) {
+      return Center(
+        child: CustomText(
+          text: 'No completed items found',
+          fontSize: 16.sp,
+          color: AppPalette.greyColor,
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async => _loadCompletedData(),
+      child: ListView.builder(
+        controller: _completedScrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        itemCount:
+            completedState.items.length + (completedState.isLoadingMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == completedState.items.length) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: const Center(child: CircularProgressIndicator()),
             );
           }
-
-          return RefreshIndicator(
-            onRefresh: () async => _loadCompletedData(),
-            child: ListView.builder(
-              controller: _completedScrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == state.items.length)
-                  return CircularProgressIndicator();
-                return GrnItemWidget(
-                  item: state.items[index],
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => CompletedGrnItemDetailPage(
-                                item: state.items[index],
-                              ),
+          final item = completedState.items[index];
+          return GrnItemWidget(
+            item: item,
+            onTap:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => CompletedGrnItemDetailPage(
+                          item: item,
                         ),
-                      ),
-                );
-              },
-            ),
+                  ),
+                ),
           );
-        }
-
-        return _completedLoadedOnce
-            ? const Center(child: CircularProgressIndicator())
-            : Center(
-              child: CustomText(
-                text: 'Tap the Completed tab to load data',
-                fontSize: 16.sp,
-                color: AppPalette.greyColor,
-                textAlign: TextAlign.center,
-              ),
-            );
-      },
+        },
+      ),
     );
   }
 
@@ -392,7 +385,7 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
           _selectedTab = index;
         });
         if (index == 0) {
-          _loadInitialData();
+          _loadPendingData();
         } else {
           _loadCompletedData();
         }
@@ -409,14 +402,19 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
         ),
         child: Center(
           child: BlocBuilder<GrnBloc, GrnState>(
-            builder: (context, state) {
-              String text = label;
-
-              if (state is GrnItemsSuccess && index == 0) {
-                text = '$label (${state.items.length})';
-              } else if (state is CompletedGrnItemsSuccess && index == 1) {
-                text = '$label (${state.items.length})';
+            buildWhen: (previous, current) {
+              if (index == 0) {
+                return previous.pendingSection.items.length !=
+                    current.pendingSection.items.length;
               }
+              return previous.completedSection.items.length !=
+                  current.completedSection.items.length;
+            },
+            builder: (context, state) {
+              final count = index == 0
+                  ? state.pendingSection.items.length
+                  : state.completedSection.items.length;
+              final text = count > 0 ? '$label ($count)' : label;
 
               return CustomText(
                 text: text,

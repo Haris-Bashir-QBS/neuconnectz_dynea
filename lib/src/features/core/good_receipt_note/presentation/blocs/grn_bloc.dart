@@ -32,7 +32,12 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
   ) async {
     if (event.refresh) {
       // Refresh: reset skipRecords to 0
-      emit(PendingGrnLoading());
+      emit(
+        PendingGrnLoading(
+          pendingSection: state.pendingSection,
+          completedSection: state.completedSection,
+        ),
+      );
 
       final params = GrnListParams(
         plant: event.params.plant,
@@ -46,7 +51,13 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
 
       result.fold(
         (failure) {
-          emit(PendingGrnFailure(message: failure.message));
+          emit(
+            PendingGrnFailure(
+              message: failure.message,
+              pendingSection: state.pendingSection,
+              completedSection: state.completedSection,
+            ),
+          );
         },
         (result) {
           emit(
@@ -54,6 +65,8 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
               items: result.items,
               totalRows: result.totalRows,
               skipRecords: result.items.length,
+              pendingSection: state.pendingSection,
+              completedSection: state.completedSection,
             ),
           );
         },
@@ -70,6 +83,8 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
           totalRows: currentState.totalRows,
           skipRecords: currentState.skipRecords,
           isLoadingMore: true,
+          pendingSection: state.pendingSection,
+          completedSection: state.completedSection,
         ),
       );
 
@@ -92,6 +107,8 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
               totalRows: currentState.totalRows,
               skipRecords: currentState.skipRecords,
               isLoadingMore: false,
+              pendingSection: state.pendingSection,
+              completedSection: state.completedSection,
             ),
           );
           // Could emit failure here, but keeping items visible
@@ -104,6 +121,8 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
               totalRows: newResult.totalRows,
               skipRecords: updatedItems.length,
               isLoadingMore: false,
+              pendingSection: state.pendingSection,
+              completedSection: state.completedSection,
             ),
           );
         },
@@ -116,8 +135,20 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
     Emitter<GrnState> emit,
   ) async {
     if (event.refresh) {
-      // Always emit loading state first when refreshing
-      emit(GrnItemsLoading());
+      final pendingSnapshot = state.pendingSection.copyWith(
+        isLoading: true,
+        isLoadingMore: false,
+        items: const [],
+        totalRows: 0,
+        skipRecords: 0,
+        errorMessage: null,
+      );
+      emit(
+        GrnItemsLoading(
+          pendingSection: pendingSnapshot,
+          completedSection: state.completedSection,
+        ),
+      );
 
       final params = GrnItemQueryParams(
         plant: event.params.plant,
@@ -132,31 +163,44 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
 
       result.fold(
         (failure) {
-          emit(GrnItemsFailure(message: failure.message));
+          emit(
+            GrnItemsFailure(
+              message: failure.message,
+              pendingSection: pendingSnapshot.copyWith(
+                isLoading: false,
+                errorMessage: failure.message,
+              ),
+              completedSection: state.completedSection,
+            ),
+          );
         },
         (result) {
           emit(
             GrnItemsSuccess(
-              items: result.items,
-              totalRows: result.totalRows,
-              skipRecords: result.items.length, // Track how many items we have
+              pendingSection: pendingSnapshot.copyWith(
+                isLoading: false,
+                items: result.items,
+                totalRows: result.totalRows,
+                skipRecords: result.items.length,
+                errorMessage: null,
+              ),
+              completedSection: state.completedSection,
             ),
           );
         },
       );
     } else {
-      // Load more - pagination logic
-      final currentState = state;
-      if (currentState is! GrnItemsSuccess) return;
-      if (currentState.isLoadingMore || !currentState.hasMore) return;
+      final pendingState = state.pendingSection;
+      if (pendingState.isLoadingMore || !pendingState.hasMore) return;
 
-      // Show loading indicator for pagination
+      final loadingMoreSnapshot = pendingState.copyWith(
+        isLoadingMore: true,
+        errorMessage: null,
+      );
       emit(
         GrnItemsSuccess(
-          items: currentState.items,
-          totalRows: currentState.totalRows,
-          skipRecords: currentState.skipRecords,
-          isLoadingMore: true,
+          pendingSection: loadingMoreSnapshot,
+          completedSection: state.completedSection,
         ),
       );
 
@@ -166,33 +210,36 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         materialDoc: event.params.materialDoc,
         materialDocYear: event.params.materialDocYear,
         lastCount: event.params.lastCount,
-        skipRecords:
-            currentState.skipRecords, // Continue from where we left off
+        skipRecords: pendingState.skipRecords,
       );
 
       final result = await getGrnItemsUseCase(params);
 
       result.fold(
         (failure) {
-          // Revert to previous state on failure
           emit(
-            GrnItemsSuccess(
-              items: currentState.items,
-              totalRows: currentState.totalRows,
-              skipRecords: currentState.skipRecords,
-              isLoadingMore: false,
+            GrnItemsFailure(
+              message: failure.message,
+              pendingSection: loadingMoreSnapshot.copyWith(
+                isLoadingMore: false,
+                errorMessage: failure.message,
+              ),
+              completedSection: state.completedSection,
             ),
           );
         },
         (newResult) {
-          // Append new items to existing list
-          final updatedItems = [...currentState.items, ...newResult.items];
+          final updatedItems = [...pendingState.items, ...newResult.items];
           emit(
             GrnItemsSuccess(
-              items: updatedItems,
-              totalRows: newResult.totalRows,
-              skipRecords: updatedItems.length, // Update skip count
-              isLoadingMore: false,
+              pendingSection: loadingMoreSnapshot.copyWith(
+                items: updatedItems,
+                totalRows: newResult.totalRows,
+                skipRecords: updatedItems.length,
+                isLoadingMore: false,
+                errorMessage: null,
+              ),
+              completedSection: state.completedSection,
             ),
           );
         },
@@ -205,7 +252,20 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
     Emitter<GrnState> emit,
   ) async {
     if (event.refresh) {
-      emit(CompletedGrnItemsLoading());
+      final completedSnapshot = state.completedSection.copyWith(
+        isLoading: true,
+        isLoadingMore: false,
+        items: const [],
+        totalRows: 0,
+        skipRecords: 0,
+        errorMessage: null,
+      );
+      emit(
+        CompletedGrnItemsLoading(
+          pendingSection: state.pendingSection,
+          completedSection: completedSnapshot,
+        ),
+      );
 
       final params = GrnItemQueryParams(
         plant: event.params.plant,
@@ -219,26 +279,45 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
       final result = await getCompletedGrnItemsUseCase(params);
 
       result.fold(
-        (failure) => emit(CompletedGrnItemsFailure(message: failure.message)),
-        (data) => emit(
-          CompletedGrnItemsSuccess(
-            items: data.items,
-            totalRows: data.totalRows,
-            skipRecords: data.items.length,
-          ),
-        ),
+        (failure) {
+          emit(
+            CompletedGrnItemsFailure(
+              message: failure.message,
+              pendingSection: state.pendingSection,
+              completedSection: completedSnapshot.copyWith(
+                isLoading: false,
+                errorMessage: failure.message,
+              ),
+            ),
+          );
+        },
+        (data) {
+          emit(
+            CompletedGrnItemsSuccess(
+              pendingSection: state.pendingSection,
+              completedSection: completedSnapshot.copyWith(
+                isLoading: false,
+                items: data.items,
+                totalRows: data.totalRows,
+                skipRecords: data.items.length,
+                errorMessage: null,
+              ),
+            ),
+          );
+        },
       );
     } else {
-      final currentState = state;
-      if (currentState is! CompletedGrnItemsSuccess) return;
-      if (currentState.isLoadingMore || !currentState.hasMore) return;
+      final completedState = state.completedSection;
+      if (completedState.isLoadingMore || !completedState.hasMore) return;
 
+      final loadingMoreSnapshot = completedState.copyWith(
+        isLoadingMore: true,
+        errorMessage: null,
+      );
       emit(
         CompletedGrnItemsSuccess(
-          items: currentState.items,
-          totalRows: currentState.totalRows,
-          skipRecords: currentState.skipRecords,
-          isLoadingMore: true,
+          pendingSection: state.pendingSection,
+          completedSection: loadingMoreSnapshot,
         ),
       );
 
@@ -248,7 +327,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         materialDoc: event.params.materialDoc,
         materialDocYear: event.params.materialDocYear,
         lastCount: event.params.lastCount,
-        skipRecords: currentState.skipRecords,
+        skipRecords: completedState.skipRecords,
       );
 
       final result = await getCompletedGrnItemsUseCase(params);
@@ -256,22 +335,28 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
       result.fold(
         (failure) {
           emit(
-            CompletedGrnItemsSuccess(
-              items: currentState.items,
-              totalRows: currentState.totalRows,
-              skipRecords: currentState.skipRecords,
-              isLoadingMore: false,
+            CompletedGrnItemsFailure(
+              message: failure.message,
+              pendingSection: state.pendingSection,
+              completedSection: loadingMoreSnapshot.copyWith(
+                isLoadingMore: false,
+                errorMessage: failure.message,
+              ),
             ),
           );
         },
         (data) {
-          final updatedItems = [...currentState.items, ...data.items];
+          final updatedItems = [...completedState.items, ...data.items];
           emit(
             CompletedGrnItemsSuccess(
-              items: updatedItems,
-              totalRows: data.totalRows,
-              skipRecords: updatedItems.length,
-              isLoadingMore: false,
+              pendingSection: state.pendingSection,
+              completedSection: loadingMoreSnapshot.copyWith(
+                items: updatedItems,
+                totalRows: data.totalRows,
+                skipRecords: updatedItems.length,
+                isLoadingMore: false,
+                errorMessage: null,
+              ),
             ),
           );
         },

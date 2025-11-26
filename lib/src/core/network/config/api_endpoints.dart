@@ -1,6 +1,8 @@
 var _auth = "Auth-Dynea-Stg/IAuthFeature";
 var _dashboard = "ZCAPI-Dynea-Stg/IDashboardFeature";
 var _putAway = "ZCAPI-Dynea-Stg/IPutAwayFeature";
+var _reservation = "ZCAPI-Dynea-Stg/IReservationFeature";
+var _movementType = "ZCAPI-Dynea-Stg/IMovementTypeFeature";
 var _binManagement = "ZCAPI-Dynea-Stg/IBinManagementFeature";
 var _plant = "ZCAPI-Dynea-Stg/IPlantFeature";
 var _warehouse = "ZCAPI-Dynea-Stg/IWarehouseFeature";
@@ -33,6 +35,14 @@ enum ApiEndpoints {
   completedGrnItems,
   listAllBins,
   createPutAwayAgainstGr,
+
+  /// ========================  Reservation =========================
+  listAllReservationsFromSAP,
+  listAllReservationItemsFromSAP,
+  listCompletedReservationItemsFromSAP,
+
+  /// ========================  Movement Types =========================
+  listMovementTypes,
 
   /// ========================  Plant/Warehouse =========================
   listAllPlantsAssignedToUser,
@@ -85,6 +95,14 @@ enum ApiEndpoints {
         return "$_binManagement/ListAllBinsByWarehouseAndStorageType";
       case ApiEndpoints.createPutAwayAgainstGr:
         return "$_putAway/CreatePutAwayAgainstGr";
+      case ApiEndpoints.listAllReservationsFromSAP:
+        return "$_reservation/ListAllReservationsFromSAP";
+      case ApiEndpoints.listAllReservationItemsFromSAP:
+        return "$_reservation/ListAllItemsOfReservationFromSAP";
+      case ApiEndpoints.listCompletedReservationItemsFromSAP:
+        return "$_reservation/ListAllCompletedItemsOfReservationFromSAP";
+      case ApiEndpoints.listMovementTypes:
+        return "$_movementType/ListAllMovementTypes";
 
       /// ======================== Plant/Warehouse =========================
       case ApiEndpoints.listAllPlantsAssignedToUser:

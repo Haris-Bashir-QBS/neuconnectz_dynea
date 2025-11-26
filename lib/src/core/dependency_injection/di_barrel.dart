@@ -35,5 +35,18 @@ import 'package:neuconnectz_dynea/src/shared/bins/domain/usecases/get_bins_useca
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/putaway_bloc.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/datasources/remote/reservation_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/datasources/remote/reservation_remote_data_source_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/datasources/remote/movement_type_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/datasources/remote/movement_type_remote_data_source_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/repositories/reservation_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/repositories/movement_type_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/repositories/reservation_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/repositories/movement_type_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_reservation_list_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_reservation_items_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_completed_reservation_items_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_movement_types_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/movement_type_bloc.dart';
 
 part 'di_container.dart';

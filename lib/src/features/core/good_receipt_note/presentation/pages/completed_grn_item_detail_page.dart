@@ -46,7 +46,15 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
               12.verticalSpace,
               _quantityDetailsSection(),
               20.verticalSpace,
-              _sectionTitle("Bin Details"),
+              Row(
+                children: [
+                  _sectionTitle("Bin Details"),
+                  Spacer(),
+                  _sectionTitle(
+                    "Total Count: ${_totalBinQuantity.formatWithCommas}",
+                  ),
+                ],
+              ),
               12.verticalSpace,
               _binDetailsSection(),
             ],
@@ -136,25 +144,24 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
         children: [
           Expanded(
             child: CustomTextFormField(
-              label: "Actual Quantity",
+              label: "Quantity",
               readOnly: true,
-              initialValue:
-                  "${item.quantity.formatWithCommas} ${item.baseUOM}",
+              initialValue: item.quantity.formatWithCommas,
               fillColor: AppPalette.lightGreyColor,
               enabled: false,
             ),
           ),
-          10.horizontalSpace,
-          Expanded(
-            child: CustomTextFormField(
-              label: "Remaining Quantity",
-              readOnly: true,
-              initialValue:
-                  "${_remainingQuantity.formatWithCommas} ${item.baseUOM}",
-              fillColor: AppPalette.lightGreyColor,
-              enabled: false,
-            ),
-          ),
+          // 10.horizontalSpace,
+          // Expanded(
+          //   child: CustomTextFormField(
+          //     label: "Remaining Quantity",
+          //     readOnly: true,
+          //     initialValue:
+          //         "${_remainingQuantity.formatWithCommas} ${item.baseUOM}",
+          //     fillColor: AppPalette.lightGreyColor,
+          //     enabled: false,
+          //   ),
+          // ),
         ],
       ),
     );
@@ -187,20 +194,6 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(
-                text: "Total Count: ${_totalBinQuantity.formatWithCommas}",
-                fontWeight: FontWeight.w600,
-              ),
-              CustomText(
-                text: "UOM: ${item.baseUOM}",
-                color: AppPalette.greyColor,
-                fontSize: 12.sp,
-              ),
-            ],
-          ),
           12.verticalSpace,
           _binDetailsHeader(),
           10.verticalSpace,
@@ -215,28 +208,21 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
 
   Widget _binDetailsHeader() {
     return Row(
-      children: const [
-        Expanded(
-          flex: 4,
-          child: CustomText(
-            text: "Bin No",
-            fontWeight: FontWeight.w600,
-          ),
+      children: [
+        CustomText(
+          text: "Bin No",
+          fontWeight: FontWeight.w500,
+          color: AppPalette.greyColor,
+          fontSize: 14.sp,
         ),
-        Expanded(
-          flex: 3,
-          child: CustomText(
-            text: "Proposed Qty",
-            fontWeight: FontWeight.w600,
-          ),
+        Spacer(),
+        CustomText(
+          text: " Quantity",
+          fontWeight: FontWeight.w500,
+          color: AppPalette.greyColor,
+          fontSize: 14.sp,
         ),
-        Expanded(
-          flex: 3,
-          child: CustomText(
-            text: "Actual Qty",
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        10.horizontalSpace,
       ],
     );
   }
@@ -244,44 +230,26 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
   Widget _binDetailTile(GrnItemBinDetailEntity bin) {
     return Padding(
       padding: EdgeInsets.only(bottom: 10.h),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 10.w),
-        decoration: BoxDecoration(
-          color: AppPalette.scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomText(
-                    text: bin.binCode,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14.sp,
-                  ),
-                  4.verticalSpace,
-                  CustomText(
-                    text:
-                        "${bin.storageType} - ${bin.storageSection}",
-                    fontSize: 12.sp,
-                    color: AppPalette.darkGreyColor,
-                  ),
-                ],
-              ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  text:
+                      "${bin.storageType} - ${bin.storageSection} - ${bin.binCode}",
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14.sp,
+                  // color: AppPalette.lightGreyColor,
+                ),
+              ],
             ),
-            Expanded(
-              flex: 3,
-              child: _quantityPill(bin.quantity),
-            ),
-            Expanded(
-              flex: 3,
-              child: _quantityPill(bin.quantity),
-            ),
-          ],
-        ),
+          ),
+          Expanded(flex: 2, child: _quantityPill(bin.quantity)),
+          //Expanded(flex: 3, child: _quantityPill(bin.quantity)),
+        ],
       ),
     );
   }
@@ -292,7 +260,7 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 10.h),
       margin: EdgeInsets.symmetric(horizontal: 4.w),
       decoration: BoxDecoration(
-        color: AppPalette.whiteColor,
+        color: AppPalette.lightGreyColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppPalette.lightGreyColor),
       ),
@@ -304,5 +272,3 @@ class CompletedGrnItemDetailPage extends StatelessWidget {
     );
   }
 }
-
-

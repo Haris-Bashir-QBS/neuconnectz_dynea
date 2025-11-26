@@ -31,9 +31,6 @@ class CommonFunctions {
     final value = res?.trim();
 
     if (value?.isEmpty != false || value == "-1") {
-      if (context.mounted) {
-        CustomToast.error(context, "Error reading barcode.");
-      }
       return;
     }
 

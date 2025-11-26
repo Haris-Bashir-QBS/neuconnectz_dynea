@@ -264,6 +264,7 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
           //     curve: Curves.easeOut,
           //   );
           // }
+          _binSearchController.clear();
           _showBinSelectionDialog();
         },
       ),
@@ -275,11 +276,15 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
     );
   }
 
-  Future<void> _showBinSelectionDialog() async {
-    _binSearchController.clear();
-    _binSearchQuery = '';
+  Future<void> _showBinSelectionDialog({String? prefillKeyword}) async {
+    if (prefillKeyword != null && prefillKeyword.isNotEmpty) {
+      _binSearchController.text = prefillKeyword;
+      _binSearchQuery = prefillKeyword;
+    } else {
+      _binSearchController.clear();
+      _binSearchQuery = '';
+    }
 
-    // Initial load with pagination reset
     _loadBins(keyword: _binSearchQuery, resetPagination: true);
 
     if (!mounted) return;
@@ -295,7 +300,6 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
                 List<BinEntity> bins = _dialogBins;
 
                 if (state is BinSuccess) {
-                  // On a fresh search/open, replace; otherwise append for pagination
                   if (_dialogResetPending) {
                     _dialogBins
                       ..clear()
@@ -311,7 +315,6 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
                   _dialogHasMore = false;
                 }
 
-                // Show shimmer only for the very first load
                 final bool isInitialLoading =
                     state is BinLoading && bins.isEmpty;
 
@@ -454,53 +457,20 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
 
   Future<void> openScanner({required FieldScanType scanType}) async {
     String? res = await Utils.scanBarcode(context, title: AppTexts.scan);
-    if ((res ?? "").isNotEmpty && res != "-1") {
-      _binCodeController.text = res ?? "";
 
-      // Load bins first (reset pagination for scan search)
-      _loadBins(keyword: res, resetPagination: true);
-
-      // Wait a bit for the bloc to process, then check state
-      await Future.delayed(Duration(milliseconds: 500));
-
-      final binState = context.read<BinBloc>().state;
-      BinEntity? foundBin;
-
-      if (binState is BinSuccess) {
-        try {
-          foundBin = binState.bins.firstWhere(
-            (bin) => bin.binCode.toLowerCase() == res!.toLowerCase(),
-          );
-        } catch (e) {
-          // Try partial match
-          try {
-            foundBin = binState.bins.firstWhere(
-              (bin) =>
-                  bin.binCode.toLowerCase().contains(res!.toLowerCase()) ||
-                  res!.toLowerCase().contains(bin.binCode.toLowerCase()),
-            );
-          } catch (e2) {
-            foundBin = null;
-          }
-        }
-      }
-
-      if (foundBin != null) {
-        _onBinSelected(foundBin);
-      } else {
-        // Bin not found, show message
-        if (mounted) {
-          CustomToast.error(
-            context,
-            "Bin code not found. Please select from list.",
-          );
-          _showBinSelectionDialog();
-        }
-      }
-    } else {
-      if (!mounted) return;
-      CustomToast.error(context, "Error reading barcode.");
+    if (res == "-1") {
+      return;
     }
+    if ((res ?? "").isEmpty) {
+      if (!mounted) return;
+      CustomToast.error(context, "Couldn't read the code. Please try again.");
+      return;
+    }
+
+    _binSearchController.text = res!;
+    _binSearchQuery = res;
+    await Future.delayed(Duration(milliseconds: 0), () {});
+    _showBinSelectionDialog(prefillKeyword: res);
   }
 
   Widget _headerWidget() {

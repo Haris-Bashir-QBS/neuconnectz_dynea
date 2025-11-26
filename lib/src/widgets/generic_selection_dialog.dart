@@ -69,7 +69,7 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
 
   @override
   void initState() {
-    widget.controller.clear();
+    // widget.controller.clear();
     super.initState();
     scrollControllerLocal.addListener(_scrollListener);
   }

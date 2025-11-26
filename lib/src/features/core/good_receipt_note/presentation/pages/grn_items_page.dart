@@ -278,7 +278,8 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == state.items.length) return const GrnItemShimmer();
+                if (index == state.items.length)
+                  return const CircularProgressIndicator();
                 return GrnItemWidget(
                   item: state.items[index],
                   onTap: () => _showQuantityBottomSheet(state.items[index]),
@@ -348,17 +349,20 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == state.items.length) return const GrnItemShimmer();
+                if (index == state.items.length)
+                  return CircularProgressIndicator();
                 return GrnItemWidget(
                   item: state.items[index],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CompletedGrnItemDetailPage(
-                        item: state.items[index],
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => CompletedGrnItemDetailPage(
+                                item: state.items[index],
+                              ),
+                        ),
                       ),
-                    ),
-                  ),
                 );
               },
             ),

@@ -130,13 +130,13 @@ class _WarehouseAndPlantSelectionPageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             10.verticalSpace,
-            ScannerAndAutoScanToggleWidget(
-              isScannerConnected: false,
-              isAutoScan: false,
-              onScannerConnectedChanged: (_) {},
-              onAutoScanChanged: (_) {},
-            ),
-            16.verticalSpace,
+            // ScannerAndAutoScanToggleWidget(
+            //   isScannerConnected: false,
+            //   isAutoScan: false,
+            //   onScannerConnectedChanged: (_) {},
+            //   onAutoScanChanged: (_) {},
+            // ),
+            //16.verticalSpace,
             CustomText(
               text: AppTexts.selectPlantAndWarehouse,
               fontWeight: FontWeight.w600,
@@ -188,7 +188,7 @@ class _WarehouseAndPlantSelectionPageState
                 ],
               ),
             ),
-            64.verticalSpace,
+            34.verticalSpace,
             CustomButton.bordered(
               icon: Icons.arrow_forward_rounded,
               onPressed:

@@ -6,6 +6,7 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/par
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_list_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_items_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_completed_grn_items_usecase.dart';
 
 part 'grn_event.dart';
 part 'grn_state.dart';
@@ -13,11 +14,16 @@ part 'grn_state.dart';
 class GrnBloc extends Bloc<GrnEvent, GrnState> {
   final GetGrnListUseCase getGrnListUseCase;
   final GetGrnItemsUseCase getGrnItemsUseCase;
+  final GetCompletedGrnItemsUseCase getCompletedGrnItemsUseCase;
 
-  GrnBloc({required this.getGrnListUseCase, required this.getGrnItemsUseCase})
-    : super(GrnInitial()) {
+  GrnBloc({
+    required this.getGrnListUseCase,
+    required this.getGrnItemsUseCase,
+    required this.getCompletedGrnItemsUseCase,
+  }) : super(GrnInitial()) {
     on<LoadPendingGrnEvent>(_onLoadPendingGrn);
     on<LoadGrnItemsEvent>(_onLoadGrnItems);
+    on<LoadCompletedGrnItemsEvent>(_onLoadCompletedGrnItems);
   }
 
   Future<void> _onLoadPendingGrn(
@@ -186,6 +192,85 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
               items: updatedItems,
               totalRows: newResult.totalRows,
               skipRecords: updatedItems.length, // Update skip count
+              isLoadingMore: false,
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _onLoadCompletedGrnItems(
+    LoadCompletedGrnItemsEvent event,
+    Emitter<GrnState> emit,
+  ) async {
+    if (event.refresh) {
+      emit(CompletedGrnItemsLoading());
+
+      final params = GrnItemQueryParams(
+        plant: event.params.plant,
+        location: event.params.location,
+        materialDoc: event.params.materialDoc,
+        materialDocYear: event.params.materialDocYear,
+        lastCount: event.params.lastCount,
+        skipRecords: 0,
+      );
+
+      final result = await getCompletedGrnItemsUseCase(params);
+
+      result.fold(
+        (failure) => emit(CompletedGrnItemsFailure(message: failure.message)),
+        (data) => emit(
+          CompletedGrnItemsSuccess(
+            items: data.items,
+            totalRows: data.totalRows,
+            skipRecords: data.items.length,
+          ),
+        ),
+      );
+    } else {
+      final currentState = state;
+      if (currentState is! CompletedGrnItemsSuccess) return;
+      if (currentState.isLoadingMore || !currentState.hasMore) return;
+
+      emit(
+        CompletedGrnItemsSuccess(
+          items: currentState.items,
+          totalRows: currentState.totalRows,
+          skipRecords: currentState.skipRecords,
+          isLoadingMore: true,
+        ),
+      );
+
+      final params = GrnItemQueryParams(
+        plant: event.params.plant,
+        location: event.params.location,
+        materialDoc: event.params.materialDoc,
+        materialDocYear: event.params.materialDocYear,
+        lastCount: event.params.lastCount,
+        skipRecords: currentState.skipRecords,
+      );
+
+      final result = await getCompletedGrnItemsUseCase(params);
+
+      result.fold(
+        (failure) {
+          emit(
+            CompletedGrnItemsSuccess(
+              items: currentState.items,
+              totalRows: currentState.totalRows,
+              skipRecords: currentState.skipRecords,
+              isLoadingMore: false,
+            ),
+          );
+        },
+        (data) {
+          final updatedItems = [...currentState.items, ...data.items];
+          emit(
+            CompletedGrnItemsSuccess(
+              items: updatedItems,
+              totalRows: data.totalRows,
+              skipRecords: updatedItems.length,
               isLoadingMore: false,
             ),
           );

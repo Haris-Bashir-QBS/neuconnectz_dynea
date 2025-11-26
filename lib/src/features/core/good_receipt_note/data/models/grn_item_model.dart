@@ -81,6 +81,7 @@ class GrnItemModel {
   final String specialStock;
   final double quantity;
   final String baseUOM;
+  final List<GrnItemBinDetailModel> binDetails;
 
   GrnItemModel({
     required this.materialDocument,
@@ -95,6 +96,7 @@ class GrnItemModel {
     required this.specialStock,
     required this.quantity,
     required this.baseUOM,
+    this.binDetails = const [],
   });
 
   factory GrnItemModel.fromJson(Map<String, dynamic> json) {
@@ -111,36 +113,84 @@ class GrnItemModel {
       specialStock: json['specialStock'] ?? '',
       quantity: (json['quantity'] ?? 0).toDouble(),
       baseUOM: json['baseUOM'] ?? '',
+      binDetails:
+          (json['binDetails'] as List<dynamic>?)
+                  ?.map(
+                    (e) => GrnItemBinDetailModel.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              const [],
     );
   }
 
   GrnItemEntity toEntity() => GrnItemEntity(
-    materialDocument: materialDocument,
-    materialDocYear: materialDocYear,
-    materialDocItem: materialDocItem,
-    movementType: movementType,
-    material: material,
-    materialDescription: materialDescription,
-    plant: plant,
-    storageLocation: storageLocation,
-    batch: batch,
-    specialStock: specialStock,
-    quantity: quantity,
-    baseUOM: baseUOM,
-  );
+        materialDocument: materialDocument,
+        materialDocYear: materialDocYear,
+        materialDocItem: materialDocItem,
+        movementType: movementType,
+        material: material,
+        materialDescription: materialDescription,
+        plant: plant,
+        storageLocation: storageLocation,
+        batch: batch,
+        specialStock: specialStock,
+        quantity: quantity,
+        baseUOM: baseUOM,
+        binDetails: binDetails.map((e) => e.toEntity()).toList(),
+      );
 
   Map<String, dynamic> toJson() => {
-    'materialDocument': materialDocument,
-    'materialDocYear': materialDocYear,
-    'materialDocItem': materialDocItem,
-    'movementType': movementType,
-    'material': material,
-    'materialDescription': materialDescription,
-    'plant': plant,
-    'storageLocation': storageLocation,
-    'batch': batch,
-    'specialStock': specialStock,
-    'quantity': quantity,
-    'baseUOM': baseUOM,
-  };
+        'materialDocument': materialDocument,
+        'materialDocYear': materialDocYear,
+        'materialDocItem': materialDocItem,
+        'movementType': movementType,
+        'material': material,
+        'materialDescription': materialDescription,
+        'plant': plant,
+        'storageLocation': storageLocation,
+        'batch': batch,
+        'specialStock': specialStock,
+        'quantity': quantity,
+        'baseUOM': baseUOM,
+        'binDetails': binDetails.map((e) => e.toJson()).toList(),
+      };
+}
+
+class GrnItemBinDetailModel {
+  final String binCode;
+  final String storageType;
+  final String storageSection;
+  final double quantity;
+
+  GrnItemBinDetailModel({
+    required this.binCode,
+    required this.storageType,
+    required this.storageSection,
+    required this.quantity,
+  });
+
+  factory GrnItemBinDetailModel.fromJson(Map<String, dynamic> json) {
+    return GrnItemBinDetailModel(
+      binCode: json['binCode'] ?? '',
+      storageType: json['storageType'] ?? '',
+      storageSection: json['storageSection'] ?? '',
+      quantity: (json['quantity'] ?? 0).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'binCode': binCode,
+        'storageType': storageType,
+        'storageSection': storageSection,
+        'quantity': quantity,
+      };
+
+  GrnItemBinDetailEntity toEntity() => GrnItemBinDetailEntity(
+        binCode: binCode,
+        storageType: storageType,
+        storageSection: storageSection,
+        quantity: quantity,
+      );
 }

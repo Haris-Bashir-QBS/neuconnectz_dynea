@@ -74,3 +74,35 @@ class GrnItemsFailure extends GrnState {
   @override
   List<Object?> get props => [message];
 }
+
+class CompletedGrnItemsLoading extends GrnState {
+  const CompletedGrnItemsLoading();
+}
+
+class CompletedGrnItemsSuccess extends GrnState {
+  final List<GrnItemEntity> items;
+  final int totalRows;
+  final int skipRecords;
+  final bool isLoadingMore;
+
+  const CompletedGrnItemsSuccess({
+    required this.items,
+    required this.totalRows,
+    required this.skipRecords,
+    this.isLoadingMore = false,
+  });
+
+  bool get hasMore => items.length < totalRows;
+
+  @override
+  List<Object?> get props => [items, totalRows, skipRecords, isLoadingMore];
+}
+
+class CompletedGrnItemsFailure extends GrnState {
+  final String message;
+
+  const CompletedGrnItemsFailure({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

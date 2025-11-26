@@ -129,6 +129,7 @@ void _registerGrnListDependencies() {
   // Use cases
   sl.registerLazySingleton(() => GetGrnListUseCase(sl()));
   sl.registerLazySingleton(() => GetGrnItemsUseCase(sl()));
+  sl.registerLazySingleton(() => GetCompletedGrnItemsUseCase(sl()));
   sl.registerLazySingleton(() => CreatePutAwayAgainstGrUseCase(sl()));
   sl.registerLazySingleton(() => GetBinsUseCase(sl()));
   // Blocs
@@ -136,6 +137,7 @@ void _registerGrnListDependencies() {
     () => GrnBloc(
       getGrnListUseCase: sl(),
       getGrnItemsUseCase: sl(),
+      getCompletedGrnItemsUseCase: sl(),
     ),
   );
   sl.registerFactory(

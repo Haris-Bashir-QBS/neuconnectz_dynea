@@ -76,14 +76,13 @@ class CreatePutAwayRequestModel {
     required GrnItemEntity item,
     required List<BinEntity> bins,
   }) {
-    final binModels = bins
-        .map(
-          (bin) => BinQuantityModel(
-            id: bin.id,
-            quantity: bin.selectedQuantity,
-          ),
-        )
-        .toList();
+    final binModels =
+        bins
+            .map(
+              (bin) =>
+                  BinQuantityModel(id: bin.id, quantity: bin.selectedQuantity),
+            )
+            .toList();
 
     return CreatePutAwayRequestModel(
       warehouseNumber: grn.warehouseNumber,
@@ -109,7 +108,7 @@ class CreatePutAwayRequestModel {
       supplier: grn.supplier,
       supplierName: grn.name,
       purchaseOrder: grn.purchaseOrder,
-      materialDocItem: item.materialDocItem.toString().padLeft(5, '0'),
+      materialDocItem: item.materialDocItem.toString(),
       material: item.material,
       materialDescription: item.materialDescription,
       plant: item.plant,
@@ -122,53 +121,46 @@ class CreatePutAwayRequestModel {
   }
 
   Map<String, dynamic> toJson() => {
-        "warehouseNumber": warehouseNumber,
-        "trNumber": trNumber,
-        "headerStatus": headerStatus,
-        "shipmentType": shipmentType,
-        "user": user,
-        "createdOn": createdOn,
-        "timeOfCreation": timeOfCreation,
-        "requirementType": requirementType,
-        "requirementNumber": requirementNumber,
-        "movementType": movementType,
-        "sourceStorageType": sourceStorageType,
-        "sourceStorageBin": sourceStorageBin,
-        "dynamicSourceBin": dynamicSourceBin,
-        "destStorageType": destStorageType,
-        "destStorageBin": destStorageBin,
-        "dynamicStorageBin": dynamicStorageBin,
-        "materialDocument": materialDocument,
-        "materialDocYear": materialDocYear,
-        "numberOfItems": numberOfItems,
-        "reservation": reservation,
-        "supplier": supplier,
-        "supplierName": supplierName,
-        "purchaseOrder": purchaseOrder,
-        "materialDocItem": materialDocItem,
-        "material": material,
-        "materialDescription": materialDescription,
-        "plant": plant,
-        "storageLocation": storageLocation,
-        "batch": batch,
-        "specialStock": specialStock,
-        "baseUOM": baseUOM,
-        "binQuantities": binQuantities.map((bin) => bin.toJson()).toList(),
-      };
+    "warehouseNumber": warehouseNumber,
+    "trNumber": trNumber,
+    "headerStatus": headerStatus,
+    "shipmentType": shipmentType,
+    "user": user,
+    "createdOn": createdOn,
+    "timeOfCreation": timeOfCreation,
+    "requirementType": requirementType,
+    "requirementNumber": requirementNumber,
+    "movementType": movementType,
+    "sourceStorageType": sourceStorageType,
+    "sourceStorageBin": sourceStorageBin,
+    "dynamicSourceBin": dynamicSourceBin,
+    "destStorageType": destStorageType,
+    "destStorageBin": destStorageBin,
+    "dynamicStorageBin": dynamicStorageBin,
+    "materialDocument": materialDocument,
+    "materialDocYear": materialDocYear,
+    "numberOfItems": numberOfItems,
+    "reservation": reservation,
+    "supplier": supplier,
+    "supplierName": supplierName,
+    "purchaseOrder": purchaseOrder,
+    "materialDocItem": materialDocItem,
+    "material": material,
+    "materialDescription": materialDescription,
+    "plant": plant,
+    "storageLocation": storageLocation,
+    "batch": batch,
+    "specialStock": specialStock,
+    "baseUOM": baseUOM,
+    "binQuantities": binQuantities.map((bin) => bin.toJson()).toList(),
+  };
 }
 
 class BinQuantityModel {
   final String id;
   final double quantity;
 
-  BinQuantityModel({
-    required this.id,
-    required this.quantity,
-  });
+  BinQuantityModel({required this.id, required this.quantity});
 
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "quantity": quantity,
-      };
+  Map<String, dynamic> toJson() => {"id": id, "quantity": quantity};
 }
-

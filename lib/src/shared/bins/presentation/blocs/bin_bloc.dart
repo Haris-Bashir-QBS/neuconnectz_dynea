@@ -18,10 +18,12 @@ class BinBloc extends Bloc<BinEvent, BinState> {
     emit(BinLoading());
 
     final params = BinParams(
-      plant: event.plant,
+      // plant: event.plant,
       storageType: event.storageType,
       keyword: event.keyword,
       warehouseCode: event.warehouseCode,
+      lastCount: event.lastCount,
+      skipRecords: event.skipRecords,
     );
 
     final result = await getBinsUseCase(params);
@@ -32,4 +34,3 @@ class BinBloc extends Bloc<BinEvent, BinState> {
     );
   }
 }
-

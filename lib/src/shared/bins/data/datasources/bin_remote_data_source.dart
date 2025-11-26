@@ -18,17 +18,26 @@ class BinRemoteDataSourceImpl implements BinRemoteDataSource {
   Future<BinResponseModel> listAllBins({required BinParams params}) async {
     return ApiErrorHandler.executeGuarded(() async {
       final queryParams = <String, dynamic>{};
-      if (params.plant != null && params.plant!.isNotEmpty) {
-        queryParams['plant'] = params.plant;
-      }
-      if (params.storageType != null && params.storageType!.isNotEmpty) {
-        queryParams['storageType'] = params.storageType;
-      }
+      // if (params.plant != null && params.plant!.isNotEmpty) {
+      //   queryParams['plant'] = params.plant;
+      // }
+      // if (params.storageType != null && params.storageType!.isNotEmpty) {
+      queryParams['storageType'] = params.storageType;
+      //}
       if (params.warehouseCode != null && params.warehouseCode!.isNotEmpty) {
         queryParams['warehouseCode'] = params.warehouseCode;
       }
       if (params.keyword != null && params.keyword!.isNotEmpty) {
-        queryParams['keyword'] = params.keyword;
+        // Backend expects bin search as `binCode`
+        queryParams['binCode'] = params.keyword;
+      }
+
+      // Pagination params
+      if (params.lastCount != null) {
+        queryParams['lastCount'] = params.lastCount;
+      }
+      if (params.skipRecords != null) {
+        queryParams['skipRecords'] = params.skipRecords;
       }
 
       final response = await dio.get(
@@ -39,4 +48,3 @@ class BinRemoteDataSourceImpl implements BinRemoteDataSource {
     });
   }
 }
-

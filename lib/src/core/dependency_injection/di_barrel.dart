@@ -29,6 +29,7 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/rep
 import 'package:neuconnectz_dynea/src/shared/bins/domain/repositories/bin_repository.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_list_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_grn_items_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/get_completed_grn_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/usecases/create_putaway_against_gr_usecase.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/usecases/get_bins_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';

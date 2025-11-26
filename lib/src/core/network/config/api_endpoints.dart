@@ -30,6 +30,7 @@ enum ApiEndpoints {
   /// ========================  Put Away =========================
   listAllGrDocFromSAP,
   listAllGrItemsFromSAP,
+  completedGrnItems,
   listAllBins,
   createPutAwayAgainstGr,
 
@@ -78,6 +79,8 @@ enum ApiEndpoints {
         return "$_putAway/ListAllGrDocFromSAP";
       case ApiEndpoints.listAllGrItemsFromSAP:
         return "$_putAway/ListAllItemsOfGrFromSAP";
+      case ApiEndpoints.completedGrnItems:
+        return "$_putAway/GetCompletedItemWithBins";
       case ApiEndpoints.listAllBins:
         return "$_binManagement/ListAllBinsByWarehouseAndStorageType";
       case ApiEndpoints.createPutAwayAgainstGr:

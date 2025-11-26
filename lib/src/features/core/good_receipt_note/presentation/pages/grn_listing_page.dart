@@ -40,7 +40,6 @@ class _GrnListingPageState extends State<GrnListingPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
 
-  int _selectedTab = 0;
   String _searchKeyword = '';
 
   @override
@@ -78,8 +77,6 @@ class _GrnListingPageState extends State<GrnListingPage> {
   }
 
   void _loadInitialData() {
-    if (_selectedTab == 1) return;
-
     final params = GrnListParams(
       plant: widget.selectedPlant.code,
       location: widget.selectedWarehouse.storageLocationCode ?? '',
@@ -100,10 +97,7 @@ class _GrnListingPageState extends State<GrnListingPage> {
         widget.scrollController!.position.maxScrollExtent) {
       final state = context.read<GrnBloc>().state;
 
-      if (state is PendingGrnSuccess &&
-          state.hasMore &&
-          !state.isLoadingMore &&
-          _selectedTab == 0) {
+      if (state is PendingGrnSuccess && state.hasMore && !state.isLoadingMore) {
         final params = GrnListParams(
           plant: widget.selectedPlant.code,
           location: widget.selectedWarehouse.storageLocationCode ?? '',
@@ -150,30 +144,8 @@ class _GrnListingPageState extends State<GrnListingPage> {
     return Column(
       children: [
         CustomSearchField(controller: _searchController),
-
-        /// Tabs — dynamic count
-        BlocBuilder<GrnBloc, GrnState>(
-          builder: (context, state) {
-            int pendingCount = 0;
-
-            if (state is PendingGrnSuccess) {
-              pendingCount = state.totalRows;
-            }
-
-            return Row(
-              children: [
-                Expanded(child: _buildTab(0, "Pending")),
-                Expanded(child: _buildTab(1, "Complete")),
-              ],
-            );
-          },
-        ),
-
         SizedBox(height: 8.h),
-
-        Expanded(
-          child: _selectedTab == 0 ? _buildPendingList() : _buildCompleteList(),
-        ),
+        Expanded(child: _buildPendingList()),
       ],
     );
   }
@@ -283,72 +255,19 @@ class _GrnListingPageState extends State<GrnListingPage> {
     BuildContext context,
     PendingGrnSuccess state,
     int index,
-  ) {
-    context.pushNamed(
-      AppRoutes.grnItems,
-      extra: GrnItemsPageParams(
-        grn: state.items[index],
-        plant: widget.selectedPlant.code,
-        warehouseCode: widget.selectedWarehouse.code,
-        location: widget.selectedWarehouse.storageLocationCode ?? '',
-      ),
-    );
-  }
-
-  Widget _buildCompleteList() {
-    return Center(
-      child: CustomText(
-        text: 'Complete list will be available soon',
-        fontSize: 16.sp,
-        color: AppPalette.greyColor,
-      ),
-    );
-  }
-
-  Widget _buildTab(int index, String label) {
-    final isSelected = _selectedTab == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() => _selectedTab = index);
-        if (index == 0) _loadInitialData();
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12.h),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? AppPalette.primaryColor : Colors.transparent,
-              width: 2,
-            ),
+  ) async {
+    await context
+        .pushNamed(
+          AppRoutes.grnItems,
+          extra: GrnItemsPageParams(
+            grn: state.items[index],
+            plant: widget.selectedPlant.code,
+            warehouseCode: widget.selectedWarehouse.code,
+            location: widget.selectedWarehouse.storageLocationCode ?? '',
           ),
-        ),
-        child: Center(
-          child: BlocBuilder<GrnBloc, GrnState>(
-            builder: (context, state) {
-              String displayLabel = label;
-
-              // Only append count if PendingGrnSuccess state
-              if (state is PendingGrnSuccess && index == 0) {
-                displayLabel = '$label (${state.totalRows})';
-              }
-
-              // You can implement Complete tab count similarly when ready:
-              // else if (state is CompleteGrnSuccess && index == 1) {
-              //   displayLabel = '$label (${state.totalRows})';
-              // }
-
-              return CustomText(
-                text: displayLabel,
-                fontSize: 16.sp,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-                color:
-                    isSelected ? AppPalette.primaryColor : AppPalette.greyColor,
-              );
-            },
-          ),
-        ),
-      ),
-    );
+        )
+        .then((value) {
+          _loadInitialData();
+        });
   }
 }

@@ -15,4 +15,5 @@ final class AppErrors {
   static const String noSecretKeyFound = "No Secret Key Found.Regenerate Key.";
   static const String barcodeRequired = "Barcode is required";
   static const String noItemsFound = "No items found";
+  static const String noBinsFound = "No bins found";
 }

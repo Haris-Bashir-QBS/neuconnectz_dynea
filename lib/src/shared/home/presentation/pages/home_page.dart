@@ -122,13 +122,6 @@ class HomeWelcomeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppPalette.whiteColor,
         borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

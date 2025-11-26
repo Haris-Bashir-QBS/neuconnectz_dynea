@@ -109,6 +109,7 @@ final class AppTexts {
   static const String modules = "Modules";
   static const String doYouWantToLogout = "Are you sure you want to logout?";
   static const String no = "No";
+  static const String numberofItems = "No of items";
   static const String addAll = "Add All";
 
   static const String restartRequired = 'Restart Required';
@@ -172,4 +173,10 @@ final class AppTexts {
   static const String outboundDeliverySales = "Outbound Delivery (Sales)";
   static const String checkStock = "Check Stock";
   static const String checkingConnection = "Checking connection...";
+  static const String trNumber = "TR Number";
+  static const String createdOn = "Created on";
+  static const String pending = "Pending";
+  static const String completed = "Completed";
+  static const String materialName = "Material Name";
+  static const String quantity = "Quantity";
 }

@@ -39,9 +39,10 @@ class BinDetailRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            flex: 3,
+            flex: 5,
             child: CustomText(
-              text: bin.binCode,
+              text:
+                  "${bin.storageType} - ${bin.storageSection} - ${bin.binCode}",
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
             ),

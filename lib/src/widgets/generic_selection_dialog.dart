@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_errors.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/shimmers/dialog_listview_shimmer.dart';
-
 import 'custom_text.dart';
 
 class GenericSelectionDialog<T> extends StatefulWidget {
@@ -15,7 +13,8 @@ class GenericSelectionDialog<T> extends StatefulWidget {
   final bool? loading;
   final void Function(String)? onChanged;
   final String? barcode;
-  final Widget Function(T item) titleBuilder, subTitleBuilder;
+  final Widget Function(T item)? titleBuilder;
+  final Widget Function(T item)? subTitleBuilder;
   final String searchLabel;
   final String? noDataText;
   final Widget? child;
@@ -27,26 +26,36 @@ class GenericSelectionDialog<T> extends StatefulWidget {
   final VoidCallback? onPaginate;
   final bool? hasMore;
 
+  /// ⭐ New table support
+  final bool isTable;
+  final List<String>? tableHeaders;
+  final List<String> Function(T item)? tableRowBuilder;
+
   const GenericSelectionDialog({
     super.key,
     required this.items,
     required this.onSelected,
     required this.controller,
-    this.noDataText,
-    required this.titleBuilder,
     required this.searchLabel,
+    this.loading = true,
+    this.titleBuilder,
+    this.subTitleBuilder,
+    this.noDataText,
     this.onRefresh,
     this.onChanged,
     this.barcode,
-    this.loading = true,
-    required this.subTitleBuilder,
-    this.scrollController,
-    this.onPaginate,
-    this.headingText,
     this.child,
     this.hasMore,
     this.chipWidget,
     this.showTrailingWidgetInShimmer,
+    this.onPaginate,
+    this.scrollController,
+    this.headingText,
+
+    /// new params
+    this.isTable = false,
+    this.tableHeaders,
+    this.tableRowBuilder,
   });
 
   @override
@@ -75,7 +84,6 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Items length is ${widget.items.length}");
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
       child: ConstrainedBox(
@@ -97,8 +105,14 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
                 widget.chipWidget!,
                 5.verticalSpace,
               ],
-              widget.child ?? SizedBox.shrink(),
-              // _shimmer(),
+              widget.child ?? const SizedBox.shrink(),
+
+              /// ⭐ Table Header
+              if (widget.isTable &&
+                  widget.tableHeaders != null &&
+                  widget.loading != true)
+                _tableHeader(),
+
               _detailsWidget(),
               SizedBox(height: 12.h),
               _closeButton(context),
@@ -122,7 +136,7 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
 
   RefreshIndicator _noDataFoundWidget() {
     return RefreshIndicator(
-      onRefresh: widget.onRefresh != null ? widget.onRefresh! : () async {},
+      onRefresh: widget.onRefresh ?? () async {},
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
@@ -131,6 +145,8 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
             child: Center(
               child: CustomText(
                 text: widget.noDataText ?? AppErrors.noItemsFound,
+                maxLines: 3,
+                textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -167,6 +183,29 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
     );
   }
 
+  /// ⭐ Table header UI
+  Widget _tableHeader() {
+    return Padding(
+      padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
+      child: Row(
+        children:
+            widget.tableHeaders!
+                .map(
+                  (h) => Expanded(
+                    child: Text(
+                      h,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+      ),
+    );
+  }
+
   Widget _itemsListView() {
     return ListView.separated(
       controller: scrollControllerLocal,
@@ -178,30 +217,52 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
         if (index == widget.items.length) {
           return _bottomLoader();
         }
+
         final item = widget.items[index];
-        return Container(
-          decoration: BoxDecoration(
-            color: context.primaryColor.withAlpha(10),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 10.w),
-          child: ListTile(
-            contentPadding: EdgeInsets.all(0),
-            leading: CustomText(text: "${index + 1}", fontSize: 18.sp),
-            title: widget.titleBuilder(item),
-            trailing: widget.subTitleBuilder(item),
-            onTap: () {
-              widget.onSelected(item);
-            },
-            onLongPress: () {
-              // Add optional detail dialog here if needed
-            },
+
+        return GestureDetector(
+          onTap: () => widget.onSelected(item),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: context.primaryColor.withAlpha(10),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child:
+                widget.isTable
+                    ? _tableRow(item)
+                    : ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CustomText(
+                        text: "${index + 1}",
+                        fontSize: 18.sp,
+                      ),
+                      title: widget.titleBuilder!(item),
+                      trailing: widget.subTitleBuilder!(item),
+                    ),
           ),
         );
       },
-      separatorBuilder: (BuildContext context, int index) {
-        return 5.verticalSpace;
-      },
+      separatorBuilder: (_, __) => 6.verticalSpace,
+    );
+  }
+
+  /// ⭐ Table row UI
+  Widget _tableRow(T item) {
+    final rowData = widget.tableRowBuilder!(item);
+
+    return Row(
+      children:
+          rowData
+              .map(
+                (val) => Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10.w),
+                    child: Text(val, style: TextStyle(fontSize: 14.sp)),
+                  ),
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -209,7 +270,10 @@ class _GenericSelectionDialogState<T> extends State<GenericSelectionDialog<T>> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Center(
-        child: Transform.scale(scale: 0.9, child: CircularProgressIndicator()),
+        child: Transform.scale(
+          scale: 0.9,
+          child: const CircularProgressIndicator(),
+        ),
       ),
     );
   }

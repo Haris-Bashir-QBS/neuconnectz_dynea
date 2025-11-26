@@ -24,3 +24,13 @@ class LoadGrnItemsEvent extends GrnEvent {
   @override
   List<Object?> get props => [params, refresh];
 }
+
+class LoadCompletedGrnItemsEvent extends GrnEvent {
+  final GrnItemQueryParams params;
+  final bool refresh;
+
+  LoadCompletedGrnItemsEvent({required this.params, this.refresh = false});
+
+  @override
+  List<Object?> get props => [params, refresh];
+}

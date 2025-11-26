@@ -52,6 +52,28 @@ class GrnRemoteDataSourceImpl implements GrnRemoteDataSource {
         endpoint: ApiEndpoints.listAllGrItemsFromSAP.value,
         queryParams: queryParams,
       );
+      return GrnItemResponseModel.fromJson(response.data);
+    });
+  }
+
+  @override
+  Future<GrnItemResponseModel> listCompletedGrnItems({
+    required GrnItemQueryParams params,
+  }) async {
+    return ApiErrorHandler.executeGuarded(() async {
+      final queryParams = {
+        'plant': params.plant,
+        'location': params.location,
+        'materialdoc': params.materialDoc,
+        'year': params.materialDocYear,
+        'lastCount': params.lastCount,
+        'skipRecords': params.skipRecords,
+      };
+
+      final response = await dio.get(
+        endpoint: ApiEndpoints.completedGrnItems.value,
+        queryParams: queryParams,
+      );
       return GrnItemResponseModel.fromJson(response.data ?? {});
     });
   }

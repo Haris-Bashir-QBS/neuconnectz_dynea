@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_list_item_entity.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
+import '../../../../../core/constants/app_texts.dart';
 import '../../../../../core/constants/asset_paths.dart';
 
 class GrnListItemWidget extends StatelessWidget {
@@ -76,11 +77,13 @@ class GrnListItemWidget extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 8.h),
-                  _detailRow("TR Number: TR-${item.trNumber}"),
+                  _detailRow("${AppTexts.trNumber}: ${item.trNumber}"),
                   SizedBox(height: 4.h),
-                  _detailRow("Quantity: ${item.numberOfItems}"),
+                  _detailRow(
+                    "${AppTexts.numberofItems} : ${item.numberOfItems}",
+                  ),
                   SizedBox(height: 4.h),
-                  _detailRow("Created On: $formattedDate"),
+                  _detailRow("${AppTexts.createdOn}: $formattedDate"),
                 ],
               ),
             ),

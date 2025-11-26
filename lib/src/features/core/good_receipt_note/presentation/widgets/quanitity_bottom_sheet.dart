@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:neuconnectz_dynea/src/core/constants/app_errors.dart';
 import 'package:neuconnectz_dynea/src/core/enums/scan_type.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
@@ -56,23 +59,48 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
   final List<BinEntity> _selectedBins = [];
   final List<TextEditingController> _binQuantityControllers = [];
   final _binQuantityFocusNodes = <FocusNode>[];
-
+  Timer? _debounceTimer;
   String _binSearchQuery = '';
+
+  // Pagination for bins
+  static const int _pageSize = 10;
+  int _skipRecords = 0;
+
+  // Local state to manage bin dialog pagination/results
+  final List<BinEntity> _dialogBins = [];
+  bool _dialogHasMore = false;
+  bool _dialogResetPending = false;
 
   double get _totalSelectedQuantity => _selectedBins.fold<double>(
     0.0,
     (sum, bin) => sum + (bin.selectedQuantity),
   );
 
-  void _loadBins({String? keyword, String? storageType}) {
+  void _loadBins({
+    String? keyword,
+    String? storageType,
+    bool resetPagination = false,
+  }) {
+    if (resetPagination) {
+      _skipRecords = 0;
+      _dialogBins.clear();
+      _dialogHasMore = false;
+      _dialogResetPending = true;
+    }
+
     context.read<BinBloc>().add(
       LoadBinsEvent(
-        plant: widget.item?.plant,
+        // plant: widget.item?.plant,
         warehouseCode: widget.grn.warehouseNumber,
-        storageType: storageType ?? widget.grn.sourceStorageType,
+        storageType: storageType ?? widget.grn.destStorageType,
         keyword: keyword,
+        lastCount: _pageSize,
+        skipRecords: _skipRecords,
       ),
     );
+
+    // Prepare for next page on subsequent calls
+    _skipRecords += _pageSize;
   }
 
   @override
@@ -212,30 +240,30 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
       hint: AppTexts.scanAndType,
       controller: _binCodeController,
       focusNode: _binCodeFocusNode,
-      readOnly: true,
-      onTap: () {
-        // Scroll to top when bin field is tapped
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            0,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-        _showBinSelectionDialog();
-      },
+      //readOnly: false,
+      //onTap: () {
+      // Scroll to top when bin field is tapped
+      // if (_scrollController.hasClients) {
+      //   _scrollController.animateTo(
+      //     0,
+      //     duration: Duration(milliseconds: 300),
+      //     curve: Curves.easeOut,
+      //   );
+      // }
+      //  _showBinSelectionDialog();
+      // },
       suffixIcon: IconButton(
-        icon: Icon(Icons.search),
-        color: context.primaryColor,
+        icon: Icon(Icons.list),
+        //color: context.primaryColor,
         onPressed: () {
-          // Scroll to top when search icon is tapped
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              0,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
-          }
+          // // Scroll to top when search icon is tapped
+          // if (_scrollController.hasClients) {
+          //   _scrollController.animateTo(
+          //     0,
+          //     duration: Duration(milliseconds: 300),
+          //     curve: Curves.easeOut,
+          //   );
+          // }
           _showBinSelectionDialog();
         },
       ),
@@ -251,7 +279,8 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
     _binSearchController.clear();
     _binSearchQuery = '';
 
-    _loadBins(keyword: _binSearchQuery);
+    // Initial load with pagination reset
+    _loadBins(keyword: _binSearchQuery, resetPagination: true);
 
     if (!mounted) return;
 
@@ -262,21 +291,46 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
             value: context.read<BinBloc>(),
             child: BlocBuilder<BinBloc, BinState>(
               builder: (context, state) {
-                List<BinEntity> bins = [];
+                // Start with locally cached dialog bins
+                List<BinEntity> bins = _dialogBins;
 
-                if (state is BinLoading) {
-                } else if (state is BinSuccess) {
-                  bins = state.bins;
+                if (state is BinSuccess) {
+                  // On a fresh search/open, replace; otherwise append for pagination
+                  if (_dialogResetPending) {
+                    _dialogBins
+                      ..clear()
+                      ..addAll(state.bins);
+                    _dialogResetPending = false;
+                  } else {
+                    _dialogBins.addAll(state.bins);
+                  }
+
+                  bins = _dialogBins;
+                  _dialogHasMore = state.bins.length == _pageSize;
                 } else if (state is BinFailure) {
-                  // if (mounted) {
-                  //   CustomToast.error(context, state.message);
-                  // }
+                  _dialogHasMore = false;
                 }
+
+                // Show shimmer only for the very first load
+                final bool isInitialLoading =
+                    state is BinLoading && bins.isEmpty;
 
                 return GenericSelectionDialog<BinEntity>(
                   items: bins,
                   controller: _binSearchController,
-                  loading: state is BinLoading,
+                  loading: isInitialLoading,
+                  isTable: true,
+                  tableHeaders: ["Storage Type", "Section", "Bin Code"],
+                  tableRowBuilder:
+                      (bin) => [
+                        bin.storageType,
+                        bin.storageSection,
+                        bin.binCode,
+                      ],
+                  noDataText:
+                      state is BinFailure
+                          ? state.message
+                          : AppErrors.noBinsFound,
                   headingText: "Select Bin",
                   searchLabel: "Search Bin Code",
                   titleBuilder:
@@ -293,13 +347,24 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
                       ),
                   onChanged: (value) {
                     _binSearchQuery = value;
-                    _loadBins(keyword: value);
+                    _loadBins(keyword: value, resetPagination: true);
                   },
                   onSelected: (bin) {
                     Navigator.pop(context);
                     _onBinSelected(bin);
                     _scrollController.jumpTo(700);
                   },
+                  // Infinite scroll pagination
+                  hasMore: _dialogHasMore,
+                  onPaginate:
+                      _dialogHasMore
+                          ? () {
+                            _loadBins(
+                              keyword: _binSearchQuery,
+                              storageType: widget.grn.destStorageType,
+                            );
+                          }
+                          : null,
                 );
               },
             ),
@@ -392,8 +457,8 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
     if ((res ?? "").isNotEmpty && res != "-1") {
       _binCodeController.text = res ?? "";
 
-      // Load bins first
-      _loadBins(keyword: res);
+      // Load bins first (reset pagination for scan search)
+      _loadBins(keyword: res, resetPagination: true);
 
       // Wait a bit for the bloc to process, then check state
       await Future.delayed(Duration(milliseconds: 500));

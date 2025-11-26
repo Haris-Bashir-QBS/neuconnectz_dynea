@@ -11,4 +11,8 @@ abstract class GrnRemoteDataSource {
   Future<GrnItemResponseModel> listAllGrItemsFromSAP({
     required GrnItemQueryParams params,
   });
+
+  Future<GrnItemResponseModel> listCompletedGrnItems({
+    required GrnItemQueryParams params,
+  });
 }

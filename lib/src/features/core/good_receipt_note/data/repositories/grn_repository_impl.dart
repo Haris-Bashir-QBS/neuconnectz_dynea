@@ -58,4 +58,32 @@ class GrnRepositoryImpl implements GrnRepository {
       return left(UnknownException(message: 'Error parsing GRN items: $e'));
     }
   }
+
+  @override
+  Future<Either<Failure, GrnItemResultEntity>> listCompletedGrnItems(
+    GrnItemQueryParams params,
+  ) async {
+    try {
+      final model = await remoteDataSource.listCompletedGrnItems(
+        params: params,
+      );
+      if (model.data == null) {
+        return right(const GrnItemResultEntity(items: [], totalRows: 0));
+      }
+      final items =
+          model.data!.data.isEmpty
+              ? <GrnItemEntity>[]
+              : model.data!.data.map((item) => item.toEntity()).toList();
+
+      return right(
+        GrnItemResultEntity(items: items, totalRows: model.data!.totalRows),
+      );
+    } on Failure catch (failure) {
+      return left(failure);
+    } catch (e) {
+      return left(
+        UnknownException(message: 'Error parsing completed GRN items: $e'),
+      );
+    }
+  }
 }

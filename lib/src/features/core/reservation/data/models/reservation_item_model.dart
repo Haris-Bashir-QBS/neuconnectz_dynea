@@ -46,10 +46,7 @@ class ReservationItemsDataModel {
   final int totalCount;
   final List<ReservationItemModel> data;
 
-  ReservationItemsDataModel({
-    required this.totalCount,
-    required this.data,
-  });
+  ReservationItemsDataModel({required this.totalCount, required this.data});
 
   factory ReservationItemsDataModel.fromJson(Map<String, dynamic> json) {
     return ReservationItemsDataModel(
@@ -81,6 +78,7 @@ class ReservationItemModel {
   final double qtyInUnitOfEntry;
   final String unitOfEntry;
   final double quantityWithdrawn;
+  final double remainingQuantity;
 
   ReservationItemModel({
     required this.reservation,
@@ -99,6 +97,7 @@ class ReservationItemModel {
     required this.qtyInUnitOfEntry,
     required this.unitOfEntry,
     required this.quantityWithdrawn,
+    required this.remainingQuantity,
   });
 
   factory ReservationItemModel.fromJson(Map<String, dynamic> json) {
@@ -125,26 +124,27 @@ class ReservationItemModel {
       qtyInUnitOfEntry: _toDouble(json['qtyInUnitOfEntry']),
       unitOfEntry: json['unitOfEntry'] ?? '',
       quantityWithdrawn: _toDouble(json['quantityWithdrawn']),
+      remainingQuantity: _toDouble(json['remainingQuantity']),
     );
   }
 
   ReservationItemEntity toEntity() => ReservationItemEntity(
-        reservation: reservation,
-        itemNumberOfReservation: itemNumberOfReservation,
-        itemDeleted: itemDeleted,
-        movementAllowed: movementAllowed,
-        finalIssue: finalIssue,
-        material: material,
-        plant: plant,
-        storageLocation: storageLocation,
-        batch: batch,
-        distrDifferences: distrDifferences,
-        specialStock: specialStock,
-        requirementQuantity: requirementQuantity,
-        baseUnitOfMeasure: baseUnitOfMeasure,
-        qtyInUnitOfEntry: qtyInUnitOfEntry,
-        unitOfEntry: unitOfEntry,
-        quantityWithdrawn: quantityWithdrawn,
-      );
+    reservation: reservation,
+    itemNumberOfReservation: itemNumberOfReservation,
+    itemDeleted: itemDeleted,
+    movementAllowed: movementAllowed,
+    finalIssue: finalIssue,
+    material: material,
+    plant: plant,
+    storageLocation: storageLocation,
+    batch: batch,
+    distrDifferences: distrDifferences,
+    specialStock: specialStock,
+    requirementQuantity: requirementQuantity,
+    baseUnitOfMeasure: baseUnitOfMeasure,
+    qtyInUnitOfEntry: qtyInUnitOfEntry,
+    unitOfEntry: unitOfEntry,
+    quantityWithdrawn: quantityWithdrawn,
+    remainingQuantity: remainingQuantity,
+  );
 }
-

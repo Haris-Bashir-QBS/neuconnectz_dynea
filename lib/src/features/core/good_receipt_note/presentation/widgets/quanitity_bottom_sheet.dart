@@ -533,7 +533,16 @@ class _GrnQuantityBottomSheetState extends State<GrnQuantityBottomSheet> {
           CustomToast.error(context, "Please add at least one bin entry.");
           return;
         }
+        final binsWithZeroQuantity =
+            _selectedBins.where((bin) => bin.selectedQuantity <= 0).toList();
 
+        if (binsWithZeroQuantity.isNotEmpty) {
+          CustomToast.error(
+            context,
+            "Please enter quantity for all bins or remove bins with zero quantity.",
+          );
+          return;
+        }
         if ((selectedQuantity - actualQuantity).abs() >= 0.001) {
           CustomToast.error(
             context,

@@ -13,6 +13,7 @@ class ReservationItemEntity extends Equatable {
   final String distrDifferences;
   final String specialStock;
   final double requirementQuantity;
+  final double remainingQuantity;
   final String baseUnitOfMeasure;
   final double qtyInUnitOfEntry;
   final String unitOfEntry;
@@ -28,6 +29,7 @@ class ReservationItemEntity extends Equatable {
     required this.plant,
     required this.storageLocation,
     required this.batch,
+    required this.remainingQuantity,
     required this.distrDifferences,
     required this.specialStock,
     required this.requirementQuantity,
@@ -39,22 +41,22 @@ class ReservationItemEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        reservation,
-        itemNumberOfReservation,
-        itemDeleted,
-        movementAllowed,
-        finalIssue,
-        material,
-        plant,
-        storageLocation,
-        batch,
-        distrDifferences,
-        specialStock,
-        requirementQuantity,
-        baseUnitOfMeasure,
-        qtyInUnitOfEntry,
-        unitOfEntry,
-        quantityWithdrawn,
-      ];
+    reservation,
+    itemNumberOfReservation,
+    itemDeleted,
+    movementAllowed,
+    finalIssue,
+    material,
+    plant,
+    storageLocation,
+    batch,
+    distrDifferences,
+    specialStock,
+    requirementQuantity,
+    baseUnitOfMeasure,
+    qtyInUnitOfEntry,
+    unitOfEntry,
+    quantityWithdrawn,
+    remainingQuantity,
+  ];
 }
-

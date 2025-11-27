@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 
@@ -45,7 +44,7 @@ class ReservationItemCard extends StatelessWidget {
                         ),
                       ),
                       CustomText(
-                        text: item.requirementQuantity.formatWithCommas,
+                        text: item.remainingQuantity.formatWithCommas,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                       ),

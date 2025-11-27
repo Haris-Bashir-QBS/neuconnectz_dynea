@@ -49,5 +49,10 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_movement_types_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/movement_type_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/data/datasources/stock_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/data/repositories/stock_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/domain/repositories/stock_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/domain/usecases/get_stocks_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/blocs/stock_bloc.dart';
 
 part 'di_container.dart';

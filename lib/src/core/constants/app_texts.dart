@@ -172,6 +172,7 @@ final class AppTexts {
   static const String disconnected = "Disconnected";
   static const String picking = "Picking";
   static const String physicalStockCheck = "Physical Stock Check";
+  static const String stockCheck = "Stock Check";
   static const String outboundDeliverySto = "Outbound Delivery STO";
   static const String outboundDeliverySales = "Outbound Delivery (Sales)";
   static const String checkStock = "Check Stock";
@@ -185,4 +186,16 @@ final class AppTexts {
   static const String selectMovementType = "Select movement type";
   static const String movementType = "Movement type";
   static const String pickingAgainstReservation = "Picking Against Reservation";
+  static const String all = "All";
+  static const String material = "Material";
+  static const String storageType = "Storage Type";
+  static const String storageBin = "Storage Bin";
+  static const String searchMaterial = "Search Material";
+  static const String searchStorageType = "Search Storage Type";
+  static const String searchStorageBin = "Search Storage Bin";
+  static const String warehouse = "Warehouse";
+  static const String availableQuantity = "Available Quantity";
+  static const String availableStock = "Available Stock";
+  static const String noStocksFound = "No stocks found";
+  static const String noResultsFound = "No results found";
 }

@@ -238,10 +238,16 @@ final class AppStaticData {
       title: AppTexts.physicalStockCheck,
       iconPath: AppAssets.stockCheckIcon,
       onTap: (context) {
-        //context.pushNamed(AppRoutes.physicalStockCheck);
+        context.pushNamed(
+          AppRoutes.documentSelection,
+          extra: DocumentSelectionConfigs.stockCheck(),
+        );
       },
       onItemTap: (context, item) {
-        // context.pushNamed(AppRoutes.physicalStockCheck);
+        context.pushNamed(
+          AppRoutes.documentSelection,
+          extra: DocumentSelectionConfigs.stockCheck(),
+        );
       },
     ),
   ];

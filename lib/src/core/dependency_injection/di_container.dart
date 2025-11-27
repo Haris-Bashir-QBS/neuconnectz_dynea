@@ -31,6 +31,7 @@ Future<void> _initAuthDependencies() async {
   _registerInventoryDependencies();
   _registerGrnListDependencies();
   _registerReservationDependencies();
+  _registerStockDependencies();
 }
 
 void _registerAuthRemoteDatasources() {
@@ -193,6 +194,23 @@ void _registerReservationDependencies() {
       getReservationListUseCase: sl(),
       getReservationItemsUseCase: sl(),
       getCompletedReservationItemsUseCase: sl(),
+    ),
+  );
+}
+
+void _registerStockDependencies() {
+  sl
+    ..registerLazySingleton<StockRemoteDataSource>(
+      () => StockRemoteDataSourceImpl(client: sl()),
+    )
+    ..registerLazySingleton<StockRepository>(
+      () => StockRepositoryImpl(remoteDataSource: sl()),
+    )
+    ..registerLazySingleton(() => GetStocksUseCase(sl()));
+
+  sl.registerFactory(
+    () => StockBloc(
+      getStocksUseCase: sl(),
     ),
   );
 }

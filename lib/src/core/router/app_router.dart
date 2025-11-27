@@ -18,6 +18,8 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/re
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_listing_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_items_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/pages/stock_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/params/stock_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
 import 'package:neuconnectz_dynea/src/shared/selection/pages/document_selection_page.dart';
@@ -168,6 +170,7 @@ List<GoRoute> putAwayRoutes = [
   _documentSelection(),
   _grnListing(),
   _grnItems(),
+  _stockCheck(),
 ];
 
 GoRoute _reservationListing() {
@@ -193,3 +196,14 @@ GoRoute _reservationItems() {
 }
 
 List<GoRoute> reservationRoutes = [_reservationListing(), _reservationItems()];
+
+GoRoute _stockCheck() {
+  return GoRoute(
+    path: '/${AppRoutes.stockCheck}',
+    name: AppRoutes.stockCheck,
+    builder: (context, state) {
+      final args = state.extra as StockListingPageParams;
+      return StockListingPage(params: args);
+    },
+  );
+}

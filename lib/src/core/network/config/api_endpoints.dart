@@ -6,6 +6,7 @@ var _movementType = "ZCAPI-Dynea-Stg/IMovementTypeFeature";
 var _binManagement = "ZCAPI-Dynea-Stg/IBinManagementFeature";
 var _plant = "ZCAPI-Dynea-Stg/IPlantFeature";
 var _warehouse = "ZCAPI-Dynea-Stg/IWarehouseFeature";
+var _stocks = "ZCAPI-Dynea-Stg/IStocksFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -44,6 +45,9 @@ enum ApiEndpoints {
 
   /// ========================  Movement Types =========================
   listMovementTypes,
+
+  /// ========================  Stocks =========================
+  listStockItems,
 
   /// ========================  Plant/Warehouse =========================
   listAllPlantsAssignedToUser,
@@ -110,6 +114,10 @@ enum ApiEndpoints {
       /// ======================== Movement Types =========================
       case ApiEndpoints.listMovementTypes:
         return "$_movementType/ListAllMovementTypes";
+
+      /// ======================== Stocks =========================
+      case ApiEndpoints.listStockItems:
+        return "$_stocks/ListAllStocks";
 
       /// ======================== Plant/Warehouse =========================
       case ApiEndpoints.listAllPlantsAssignedToUser:

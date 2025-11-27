@@ -16,6 +16,7 @@ class AppRoutes {
   static const documentSelection = 'document_selection';
   static const grnListing = 'grn_listing';
   static const grnItems = 'grn_items';
+  static const stockCheck = 'stock_check';
   // ============================ Reservation ============================
   static const reservationListing = 'reservation_listing';
   static const reservationItems = 'reservation_items';

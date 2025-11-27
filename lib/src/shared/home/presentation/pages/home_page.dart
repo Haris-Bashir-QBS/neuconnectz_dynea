@@ -264,6 +264,12 @@ class PhysicalStockCheckSection extends StatelessWidget {
           iconColor: Color(0xFF5C6BC0),
           iconPath: AppAssets.stockCheckIcon,
           spanFullWidth: true,
+          onTap: () {
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.stockCheck(),
+            );
+          },
         ),
       ],
     );

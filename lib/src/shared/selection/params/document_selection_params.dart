@@ -2,6 +2,7 @@ import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/params/stock_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/movement_type_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
@@ -29,7 +30,8 @@ class SelectionDestination<T extends Object> {
     required PlantEntity plant,
     required WarehouseEntity warehouse,
     MovementTypeEntity? movementType,
-  }) buildArgs;
+  })
+  buildArgs;
 }
 
 class DocumentSelectionConfigs {
@@ -38,11 +40,12 @@ class DocumentSelectionConfigs {
       title: AppTexts.putAwayAgainstGrn,
       destination: SelectionDestination(
         routeName: AppRoutes.grnListing,
-        buildArgs: ({
-          required PlantEntity plant,
-          required WarehouseEntity warehouse,
-          MovementTypeEntity? movementType,
-        }) => GrnListingPageParams(plant: plant, warehouse: warehouse),
+        buildArgs:
+            ({
+              required PlantEntity plant,
+              required WarehouseEntity warehouse,
+              MovementTypeEntity? movementType,
+            }) => GrnListingPageParams(plant: plant, warehouse: warehouse),
       ),
     );
   }
@@ -58,15 +61,27 @@ class DocumentSelectionConfigs {
           required WarehouseEntity warehouse,
           MovementTypeEntity? movementType,
         }) {
-          if (movementType == null) {
-            throw ArgumentError('movementType is required');
-          }
           return ReservationListingPageParams(
             plant: plant.code,
             storageLocation: warehouse.storageLocationCode ?? '',
-            movementType: movementType.movementType,
+            movementType: movementType?.movementType ?? "",
           );
         },
+      ),
+    );
+  }
+
+  static DocumentSelectionParams<StockListingPageParams> stockCheck() {
+    return DocumentSelectionParams(
+      title: AppTexts.stockCheck,
+      destination: SelectionDestination(
+        routeName: AppRoutes.stockCheck,
+        buildArgs:
+            ({
+              required PlantEntity plant,
+              required WarehouseEntity warehouse,
+              MovementTypeEntity? movementType,
+            }) => StockListingPageParams(plant: plant, warehouse: warehouse),
       ),
     );
   }

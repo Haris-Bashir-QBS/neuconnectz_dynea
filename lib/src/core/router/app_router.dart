@@ -10,11 +10,18 @@ import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/login_pag
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/reset_password.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/splash_page.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/verify_otp_page.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/warehouse_and_plant_selection_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
-import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_items_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_items_page.dart';
+import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
+import 'package:neuconnectz_dynea/src/shared/selection/pages/document_selection_page.dart';
+import 'package:neuconnectz_dynea/src/shared/selection/params/document_selection_params.dart';
 import 'package:neuconnectz_dynea/src/widgets/connectivity_overlay.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -25,6 +32,7 @@ final GoRouter appRouter = GoRouter(
     /// ====================== Auth Routes ======================
     ...authRoutes,
     ...putAwayRoutes,
+    ...reservationRoutes,
 
     /// ====================== Core Routes ======================
     ShellRoute(
@@ -121,11 +129,27 @@ GoRoute _verifyOtp() {
   );
 }
 
-GoRoute _putAwayFromGr() {
+GoRoute _documentSelection() {
   return GoRoute(
-    path: '/${AppRoutes.warehouseAndPlantSelection}',
-    name: AppRoutes.warehouseAndPlantSelection,
-    builder: (context, state) => WarehouseAndPlantSelectionPage(),
+    path: '/${AppRoutes.documentSelection}',
+    name: AppRoutes.documentSelection,
+    builder: (context, state) {
+      final params =
+          state.extra as DocumentSelectionParams? ??
+          DocumentSelectionConfigs.grn();
+      return DocumentSelectionPage(params: params);
+    },
+  );
+}
+
+GoRoute _grnListing() {
+  return GoRoute(
+    path: '/${AppRoutes.grnListing}',
+    name: AppRoutes.grnListing,
+    builder: (context, state) {
+      final args = state.extra as GrnListingPageParams;
+      return GrnListingPage(params: args);
+    },
   );
 }
 
@@ -140,4 +164,32 @@ GoRoute _grnItems() {
   );
 }
 
-List<GoRoute> putAwayRoutes = [_putAwayFromGr(), _grnItems()];
+List<GoRoute> putAwayRoutes = [
+  _documentSelection(),
+  _grnListing(),
+  _grnItems(),
+];
+
+GoRoute _reservationListing() {
+  return GoRoute(
+    path: '/${AppRoutes.reservationListing}',
+    name: AppRoutes.reservationListing,
+    builder: (context, state) {
+      final args = state.extra as ReservationListingPageParams;
+      return ReservationListingPage(params: args);
+    },
+  );
+}
+
+GoRoute _reservationItems() {
+  return GoRoute(
+    path: '/${AppRoutes.reservationItems}',
+    name: AppRoutes.reservationItems,
+    builder: (context, state) {
+      final args = state.extra as ReservationItemParams;
+      return ReservationItemsPage(params: args);
+    },
+  );
+}
+
+List<GoRoute> reservationRoutes = [_reservationListing(), _reservationItems()];

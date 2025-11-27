@@ -5,6 +5,7 @@ import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/constants/asset_paths.dart';
 import 'package:neuconnectz_dynea/src/core/models/stock_transfer_order_model.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
+import 'package:neuconnectz_dynea/src/shared/selection/params/document_selection_params.dart';
 
 final class AppStaticData {
   AppStaticData._();
@@ -103,7 +104,10 @@ final class AppStaticData {
       onTap: null,
       onItemTap: (context, item) {
         if (item == AppTexts.goodReceiptNote) {
-          context.pushNamed(AppRoutes.warehouseAndPlantSelection);
+          context.pushNamed(
+            AppRoutes.documentSelection,
+            extra: DocumentSelectionConfigs.grn(),
+          );
         }
       },
     ),
@@ -129,11 +133,12 @@ final class AppStaticData {
       ],
       onTap: null,
       onItemTap: (context, item) {
-        // if (item == AppTexts.salesOrder) {
-        //   context.pushNamed(AppRoutes.salesOrderListing);
-        // } else if (item == AppTexts.delivery) {
-        //   context.pushNamed(AppRoutes.deliveryOrderListing);
-        // }
+        if (item == AppTexts.reservation) {
+          context.pushNamed(
+            AppRoutes.documentSelection,
+            extra: DocumentSelectionConfigs.reservation(),
+          );
+        }
       },
     ),
     // ModuleItem(

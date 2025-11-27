@@ -40,6 +40,7 @@ enum ApiEndpoints {
   listAllReservationsFromSAP,
   listAllReservationItemsFromSAP,
   listCompletedReservationItemsFromSAP,
+  createPickingAgainstReservation,
 
   /// ========================  Movement Types =========================
   listMovementTypes,
@@ -95,12 +96,18 @@ enum ApiEndpoints {
         return "$_binManagement/ListAllBinsByWarehouseAndStorageType";
       case ApiEndpoints.createPutAwayAgainstGr:
         return "$_putAway/CreatePutAwayAgainstGr";
+
+      /// ============================ Reservation =========================
       case ApiEndpoints.listAllReservationsFromSAP:
         return "$_reservation/ListAllReservationsFromSAP";
       case ApiEndpoints.listAllReservationItemsFromSAP:
         return "$_reservation/ListAllItemsOfReservationFromSAP";
       case ApiEndpoints.listCompletedReservationItemsFromSAP:
-        return "$_reservation/ListAllCompletedItemsOfReservationFromSAP";
+        return "$_reservation/ListAllCompletedItemsOfReservation";
+      case ApiEndpoints.createPickingAgainstReservation:
+        return "$_reservation/CreatePickingAgainstReservation";
+
+      /// ======================== Movement Types =========================
       case ApiEndpoints.listMovementTypes:
         return "$_movementType/ListAllMovementTypes";
 

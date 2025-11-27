@@ -148,8 +148,9 @@ final class AppTexts {
   static const String proceed = "Proceed";
   static const String apply = "Apply";
   static const String selectPlantAndWarehouse = 'Select Plant & Warehouse';
+  static const String selectAllFieldsToProceed = 'Select all fields to proceed';
   static const String selectPlantWarehouseAndMovementType =
-      'Select Plant,warehouse and Movement Type';
+      'Select Plant,Warehouse & Movement Type';
   static const String selectPlant = 'Select Plant';
   static const String purchaseOrder = "Purchase Order";
   static const String inboundDelivery = "Inbound Delivery";
@@ -182,5 +183,6 @@ final class AppTexts {
   static const String materialName = "Material Name";
   static const String quantity = "Quantity";
   static const String selectMovementType = "Select movement type";
+  static const String movementType = "Movement type";
   static const String pickingAgainstReservation = "Picking Against Reservation";
 }

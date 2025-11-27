@@ -13,6 +13,7 @@ import 'package:neuconnectz_dynea/src/core/services/session_service.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../selection/params/document_selection_params.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -170,6 +171,12 @@ class HomeWelcomeCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
+          6.horizontalSpace,
+          CustomText(
+            text: statusText,
+            fontSize: 12.sp,
+            color: statusColor,
+          ),
         ],
       ),
     );
@@ -189,7 +196,10 @@ class PutawaySection extends StatelessWidget {
           iconBackgroundColor: AppPalette.d4Color,
           iconColor: AppPalette.lightGreenColor,
           onTap: () {
-            context.pushNamed(AppRoutes.warehouseAndPlantSelection);
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.grn(),
+            );
           },
         ),
         HomeActionCardData(
@@ -215,6 +225,12 @@ class PickingSection extends StatelessWidget {
           title: AppTexts.reservation,
           iconBackgroundColor: AppPalette.d5Color,
           iconColor: AppPalette.primaryColor,
+          onTap: () {
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.reservation(),
+            );
+          },
         ),
         HomeActionCardData(
           title: AppTexts.outboundDeliverySto,
@@ -270,7 +286,7 @@ class HomeSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

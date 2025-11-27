@@ -4,14 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
+import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_widget.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/item_listing_header_shimmer.dart';
-import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
-import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_search_field.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:go_router/go_router.dart';
@@ -19,26 +19,35 @@ import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
 
 import '../../../../../core/constants/app_texts.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../widgets/custom_appbar.dart';
 
-class GrnListingPage extends StatefulWidget {
-  final PlantEntity selectedPlant;
-  final WarehouseEntity selectedWarehouse;
-  final ScrollController? scrollController;
+class GrnListingPage extends StatelessWidget {
+  final GrnListingPageParams params;
 
-  const GrnListingPage({
-    super.key,
-    required this.selectedPlant,
-    required this.selectedWarehouse,
-    this.scrollController,
-  });
+  const GrnListingPage({super.key, required this.params});
 
   @override
-  State<GrnListingPage> createState() => _GrnListingPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => sl<GrnBloc>(),
+      child: _GrnListingView(params: params),
+    );
+  }
 }
 
-class _GrnListingPageState extends State<GrnListingPage> {
+class _GrnListingView extends StatefulWidget {
+  final GrnListingPageParams params;
+
+  const _GrnListingView({required this.params});
+
+  @override
+  State<_GrnListingView> createState() => __GrnListingViewState();
+}
+
+class __GrnListingViewState extends State<_GrnListingView> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
+  late final ScrollController _scrollController;
 
   String _searchKeyword = '';
 
@@ -47,10 +56,7 @@ class _GrnListingPageState extends State<GrnListingPage> {
     super.initState();
     _loadInitialData();
     _searchController.addListener(_onSearchChanged);
-
-    if (widget.scrollController != null) {
-      widget.scrollController!.addListener(_onScroll);
-    }
+    _scrollController = ScrollController()..addListener(_onScroll);
   }
 
   @override
@@ -59,9 +65,8 @@ class _GrnListingPageState extends State<GrnListingPage> {
     _searchController.dispose();
     _searchDebounce?.cancel();
 
-    if (widget.scrollController != null) {
-      widget.scrollController!.removeListener(_onScroll);
-    }
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -78,8 +83,8 @@ class _GrnListingPageState extends State<GrnListingPage> {
 
   void _loadInitialData() {
     final params = GrnListParams(
-      plant: widget.selectedPlant.code,
-      location: widget.selectedWarehouse.storageLocationCode ?? '',
+      plant: widget.params.plant.code,
+      location: widget.params.warehouse.storageLocationCode ?? '',
       lastCount: 10,
       skipRecords: 0,
       keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
@@ -91,16 +96,14 @@ class _GrnListingPageState extends State<GrnListingPage> {
   }
 
   void _onScroll() {
-    if (widget.scrollController == null) return;
-
-    if (widget.scrollController!.position.pixels ==
-        widget.scrollController!.position.maxScrollExtent) {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
       final state = context.read<GrnBloc>().state;
 
       if (state is PendingGrnSuccess && state.hasMore && !state.isLoadingMore) {
         final params = GrnListParams(
-          plant: widget.selectedPlant.code,
-          location: widget.selectedWarehouse.storageLocationCode ?? '',
+          plant: widget.params.plant.code,
+          location: widget.params.warehouse.storageLocationCode ?? '',
           lastCount: 4,
           skipRecords: state.skipRecords,
           keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
@@ -141,12 +144,15 @@ class _GrnListingPageState extends State<GrnListingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CustomSearchField(controller: _searchController),
-        SizedBox(height: 8.h),
-        Expanded(child: _buildPendingList()),
-      ],
+    return Scaffold(
+      appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
+      body: Column(
+        children: [
+          CustomSearchField(controller: _searchController),
+          SizedBox(height: 8.h),
+          Expanded(child: _buildPendingList()),
+        ],
+      ),
     );
   }
 
@@ -219,7 +225,7 @@ class _GrnListingPageState extends State<GrnListingPage> {
                 child: RefreshIndicator(
                   onRefresh: () async => _loadInitialData(),
                   child: ListView.builder(
-                    controller: widget.scrollController,
+                    controller: _scrollController,
                     physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 15.w),
                     itemCount:
@@ -262,9 +268,9 @@ class _GrnListingPageState extends State<GrnListingPage> {
           AppRoutes.grnItems,
           extra: GrnItemsPageParams(
             grn: state.items[index],
-            plant: widget.selectedPlant.code,
-            warehouseCode: widget.selectedWarehouse.code,
-            location: widget.selectedWarehouse.storageLocationCode ?? '',
+            plant: widget.params.plant.code,
+            warehouseCode: widget.params.warehouse.code,
+            location: widget.params.warehouse.storageLocationCode ?? '',
           ),
         )
         .then((value) {

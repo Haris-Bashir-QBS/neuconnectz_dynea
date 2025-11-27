@@ -48,5 +48,6 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_completed_reservation_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_movement_types_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/movement_type_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bloc.dart';
 
 part 'di_container.dart';

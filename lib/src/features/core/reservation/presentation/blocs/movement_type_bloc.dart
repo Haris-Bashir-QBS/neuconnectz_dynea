@@ -8,37 +8,85 @@ part 'movement_type_event.dart';
 part 'movement_type_state.dart';
 
 class MovementTypeBloc extends Bloc<MovementTypeEvent, MovementTypeState> {
-  final GetMovementTypesUseCase getMovementTypesUseCase;
-
   MovementTypeBloc({required this.getMovementTypesUseCase})
-      : super(MovementTypeInitial()) {
-    on<LoadMovementTypesEvent>(_onLoadMovementTypes);
+    : super(MovementTypeState.initial()) {
+    on<MovementTypeFetchEvent>(_onFetch);
+    on<MovementTypeLoadMoreEvent>(_onLoadMore);
   }
 
-  Future<void> _onLoadMovementTypes(
-    LoadMovementTypesEvent event,
+  final GetMovementTypesUseCase getMovementTypesUseCase;
+  static const int _pageSize = 50;
+
+  Future<void> _onFetch(
+    MovementTypeFetchEvent event,
     Emitter<MovementTypeState> emit,
   ) async {
-    emit(MovementTypeLoading());
-
-    final params = MovementTypeQueryParams(
-      keyword: event.keyword,
-      lastCount: event.lastCount,
-      skipRecords: 0,
+    emit(
+      state.copyWith(
+        isLoading: true,
+        items: const [],
+        totalCount: 0,
+        keyword: event.keyword,
+        clearError: true,
+      ),
     );
 
-    final result = await getMovementTypesUseCase.call(params);
+    final result = await getMovementTypesUseCase(
+      MovementTypeQueryParams(
+        keyword: event.keyword,
+        lastCount: _pageSize,
+        skipRecords: 0,
+      ),
+    );
 
     result.fold(
-      (failure) => emit(MovementTypeFailure(message: failure.message)),
-      (success) => emit(
-        MovementTypeSuccess(
-          items: success.items,
-          totalCount: success.totalCount,
+      (failure) => emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage: failure.message,
+          items: const [],
+          totalCount: 0,
+        ),
+      ),
+      (data) => emit(
+        state.copyWith(
+          isLoading: false,
+          items: data.items,
+          totalCount: data.totalCount,
+          clearError: true,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onLoadMore(
+    MovementTypeLoadMoreEvent event,
+    Emitter<MovementTypeState> emit,
+  ) async {
+    if (state.isLoading || state.isLoadingMore || !state.hasMore) return;
+
+    emit(state.copyWith(isLoadingMore: true, clearError: true));
+
+    final result = await getMovementTypesUseCase(
+      MovementTypeQueryParams(
+        keyword: state.keyword,
+        lastCount: _pageSize,
+        skipRecords: state.items.length,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(isLoadingMore: false, errorMessage: failure.message),
+      ),
+      (data) => emit(
+        state.copyWith(
+          isLoadingMore: false,
+          items: [...state.items, ...data.items],
+          totalCount: data.totalCount,
+          clearError: true,
         ),
       ),
     );
   }
 }
-
-

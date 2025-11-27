@@ -12,7 +12,11 @@ class AppRoutes {
   static const String home = 'home';
   static const String settings = 'settings';
   static const String dashboard = 'dashboard';
-  // ============================ PutAway ============================
-  static const warehouseAndPlantSelection = 'warehouse_and_plant_selection';
+  // ============================ Selection & PutAway ============================
+  static const documentSelection = 'document_selection';
+  static const grnListing = 'grn_listing';
   static const grnItems = 'grn_items';
+  // ============================ Reservation ============================
+  static const reservationListing = 'reservation_listing';
+  static const reservationItems = 'reservation_items';
 }

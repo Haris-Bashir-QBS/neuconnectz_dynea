@@ -7,17 +7,16 @@ abstract class MovementTypeEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadMovementTypesEvent extends MovementTypeEvent {
+class MovementTypeFetchEvent extends MovementTypeEvent {
   final String? keyword;
-  final int lastCount;
 
-  const LoadMovementTypesEvent({
-    this.keyword,
-    this.lastCount = 50,
-  });
+  const MovementTypeFetchEvent({this.keyword});
 
   @override
-  List<Object?> get props => [keyword, lastCount];
+  List<Object?> get props => [keyword];
 }
 
+class MovementTypeLoadMoreEvent extends MovementTypeEvent {
+  const MovementTypeLoadMoreEvent();
+}
 

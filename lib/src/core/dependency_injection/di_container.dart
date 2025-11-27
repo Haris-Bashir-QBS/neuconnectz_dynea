@@ -188,4 +188,11 @@ void _registerReservationDependencies() {
       getMovementTypesUseCase: sl(),
     ),
   );
+  sl.registerFactory(
+    () => ReservationBloc(
+      getReservationListUseCase: sl(),
+      getReservationItemsUseCase: sl(),
+      getCompletedReservationItemsUseCase: sl(),
+    ),
+  );
 }

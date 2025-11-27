@@ -11,26 +11,38 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentati
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_widget.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/quanitity_bottom_sheet.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/completed_grn_item_detail_page.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
-import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_texts.dart';
 import '../../../../../widgets/custom_toast.dart';
 
-class GrnItemsPage extends StatefulWidget {
+class GrnItemsPage extends StatelessWidget {
   final GrnItemsPageParams params;
 
   const GrnItemsPage({super.key, required this.params});
 
   @override
-  State<GrnItemsPage> createState() => _GrnItemsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => sl<GrnBloc>(),
+      child: _GrnItemsView(params: params),
+    );
+  }
 }
 
-class _GrnItemsPageState extends State<GrnItemsPage> {
-  late final GrnBloc _grnBloc;
+class _GrnItemsView extends StatefulWidget {
+  final GrnItemsPageParams params;
+
+  const _GrnItemsView({required this.params});
+
+  @override
+  State<_GrnItemsView> createState() => _GrnItemsViewState();
+}
+
+class _GrnItemsViewState extends State<_GrnItemsView> {
   final ScrollController _pendingScrollController = ScrollController();
   final ScrollController _completedScrollController = ScrollController();
   int _selectedTab = 0;
@@ -38,7 +50,6 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   @override
   void initState() {
     super.initState();
-    _grnBloc = sl<GrnBloc>();
     _pendingScrollController.addListener(_onPendingScroll);
     _completedScrollController.addListener(_onCompletedScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -53,7 +64,6 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
   void dispose() {
     _pendingScrollController.dispose();
     _completedScrollController.dispose();
-    _grnBloc.close();
     super.dispose();
   }
 
@@ -66,13 +76,13 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
       lastCount: 10,
       skipRecords: 0,
     );
-    _grnBloc.add(LoadGrnItemsEvent(params: params, refresh: true));
+    context.read<GrnBloc>().add(LoadGrnItemsEvent(params: params, refresh: true));
   }
 
   void _onPendingScroll() {
     if (_pendingScrollController.position.pixels ==
         _pendingScrollController.position.maxScrollExtent) {
-      final state = _grnBloc.state;
+      final state = context.read<GrnBloc>().state;
       if (state.pendingSection.hasMore && !state.pendingSection.isLoadingMore) {
         final params = GrnItemQueryParams(
           plant: widget.params.plant,
@@ -82,7 +92,7 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
           lastCount: 10,
           skipRecords: state.pendingSection.skipRecords,
         );
-        _grnBloc.add(LoadGrnItemsEvent(params: params, refresh: false));
+        context.read<GrnBloc>().add(LoadGrnItemsEvent(params: params, refresh: false));
       }
     }
   }
@@ -97,13 +107,13 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
       skipRecords: 0,
     );
 
-    _grnBloc.add(LoadCompletedGrnItemsEvent(params: params, refresh: refresh));
+    context.read<GrnBloc>().add(LoadCompletedGrnItemsEvent(params: params, refresh: refresh));
   }
 
   void _onCompletedScroll() {
     if (_completedScrollController.position.pixels ==
         _completedScrollController.position.maxScrollExtent) {
-      final state = _grnBloc.state;
+      final state = context.read<GrnBloc>().state;
       if (state.completedSection.hasMore &&
           !state.completedSection.isLoadingMore) {
         final params = GrnItemQueryParams(
@@ -114,7 +124,7 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
           lastCount: 10,
           skipRecords: state.completedSection.skipRecords,
         );
-        _grnBloc.add(
+        context.read<GrnBloc>().add(
           LoadCompletedGrnItemsEvent(params: params, refresh: false),
         );
       }
@@ -155,87 +165,57 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _grnBloc,
-      child: BlocListener<GrnBloc, GrnState>(
-        listenWhen: (previous, current) {
-          final pendingChanged =
-              previous.pendingSection.errorMessage !=
-                  current.pendingSection.errorMessage;
-          final completedChanged =
-              previous.completedSection.errorMessage !=
-                  current.completedSection.errorMessage;
-          return pendingChanged || completedChanged;
-        },
-        listener: (context, state) {
-          final pendingError = state.pendingSection.errorMessage;
-          final completedError = state.completedSection.errorMessage;
-          if (pendingError != null && pendingError.isNotEmpty) {
-            CustomToast.error(context, pendingError);
-          } else if (completedError != null && completedError.isNotEmpty) {
-            CustomToast.error(context, completedError);
-          }
-        },
-        child: BlocBuilder<GrnBloc, GrnState>(
-          builder: (context, state) {
-            final pendingSection = state.pendingSection;
-            final completedSection = state.completedSection;
-
-            return Scaffold(
-              appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
-              body: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: _buildTab(0, AppTexts.pending)),
-                      Expanded(child: _buildTab(1, AppTexts.completed)),
-                    ],
-                  ),
-                  10.verticalSpace,
-                  ItemListingHeader(
-                    leftHeading: AppTexts.materialName,
-                    rightHeading: AppTexts.quantity,
-                  ),
-                  SizedBox(height: 8.h),
-                  Expanded(
-                    child:
-                        _selectedTab == 0
-                            ? _buildPendingList(pendingSection)
-                            : _buildCompleteList(completedSection),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  AnimatedSwitcher _markAsCompleteButton() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      transitionBuilder: (child, animation) {
-        return SizeTransition(
-          sizeFactor: animation,
-          axisAlignment: -1.0,
-          child: child,
-        );
+    return BlocListener<GrnBloc, GrnState>(
+      listenWhen: (previous, current) {
+        final pendingChanged =
+            previous.pendingSection.errorMessage !=
+                current.pendingSection.errorMessage;
+        final completedChanged =
+            previous.completedSection.errorMessage !=
+                current.completedSection.errorMessage;
+        return pendingChanged || completedChanged;
       },
-      child:
-          _selectedTab == 1
-              ? Padding(
-                key: const ValueKey('markCompleteButton'),
-                padding: EdgeInsets.all(16.w),
-                child: CustomButton(
-                  text: 'Mark As Complete',
-                  onPressed: () {
-                    // TODO: Implement mark as complete
-                  },
-                  icon: Icons.check,
+      listener: (context, state) {
+        final pendingError = state.pendingSection.errorMessage;
+        final completedError = state.completedSection.errorMessage;
+        if (pendingError != null && pendingError.isNotEmpty) {
+          CustomToast.error(context, pendingError);
+        } else if (completedError != null && completedError.isNotEmpty) {
+          CustomToast.error(context, completedError);
+        }
+      },
+      child: BlocBuilder<GrnBloc, GrnState>(
+        builder: (context, state) {
+          final pendingSection = state.pendingSection;
+          final completedSection = state.completedSection;
+
+          return Scaffold(
+            appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
+            body: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: _buildTab(0, AppTexts.pending)),
+                    Expanded(child: _buildTab(1, AppTexts.completed)),
+                  ],
                 ),
-              )
-              : const SizedBox(key: ValueKey('emptySpace')),
+                10.verticalSpace,
+                ItemListingHeader(
+                  leftHeading: AppTexts.materialName,
+                  rightHeading: AppTexts.quantity,
+                ),
+                SizedBox(height: 8.h),
+                Expanded(
+                  child:
+                      _selectedTab == 0
+                          ? _buildPendingList(pendingSection)
+                          : _buildCompleteList(completedSection),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -361,14 +341,9 @@ class _GrnItemsPageState extends State<GrnItemsPage> {
           return GrnItemWidget(
             item: item,
             onTap:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (_) => CompletedGrnItemDetailPage(
-                          item: item,
-                        ),
-                  ),
+                () => context.push(
+                  '/completed_grn_item_detail',
+                  extra: item,
                 ),
           );
         },

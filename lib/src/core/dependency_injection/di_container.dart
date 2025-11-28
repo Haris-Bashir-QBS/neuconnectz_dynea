@@ -165,6 +165,9 @@ void _registerReservationDependencies() {
     )
     ..registerLazySingleton<MovementTypeRemoteDataSource>(
       () => MovementTypeRemoteDataSourceImpl(dio: sl()),
+    )
+    ..registerLazySingleton<ReservationBinRemoteDataSource>(
+      () => ReservationBinRemoteDataSourceImpl(client: sl()),
     );
 
   // Repositories
@@ -174,6 +177,9 @@ void _registerReservationDependencies() {
     )
     ..registerLazySingleton<MovementTypeRepository>(
       () => MovementTypeRepositoryImpl(remoteDataSource: sl()),
+    )
+    ..registerLazySingleton<ReservationBinRepository>(
+      () => ReservationBinRepositoryImpl(remoteDataSource: sl()),
     );
 
   // Use cases
@@ -181,7 +187,9 @@ void _registerReservationDependencies() {
     ..registerLazySingleton(() => GetReservationListUseCase(sl()))
     ..registerLazySingleton(() => GetReservationItemsUseCase(sl()))
     ..registerLazySingleton(() => GetCompletedReservationItemsUseCase(sl()))
-    ..registerLazySingleton(() => GetMovementTypesUseCase(sl()));
+    ..registerLazySingleton(() => GetMovementTypesUseCase(sl()))
+    ..registerLazySingleton(() => GetWarehouseBinsByMaterialUseCase(sl()))
+    ..registerLazySingleton(() => CreatePickingAgainstReservationUseCase(sl()));
 
   // Blocs
   sl.registerFactory(
@@ -194,6 +202,16 @@ void _registerReservationDependencies() {
       getReservationListUseCase: sl(),
       getReservationItemsUseCase: sl(),
       getCompletedReservationItemsUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => ReservationBinBloc(
+      getWarehouseBinsByMaterialUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => PickingBloc(
+      createPickingAgainstReservationUseCase: sl(),
     ),
   );
 }

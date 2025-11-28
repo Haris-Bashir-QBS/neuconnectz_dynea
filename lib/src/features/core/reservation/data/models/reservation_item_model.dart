@@ -79,6 +79,7 @@ class ReservationItemModel {
   final String unitOfEntry;
   final double quantityWithdrawn;
   final double remainingQuantity;
+  final List<ReservationBinDetailModel> binDetails;
 
   ReservationItemModel({
     required this.reservation,
@@ -98,6 +99,7 @@ class ReservationItemModel {
     required this.unitOfEntry,
     required this.quantityWithdrawn,
     required this.remainingQuantity,
+    required this.binDetails,
   });
 
   factory ReservationItemModel.fromJson(Map<String, dynamic> json) {
@@ -106,6 +108,12 @@ class ReservationItemModel {
       if (value is num) return value.toDouble();
       return double.tryParse(value.toString()) ?? 0;
     }
+
+    final rawBinDetails =
+        (json['additionalBinDetails'] ??
+                json['binDetails'] ??
+                json['reservationBinDetails']) as List<dynamic>? ??
+            const [];
 
     return ReservationItemModel(
       reservation: json['reservation'] ?? 0,
@@ -125,26 +133,75 @@ class ReservationItemModel {
       unitOfEntry: json['unitOfEntry'] ?? '',
       quantityWithdrawn: _toDouble(json['quantityWithdrawn']),
       remainingQuantity: _toDouble(json['remainingQuantity']),
+      binDetails: rawBinDetails
+          .map(
+            (e) => ReservationBinDetailModel.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 
   ReservationItemEntity toEntity() => ReservationItemEntity(
-    reservation: reservation,
-    itemNumberOfReservation: itemNumberOfReservation,
-    itemDeleted: itemDeleted,
-    movementAllowed: movementAllowed,
-    finalIssue: finalIssue,
-    material: material,
-    plant: plant,
-    storageLocation: storageLocation,
-    batch: batch,
-    distrDifferences: distrDifferences,
-    specialStock: specialStock,
-    requirementQuantity: requirementQuantity,
-    baseUnitOfMeasure: baseUnitOfMeasure,
-    qtyInUnitOfEntry: qtyInUnitOfEntry,
-    unitOfEntry: unitOfEntry,
-    quantityWithdrawn: quantityWithdrawn,
-    remainingQuantity: remainingQuantity,
+        reservation: reservation,
+        itemNumberOfReservation: itemNumberOfReservation,
+        itemDeleted: itemDeleted,
+        movementAllowed: movementAllowed,
+        finalIssue: finalIssue,
+        material: material,
+        plant: plant,
+        storageLocation: storageLocation,
+        batch: batch,
+        distrDifferences: distrDifferences,
+        specialStock: specialStock,
+        requirementQuantity: requirementQuantity,
+        baseUnitOfMeasure: baseUnitOfMeasure,
+        qtyInUnitOfEntry: qtyInUnitOfEntry,
+        unitOfEntry: unitOfEntry,
+        quantityWithdrawn: quantityWithdrawn,
+        remainingQuantity: remainingQuantity,
+        binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
   );
+}
+
+class ReservationBinDetailModel {
+  final String binCode;
+  final String storageType;
+  final String storageSection;
+  final double proposedQuantity;
+  final double actualQuantity;
+
+  ReservationBinDetailModel({
+    required this.binCode,
+    required this.storageType,
+    required this.storageSection,
+    required this.proposedQuantity,
+    required this.actualQuantity,
+  });
+
+  factory ReservationBinDetailModel.fromJson(Map<String, dynamic> json) {
+    double _toDouble(dynamic value) {
+      if (value == null) return 0;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value.toString()) ?? 0;
+    }
+
+    return ReservationBinDetailModel(
+      binCode: json['binCode'] ?? '',
+      storageType: json['storageType'] ?? '',
+      storageSection: json['storageSection'] ?? '',
+      proposedQuantity: _toDouble(json['proposedQuantity'] ?? json['quantity']),
+      actualQuantity: _toDouble(json['actualQuantity'] ?? json['qty']),
+    );
+  }
+
+  ReservationItemBinDetailEntity toEntity() =>
+      ReservationItemBinDetailEntity(
+        binCode: binCode,
+        storageType: storageType,
+        storageSection: storageSection,
+        proposedQuantity: proposedQuantity,
+        actualQuantity: actualQuantity,
+      );
 }

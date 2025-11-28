@@ -5,9 +5,15 @@ import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/picking_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bin_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/completed_reservation_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/widgets/reservation_item_card.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/widgets/reservation_quantity_bottom_sheet.dart';
+import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
@@ -89,6 +95,46 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
         _loadCompleted(refresh: false);
       }
     }
+  }
+
+  Future<void> _showQuantityBottomSheet(item) async {
+    await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      enableDrag: true,
+      useSafeArea: false,
+      builder:
+          (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => sl<ReservationBinBloc>()),
+              BlocProvider(create: (_) => sl<BinBloc>()),
+              BlocProvider(create: (_) => sl<PickingBloc>()),
+            ],
+            child: ReservationQuantityBottomSheet(
+              item: item,
+              plant: widget.params.plant,
+              storageLocation: widget.params.storageLocation,
+              movementType: widget.params.movementType,
+              warehouseCode: widget.params.warehouseCode,
+              warehouse: widget.params.warehouse,
+            ),
+          ),
+    );
+
+    if (!mounted) return;
+    _loadPending(refresh: true);
+  }
+
+  Future<void> _showCompletedDetails(ReservationItemEntity item) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CompletedReservationDetailPage(item: item),
+      ),
+    );
+    if (!mounted) return;
+    _loadCompleted(refresh: true);
   }
 
   @override
@@ -192,7 +238,10 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
                 return _buildLoadMoreIndicator();
               }
               final item = state.pendingItems[index];
-              return ReservationItemCard(item: item, onTap: () {});
+              return ReservationItemCard(
+                item: item,
+                onTap: () => _showQuantityBottomSheet(item),
+              );
             },
           ),
         );
@@ -203,40 +252,43 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
   Widget _buildCompletedList() {
     return BlocBuilder<ReservationBloc, ReservationState>(
       builder: (context, state) {
-        return _buildEmpty("Under Development");
-        // if (state.completedLoading && state.completedItems.isEmpty) {
-        //   return _buildShimmerList();
-        // }
-        //
-        // if (state.completedError != null && state.completedItems.isEmpty) {
-        //   return _buildError(
-        //     message: state.completedError!,
-        //     onRetry: () => _loadCompleted(refresh: true),
-        //   );
-        // }
-        //
-        // if (state.completedItems.isEmpty) {
-        //   return _buildEmpty('No completed items found');
-        // }
-        //
-        // return RefreshIndicator(
-        //   onRefresh: () async => _loadCompleted(refresh: true),
-        //   child: ListView.builder(
-        //     controller: _completedScrollController,
-        //     physics: const AlwaysScrollableScrollPhysics(),
-        //     padding: EdgeInsets.symmetric(horizontal: 16.w),
-        //     itemCount:
-        //         state.completedItems.length +
-        //         (state.completedIsLoadingMore ? 1 : 0),
-        //     itemBuilder: (context, index) {
-        //       if (index == state.completedItems.length) {
-        //         return _buildLoadMoreIndicator();
-        //       }
-        //       final item = state.completedItems[index];
-        //       return ReservationItemCard(item: item, onTap: () {});
-        //     },
-        //   ),
-        // );
+        if (state.completedLoading && state.completedItems.isEmpty) {
+          return _buildShimmerList();
+        }
+
+        if (state.completedError != null && state.completedItems.isEmpty) {
+          return _buildError(
+            message: state.completedError!,
+            onRetry: () => _loadCompleted(refresh: true),
+          );
+        }
+
+        if (state.completedItems.isEmpty) {
+          return _buildEmpty('No completed items found');
+        }
+
+        return RefreshIndicator(
+          onRefresh: () async => _loadCompleted(refresh: true),
+          child: ListView.builder(
+            controller: _completedScrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount:
+                state.completedItems.length +
+                (state.completedIsLoadingMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index == state.completedItems.length) {
+                return _buildLoadMoreIndicator();
+              }
+              final item = state.completedItems[index];
+              return ReservationItemCard(
+                item: item,
+                ctaText: 'View Details',
+                onTap: () => _showCompletedDetails(item),
+              );
+            },
+          ),
+        );
       },
     );
   }

@@ -1,6 +1,8 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:neuconnectz_dynea/src/core/errors/api_exceptions.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/data/datasources/remote/reservation_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/data/models/create_picking_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_items_result_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_result_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
@@ -48,6 +50,20 @@ class ReservationRepositoryImpl implements ReservationRepository {
         params: params,
       );
       return Right(response.toEntity());
+    } on Failure catch (error) {
+      return Left(error);
+    }
+  }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> createPickingAgainstReservation(
+    CreatePickingRequestModel request,
+  ) async {
+    try {
+      final response = await remoteDataSource.createPickingAgainstReservation(
+        request: request,
+      );
+      return Right(response);
     } on Failure catch (error) {
       return Left(error);
     }

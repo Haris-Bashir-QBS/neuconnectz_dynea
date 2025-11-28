@@ -8,11 +8,13 @@ import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 class ReservationItemCard extends StatelessWidget {
   final ReservationItemEntity item;
   final VoidCallback onTap;
+  final String ctaText;
 
   const ReservationItemCard({
     super.key,
     required this.item,
     required this.onTap,
+    this.ctaText = 'Tap to Process',
   });
 
   @override
@@ -93,7 +95,7 @@ class ReservationItemCard extends StatelessWidget {
                   ),
                   Spacer(),
                   CustomText(
-                    text: 'Tap to Process',
+                    text: ctaText,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
                     color: AppPalette.whiteColor,

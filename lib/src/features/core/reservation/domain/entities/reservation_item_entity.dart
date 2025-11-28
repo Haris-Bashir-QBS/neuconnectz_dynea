@@ -18,6 +18,7 @@ class ReservationItemEntity extends Equatable {
   final double qtyInUnitOfEntry;
   final String unitOfEntry;
   final double quantityWithdrawn;
+  final List<ReservationItemBinDetailEntity> binDetails;
 
   const ReservationItemEntity({
     required this.reservation,
@@ -37,26 +38,53 @@ class ReservationItemEntity extends Equatable {
     required this.qtyInUnitOfEntry,
     required this.unitOfEntry,
     required this.quantityWithdrawn,
+    this.binDetails = const [],
   });
 
   @override
   List<Object?> get props => [
-    reservation,
-    itemNumberOfReservation,
-    itemDeleted,
-    movementAllowed,
-    finalIssue,
-    material,
-    plant,
-    storageLocation,
-    batch,
-    distrDifferences,
-    specialStock,
-    requirementQuantity,
-    baseUnitOfMeasure,
-    qtyInUnitOfEntry,
-    unitOfEntry,
-    quantityWithdrawn,
-    remainingQuantity,
-  ];
+        reservation,
+        itemNumberOfReservation,
+        itemDeleted,
+        movementAllowed,
+        finalIssue,
+        material,
+        plant,
+        storageLocation,
+        batch,
+        distrDifferences,
+        specialStock,
+        requirementQuantity,
+        baseUnitOfMeasure,
+        qtyInUnitOfEntry,
+        unitOfEntry,
+        quantityWithdrawn,
+        remainingQuantity,
+        binDetails,
+      ];
+}
+
+class ReservationItemBinDetailEntity extends Equatable {
+  final String binCode;
+  final String storageType;
+  final String storageSection;
+  final double proposedQuantity;
+  final double actualQuantity;
+
+  const ReservationItemBinDetailEntity({
+    required this.binCode,
+    required this.storageType,
+    required this.storageSection,
+    required this.proposedQuantity,
+    required this.actualQuantity,
+  });
+
+  @override
+  List<Object?> get props => [
+        binCode,
+        storageType,
+        storageSection,
+        proposedQuantity,
+        actualQuantity,
+      ];
 }

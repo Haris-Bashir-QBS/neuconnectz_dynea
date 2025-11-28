@@ -65,6 +65,8 @@ class DocumentSelectionConfigs {
             plant: plant.code,
             storageLocation: warehouse.storageLocationCode ?? '',
             movementType: movementType?.movementType ?? "",
+            warehouseCode: warehouse.code,
+            warehouse: warehouse,
           );
         },
       ),

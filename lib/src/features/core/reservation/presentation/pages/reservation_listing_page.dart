@@ -231,13 +231,22 @@ class _ReservationListingViewState extends State<_ReservationListingView> {
     );
   }
 
-  void _navigateToReservationItemsPage(ReservationEntity item) {
+  void _navigateToReservationItemsPage(ReservationEntity item) async {
     final params = ReservationItemParams(
       reservationNo: item.reservation.toString(),
+      plant: widget.params.plant,
+      storageLocation: widget.params.storageLocation,
+      movementType: widget.params.movementType,
+      warehouseCode: widget.params.warehouseCode,
+      warehouse: widget.params.warehouse,
       lastCount: 10,
       skipRecords: 0,
     );
 
-    context.pushNamed(AppRoutes.reservationItems, extra: params);
+    await context.pushNamed(AppRoutes.reservationItems, extra: params).then((
+      value,
+    ) {
+      _loadInitialData();
+    });
   }
 }

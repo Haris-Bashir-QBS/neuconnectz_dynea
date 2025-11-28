@@ -8,9 +8,9 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/par
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/putaway_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_quanitity_bottom_sheet.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_widget.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/quanitity_bottom_sheet.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
@@ -76,7 +76,9 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
       lastCount: 10,
       skipRecords: 0,
     );
-    context.read<GrnBloc>().add(LoadGrnItemsEvent(params: params, refresh: true));
+    context.read<GrnBloc>().add(
+      LoadGrnItemsEvent(params: params, refresh: true),
+    );
   }
 
   void _onPendingScroll() {
@@ -92,7 +94,9 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
           lastCount: 10,
           skipRecords: state.pendingSection.skipRecords,
         );
-        context.read<GrnBloc>().add(LoadGrnItemsEvent(params: params, refresh: false));
+        context.read<GrnBloc>().add(
+          LoadGrnItemsEvent(params: params, refresh: false),
+        );
       }
     }
   }
@@ -107,7 +111,9 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
       skipRecords: 0,
     );
 
-    context.read<GrnBloc>().add(LoadCompletedGrnItemsEvent(params: params, refresh: refresh));
+    context.read<GrnBloc>().add(
+      LoadCompletedGrnItemsEvent(params: params, refresh: refresh),
+    );
   }
 
   void _onCompletedScroll() {
@@ -169,10 +175,10 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
       listenWhen: (previous, current) {
         final pendingChanged =
             previous.pendingSection.errorMessage !=
-                current.pendingSection.errorMessage;
+            current.pendingSection.errorMessage;
         final completedChanged =
             previous.completedSection.errorMessage !=
-                current.completedSection.errorMessage;
+            current.completedSection.errorMessage;
         return pendingChanged || completedChanged;
       },
       listener: (context, state) {
@@ -329,7 +335,8 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount:
-            completedState.items.length + (completedState.isLoadingMore ? 1 : 0),
+            completedState.items.length +
+            (completedState.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == completedState.items.length) {
             return Padding(
@@ -341,10 +348,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
           return GrnItemWidget(
             item: item,
             onTap:
-                () => context.push(
-                  '/completed_grn_item_detail',
-                  extra: item,
-                ),
+                () => context.push('/completed_grn_item_detail', extra: item),
           );
         },
       ),
@@ -386,9 +390,10 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
                   current.completedSection.items.length;
             },
             builder: (context, state) {
-              final count = index == 0
-                  ? state.pendingSection.items.length
-                  : state.completedSection.items.length;
+              final count =
+                  index == 0
+                      ? state.pendingSection.items.length
+                      : state.completedSection.items.length;
               final text = count > 0 ? '$label ($count)' : label;
 
               return CustomText(

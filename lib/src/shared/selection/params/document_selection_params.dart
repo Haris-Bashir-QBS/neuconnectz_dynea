@@ -6,6 +6,7 @@ import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/par
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/movement_type_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
 
 class DocumentSelectionParams<T extends Object> {
   final String title;
@@ -84,6 +85,27 @@ class DocumentSelectionConfigs {
               required WarehouseEntity warehouse,
               MovementTypeEntity? movementType,
             }) => StockListingPageParams(plant: plant, warehouse: warehouse),
+      ),
+    );
+  }
+
+  static DocumentSelectionParams<OutboundDeliveryStoListParams> outboundDeliverySto() {
+    return DocumentSelectionParams(
+      title: AppTexts.outboundDeliverySto,
+      requiresMovementType: true,
+      destination: SelectionDestination(
+        routeName: AppRoutes.outboundDeliveryStoListing,
+        buildArgs: ({
+          required PlantEntity plant,
+          required WarehouseEntity warehouse,
+          MovementTypeEntity? movementType,
+        }) {
+          return OutboundDeliveryStoListParams(
+            plant: plant.code,
+            storageLocation: warehouse.storageLocationCode ?? '',
+            movementType: movementType?.movementType ?? "",
+          );
+        },
       ),
     );
   }

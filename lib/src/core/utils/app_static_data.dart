@@ -117,17 +117,17 @@ final class AppStaticData {
       subItems: [
         SubModuleItem(
           title: AppTexts.reservation,
-          subtitle: "Manage & create picking against reservation",
+          subtitle: AppTexts.reservationSubtitle,
           iconPath: AppAssets.menuItIcon,
         ),
         SubModuleItem(
-          title: "Outbound Delivery (STO)",
-          subtitle: "Manage & create picking against STO",
+          title: AppTexts.outboundDeliverySto,
+          subtitle: AppTexts.outboundDeliverySTOSubtitle,
           iconPath: AppAssets.menuItrIcon,
         ),
         SubModuleItem(
-          title: "Outbound Delivery (Sales)",
-          subtitle: "Manage & create picking against sales",
+          title: AppTexts.outboundDeliverySales,
+          subtitle: AppTexts.outboundDeliverySalesSubtitle,
           iconPath: AppAssets.menuItrIcon,
         ),
       ],
@@ -138,9 +138,15 @@ final class AppStaticData {
             AppRoutes.documentSelection,
             extra: DocumentSelectionConfigs.reservation(),
           );
+        } else if (item == AppTexts.outboundDeliverySto) {
+          context.pushNamed(
+            AppRoutes.documentSelection,
+            extra: DocumentSelectionConfigs.outboundDeliverySto(),
+          );
         }
       },
     ),
+
     // ModuleItem(
     //   //  title: AppTexts.stockMovement,
     //   title: AppTexts.inventoryMovement,

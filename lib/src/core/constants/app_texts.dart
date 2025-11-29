@@ -133,6 +133,7 @@ final class AppTexts {
   static const String menu = "Menu";
   static const String po = "PO";
   static const String reservation = "Reservation";
+
   static const String grn = "GRN";
   static const String itr = "ITR";
   static const String home = "Home";
@@ -173,7 +174,7 @@ final class AppTexts {
   static const String picking = "Picking";
   static const String physicalStockCheck = "Physical Stock Check";
   static const String stockCheck = "Stock Check";
-  static const String outboundDeliverySto = "Outbound Delivery STO";
+  static const String outboundDeliverySto = "Outbound Delivery (STO)";
   static const String outboundDeliverySales = "Outbound Delivery (Sales)";
   static const String checkStock = "Check Stock";
   static const String checkingConnection = "Checking connection...";
@@ -198,4 +199,12 @@ final class AppTexts {
   static const String availableStock = "Available Stock";
   static const String noStocksFound = "No stocks found";
   static const String noResultsFound = "No results found";
+
+  // Submodule Subtitles
+  static const reservationSubtitle =
+      "Manage & create picking against reservation";
+  static const outboundDeliverySTOSubtitle =
+      "Manage & create picking against STO";
+  static const outboundDeliverySalesSubtitle =
+      "Manage & create picking against sales";
 }

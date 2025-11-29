@@ -1,0 +1,12 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:neuconnectz_dynea/src/core/errors/api_exceptions.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/entities/outbound_delivery_sto_item_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_item_params.dart';
+
+abstract class OutboundDeliveryStoItemRepository {
+  Future<Either<Failure, List<OutboundDeliveryStoItemEntity>>>
+      getStockDocItemFromSAP({required OutboundDeliveryStoItemParams params});
+
+  Future<Either<Failure, List<OutboundDeliveryStoItemEntity>>>
+      getCompletedStoItems({required OutboundDeliveryStoItemParams params});
+}

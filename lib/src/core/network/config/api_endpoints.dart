@@ -1,12 +1,16 @@
-var _auth = "Auth-Dynea-Stg/IAuthFeature";
-var _dashboard = "ZCAPI-Dynea-Stg/IDashboardFeature";
-var _putAway = "ZCAPI-Dynea-Stg/IPutAwayFeature";
-var _reservation = "ZCAPI-Dynea-Stg/IReservationFeature";
-var _movementType = "ZCAPI-Dynea-Stg/IMovementTypeFeature";
-var _binManagement = "ZCAPI-Dynea-Stg/IBinManagementFeature";
-var _plant = "ZCAPI-Dynea-Stg/IPlantFeature";
-var _warehouse = "ZCAPI-Dynea-Stg/IWarehouseFeature";
-var _stocks = "ZCAPI-Dynea-Stg/IStocksFeature";
+var _rootAuth = "Auth-Dynea-Stg";
+var _rootApi = "ZCAPI-Dynea-Stg";
+
+var _auth = "$_rootAuth/IAuthFeature";
+var _dashboard = "$_rootApi/IDashboardFeature";
+var _putAway = "$_rootApi/IPutAwayFeature";
+var _reservation = "$_rootApi/IReservationFeature";
+var _movementType = "$_rootApi/IMovementTypeFeature";
+var _binManagement = "$_rootApi/IBinManagementFeature";
+var _plant = "$_rootApi/IPlantFeature";
+var _warehouse = "$_rootApi/IWarehouseFeature";
+var _stocks = "$_rootApi/IStocksFeature";
+var _stockTransferOrder = "$_rootApi/IStockTransferOrderFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -16,7 +20,7 @@ enum ApiEndpoints {
   refreshToken,
   login,
 
-  /// ======================== Forget Password =========================
+  /// ============ Forget Password ===================
   forgetPassword,
   verifyOtpForForgetPassword,
   resetPassword,
@@ -47,12 +51,17 @@ enum ApiEndpoints {
   /// ========================  Movement Types =========================
   listMovementTypes,
 
-  /// ========================  Stocks =========================
+  /// ========================  Stocks =================================
   listStockItems,
 
   /// ========================  Plant/Warehouse =========================
   listAllPlantsAssignedToUser,
-  listAllWarehousesByUserPlants;
+  listAllWarehousesByUserPlants,
+
+  /// ===================== Outbound Delivery (STO) =====================
+  listAllStockDocFromSAP,
+  stoItems,
+  completedStoItems;
 
   String get value {
     switch (this) {
@@ -86,7 +95,7 @@ enum ApiEndpoints {
       case ApiEndpoints.changePassword:
         return "$_auth/ChangePassword";
 
-      /// ======================== Get Dashboard Analytics =========================
+      /// ============== Get Dashboard Analytics =====================
       case ApiEndpoints.getDashboardAnalytics:
         return "$_dashboard/GetDashboardAnalytics";
 
@@ -102,31 +111,41 @@ enum ApiEndpoints {
       case ApiEndpoints.createPutAwayAgainstGr:
         return "$_putAway/CreatePutAwayAgainstGr";
 
-      /// ============================ Reservation =========================
+      /// ============================ Reservation =====================
       case ApiEndpoints.listAllReservationsFromSAP:
         return "$_reservation/ListAllReservationsFromSAP";
       case ApiEndpoints.listAllReservationItemsFromSAP:
         return "$_reservation/ListAllItemsOfReservationFromSAP";
       case ApiEndpoints.listCompletedReservationItemsFromSAP:
-        return "$_reservation/ListAllCompletedItemsOfReservation";
+        return "$_reservation/GetCompletedReservationItemWithBins";
       case ApiEndpoints.createPickingAgainstReservation:
-        return "$_reservation/CreatePickingAgainstReservation";
+        return "$_reservation/CreateReservationList";
       case ApiEndpoints.getWarehouseBinsByMaterial:
         return "$_binManagement/GetWarehouseBinsByMaterial";
 
-      /// ======================== Movement Types =========================
+      /// ======================== Movement Types =======================
       case ApiEndpoints.listMovementTypes:
         return "$_movementType/ListAllMovementTypes";
 
-      /// ======================== Stocks =========================
+      /// ======================== Stocks ===============================
       case ApiEndpoints.listStockItems:
         return "$_stocks/ListAllStocks";
 
-      /// ======================== Plant/Warehouse =========================
+      /// ======================== Stock Check  =========================
+      case ApiEndpoints.listAllStockDocFromSAP:
+        return "$_stockTransferOrder/ListAllStockDocFromSAP";
+
+      /// ======================== Plant/Warehouse ======================
       case ApiEndpoints.listAllPlantsAssignedToUser:
         return "$_plant/ListAllPlantsAssignedToUser";
       case ApiEndpoints.listAllWarehousesByUserPlants:
         return "$_warehouse/ListAllWarehousesByUserPlants";
+
+      /// ======================== Outbound Delivery (STO) ===============
+      case ApiEndpoints.stoItems:
+        return "$_stockTransferOrder/StockDocItemFromSAP";
+      case ApiEndpoints.completedStoItems:
+        return "$_stockTransferOrder/CompletedStoItems";
     }
   }
 }

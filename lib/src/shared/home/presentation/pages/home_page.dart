@@ -172,11 +172,7 @@ class HomeWelcomeCard extends StatelessWidget {
             ),
           ),
           6.horizontalSpace,
-          CustomText(
-            text: statusText,
-            fontSize: 12.sp,
-            color: statusColor,
-          ),
+          CustomText(text: statusText, fontSize: 12.sp, color: statusColor),
         ],
       ),
     );
@@ -237,6 +233,12 @@ class PickingSection extends StatelessWidget {
           iconBackgroundColor: AppPalette.d8Color,
           iconColor: Color(0xFF8E5BF7),
           iconPath: AppAssets.pendingIcon,
+          onTap: () {
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.outboundDeliverySto(),
+            );
+          },
         ),
         HomeActionCardData(
           title: AppTexts.outboundDeliverySales,

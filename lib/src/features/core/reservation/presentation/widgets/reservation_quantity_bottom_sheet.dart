@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,6 +57,7 @@ class _ReservationQuantityBottomSheetState
   final List<FocusNode> _binQuantityFocusNodes = [];
   final Map<String, double> _proposedQuantities = {};
   final List<BinEntity> _selectedBins = [];
+  final Map<String, String> _binFieldErrors = {};
 
   // Bin selection fields
   final _binCodeController = TextEditingController();
@@ -70,6 +72,16 @@ class _ReservationQuantityBottomSheetState
   final List<BinEntity> _dialogBins = [];
   bool _dialogHasMore = false;
   bool _dialogResetPending = false;
+
+  double get _targetQuantity => widget.item.remainingQuantity;
+
+  double get _autoLoadedCoverage => _selectedBins.fold<double>(
+    0.0,
+    (sum, bin) => sum + (_proposedQuantities[bin.id] ?? 0.0),
+  );
+
+  double get _autoCoverageDeficit =>
+      max(0, _targetQuantity - _autoLoadedCoverage);
 
   @override
   void initState() {
@@ -116,7 +128,7 @@ class _ReservationQuantityBottomSheetState
       _selectedBins.fold<double>(0.0, (sum, bin) => sum + bin.selectedQuantity);
 
   double get _remainingQuantity =>
-      widget.item.remainingQuantity - _totalSelectedQuantity;
+      max(0, widget.item.remainingQuantity - _totalSelectedQuantity);
 
   @override
   Widget build(BuildContext context) {
@@ -128,21 +140,27 @@ class _ReservationQuantityBottomSheetState
               CustomToast.error(context, state.message);
             } else if (state is ReservationBinSuccess) {
               setState(() {
-                // Add auto-loaded bins to selected bins if not already present
-                for (var bin in state.bins) {
-                  if (!_selectedBins.any((b) => b.id == bin.id)) {
-                    final binWithQty = bin.copyWith(selectedQuantity: 0.0);
-                    _selectedBins.add(binWithQty);
-                    _proposedQuantities[bin.id] =
-                        state.proposedQuantities[bin.id] ?? 0.0;
+                double remainingCoverage = _autoCoverageDeficit;
+                final List<BinEntity> fallbackBins = [];
 
-                    final controller = TextEditingController();
-                    final focusNode = FocusNode();
-                    controller.addListener(
-                      () => _updateBinQuantity(bin.id, controller.text),
-                    );
-                    _binQuantityControllers.add(controller);
-                    _binQuantityFocusNodes.add(focusNode);
+                for (var bin in state.bins) {
+                  if (remainingCoverage <= 0) break;
+                  if (_selectedBins.any((b) => b.id == bin.id)) continue;
+
+                  final proposedQty = state.proposedQuantities[bin.id] ?? 0.0;
+                  if (proposedQty <= 0) {
+                    fallbackBins.add(bin);
+                    continue;
+                  }
+
+                  _appendBin(bin, proposedQuantity: proposedQty);
+                  remainingCoverage -= proposedQty;
+                }
+
+                if (remainingCoverage > 0) {
+                  for (final bin in fallbackBins) {
+                    if (_selectedBins.any((b) => b.id == bin.id)) continue;
+                    _appendBin(bin);
                   }
                 }
               });
@@ -168,7 +186,7 @@ class _ReservationQuantityBottomSheetState
           return LayoutBuilder(
             builder: (context, constraints) {
               final screenHeight = MediaQuery.of(context).size.height;
-              final bottomSheetHeight = screenHeight * 0.90;
+              final bottomSheetHeight = screenHeight * 0.95;
 
               return SizedBox(
                 height: bottomSheetHeight,
@@ -558,32 +576,8 @@ class _ReservationQuantityBottomSheetState
       return;
     }
 
-    final newBin = bin.copyWith(selectedQuantity: 0.0);
-    final quantityController = TextEditingController();
-    final quantityFocusNode = FocusNode();
-    _binQuantityFocusNodes.add(quantityFocusNode);
-
-    quantityFocusNode.addListener(() {
-      if (quantityFocusNode.hasFocus) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (_scrollController.hasClients) {
-            final index = _selectedBins.indexWhere((b) => b.id == newBin.id);
-            _scrollController.jumpTo(700);
-          }
-        });
-      }
-    });
-    quantityController.addListener(() {
-      _updateBinQuantity(newBin.id, quantityController.text);
-    });
-
     setState(() {
-      _selectedBins.add(newBin);
-      _binQuantityControllers.add(quantityController);
-      // Set proposed quantity to 0 if not from auto-loaded bins
-      if (!_proposedQuantities.containsKey(newBin.id)) {
-        _proposedQuantities[newBin.id] = 0.0;
-      }
+      _appendBin(bin);
     });
 
     _binCodeController.clear();
@@ -627,11 +621,14 @@ class _ReservationQuantityBottomSheetState
       ),
       onDismissed: (_) => _removeBin(index),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 3,
             child: CustomText(
-              text: bin.binCode,
+              text:
+                  //     "${bin.storageType} - ${bin.storageSection} - ${bin.binCode}",
+                  bin.binCode,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
             ),
@@ -657,45 +654,56 @@ class _ReservationQuantityBottomSheetState
           8.horizontalSpace,
           Expanded(
             flex: 2,
-            child: Container(
-              height: 45.h,
-              padding: EdgeInsets.symmetric(horizontal: 4.w),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppPalette.primaryColor, width: 1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Center(
-                child: TextFormField(
-                  controller: controller,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  textAlign: TextAlign.center,
-                  focusNode: focusNode,
-                  style: TextStyle(fontSize: 14.sp, height: 2),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(
-                      AppStaticData.quantityFieldMaxLength,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  constraints: BoxConstraints(minHeight: 45.h),
+                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppPalette.primaryColor,
+                      width: 1,
                     ),
-                    TextInputFormatter.withFunction((oldValue, newValue) {
-                      if (newValue.text.isEmpty) return newValue;
-                      final regex = RegExp(r'^\d*\.?\d{0,3}$');
-                      if (regex.hasMatch(newValue.text)) {
-                        final value = double.tryParse(newValue.text) ?? 0.0;
-                        if (value <= proposedQty) {
-                          return newValue;
-                        }
-                      }
-                      return oldValue;
-                    }),
-                  ],
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: TextFormField(
+                    controller: controller,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    textAlign: TextAlign.center,
+                    focusNode: focusNode,
+                    style: TextStyle(fontSize: 14.sp),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(
+                        AppStaticData.quantityFieldMaxLength,
+                      ),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        if (newValue.text.isEmpty) return newValue;
+                        final regex = RegExp(r'^\d*\.?\d{0,3}$');
+                        return regex.hasMatch(newValue.text)
+                            ? newValue
+                            : oldValue;
+                      }),
+                    ],
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 6.h),
+                    ),
                   ),
                 ),
-              ),
+                if (_binFieldErrors[bin.id] != null)
+                  Padding(
+                    padding: EdgeInsets.only(top: 4.h),
+                    child: Text(
+                      _binFieldErrors[bin.id]!,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(fontSize: 11.sp, color: Colors.red),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -707,19 +715,55 @@ class _ReservationQuantityBottomSheetState
     final index = _selectedBins.indexWhere((bin) => bin.id == binId);
     if (index == -1) return;
 
-    var quantity = double.tryParse(value) ?? 0.0;
+    final trimmedValue = value.trim();
+    final quantity = double.tryParse(trimmedValue);
     final proposedQty = _proposedQuantities[binId] ?? 0.0;
 
-    if (quantity > proposedQty && proposedQty > 0) {
-      CustomToast.error(
-        context,
-        "Quantity cannot exceed proposed quantity (${proposedQty.formatWithCommas})",
-      );
-      _binQuantityControllers[index].text = proposedQty.toString();
-      quantity = proposedQty;
+    final otherSelectedTotal = _selectedBins
+        .asMap()
+        .entries
+        .where((entry) => entry.key != index)
+        .fold<double>(0.0, (sum, entry) => sum + entry.value.selectedQuantity);
+
+    final remainingActual = max(
+      0.0,
+      widget.item.remainingQuantity - otherSelectedTotal,
+    );
+
+    double allowedQty = remainingActual;
+    if (proposedQty > 0 && proposedQty < allowedQty) {
+      allowedQty = proposedQty;
+    }
+
+    String? errorMessage;
+
+    if (trimmedValue.isEmpty) {
+      setState(() {
+        _binFieldErrors.remove(binId);
+        _selectedBins[index] = _selectedBins[index].copyWith(
+          selectedQuantity: 0.0,
+        );
+      });
+      return;
+    }
+
+    if (quantity == null) return;
+
+    if (allowedQty <= 0 && quantity > 0) {
+      errorMessage = "Qty exceed";
+    } else if (quantity > allowedQty) {
+      errorMessage = "Qty exceed";
+    }
+
+    if (errorMessage != null) {
+      setState(() {
+        _binFieldErrors[binId] = errorMessage!;
+      });
+      return;
     }
 
     setState(() {
+      _binFieldErrors.remove(binId);
       _selectedBins[index] = _selectedBins[index].copyWith(
         selectedQuantity: quantity,
       );
@@ -728,13 +772,47 @@ class _ReservationQuantityBottomSheetState
 
   void _removeBin(int index) {
     if (index >= 0 && index < _selectedBins.length) {
+      final removedBin = _selectedBins[index];
       _binQuantityControllers[index].dispose();
       _binQuantityFocusNodes[index].dispose();
       setState(() {
         _selectedBins.removeAt(index);
         _binQuantityControllers.removeAt(index);
         _binQuantityFocusNodes.removeAt(index);
+        _proposedQuantities.remove(removedBin.id);
+        _binFieldErrors.remove(removedBin.id);
       });
+    }
+  }
+
+  void _appendBin(BinEntity bin, {double? proposedQuantity}) {
+    final newBin = bin.copyWith(selectedQuantity: 0.0);
+    final quantityController = TextEditingController();
+    final quantityFocusNode = FocusNode();
+
+    quantityFocusNode.addListener(() {
+      if (quantityFocusNode.hasFocus) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (_scrollController.hasClients) {
+            _scrollController.jumpTo(700);
+          }
+        });
+      }
+    });
+
+    quantityController.addListener(() {
+      _updateBinQuantity(newBin.id, quantityController.text);
+    });
+
+    _selectedBins.add(newBin);
+    _binQuantityControllers.add(quantityController);
+    _binQuantityFocusNodes.add(quantityFocusNode);
+    _binFieldErrors.remove(newBin.id);
+
+    if (proposedQuantity != null) {
+      _proposedQuantities[newBin.id] = proposedQuantity;
+    } else {
+      _proposedQuantities.putIfAbsent(newBin.id, () => 0.0);
     }
   }
 
@@ -789,6 +867,15 @@ class _ReservationQuantityBottomSheetState
               CustomToast.error(
                 context,
                 "Total quantity cannot exceed remaining quantity (${widget.item.remainingQuantity.formatWithCommas})",
+              );
+              return;
+            }
+
+            if (_totalSelectedQuantity <
+                widget.item.remainingQuantity) {
+              CustomToast.error(
+                context,
+                "Total quantity must equal remaining quantity (${widget.item.remainingQuantity.formatWithCommas})",
               );
               return;
             }

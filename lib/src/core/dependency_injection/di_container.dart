@@ -32,6 +32,8 @@ Future<void> _initAuthDependencies() async {
   _registerGrnListDependencies();
   _registerReservationDependencies();
   _registerStockDependencies();
+  _registerOutboundDeliveryStoDependencies();
+  _registerOutboundDeliveryStoItemsDependencies();
 }
 
 void _registerAuthRemoteDatasources() {
@@ -142,16 +144,8 @@ void _registerGrnListDependencies() {
       getCompletedGrnItemsUseCase: sl(),
     ),
   );
-  sl.registerFactory(
-    () => PutAwayBloc(
-      createPutAwayUseCase: sl(),
-    ),
-  );
-  sl.registerFactory(
-    () => BinBloc(
-      getBinsUseCase: sl(),
-    ),
-  );
+  sl.registerFactory(() => PutAwayBloc(createPutAwayUseCase: sl()));
+  sl.registerFactory(() => BinBloc(getBinsUseCase: sl()));
 }
 
 /// ------------------------
@@ -192,11 +186,7 @@ void _registerReservationDependencies() {
     ..registerLazySingleton(() => CreatePickingAgainstReservationUseCase(sl()));
 
   // Blocs
-  sl.registerFactory(
-    () => MovementTypeBloc(
-      getMovementTypesUseCase: sl(),
-    ),
-  );
+  sl.registerFactory(() => MovementTypeBloc(getMovementTypesUseCase: sl()));
   sl.registerFactory(
     () => ReservationBloc(
       getReservationListUseCase: sl(),
@@ -205,14 +195,10 @@ void _registerReservationDependencies() {
     ),
   );
   sl.registerFactory(
-    () => ReservationBinBloc(
-      getWarehouseBinsByMaterialUseCase: sl(),
-    ),
+    () => ReservationBinBloc(getWarehouseBinsByMaterialUseCase: sl()),
   );
   sl.registerFactory(
-    () => PickingBloc(
-      createPickingAgainstReservationUseCase: sl(),
-    ),
+    () => PickingBloc(createPickingAgainstReservationUseCase: sl()),
   );
 }
 
@@ -226,9 +212,39 @@ void _registerStockDependencies() {
     )
     ..registerLazySingleton(() => GetStocksUseCase(sl()));
 
+  sl.registerFactory(() => StockBloc(getStocksUseCase: sl()));
+}
+
+void _registerOutboundDeliveryStoDependencies() {
+  sl
+    ..registerLazySingleton<OutboundDeliveryStoRemoteDataSource>(
+      () => OutboundDeliveryStoRemoteDataSourceImpl(dioClient: sl()),
+    )
+    ..registerLazySingleton<OutboundDeliveryStoRepository>(
+      () => OutboundDeliveryStoRepositoryImpl(sl()),
+    )
+    ..registerLazySingleton(() => GetOutboundDeliveryStoListUseCase(sl()));
+
   sl.registerFactory(
-    () => StockBloc(
-      getStocksUseCase: sl(),
+    () => OutboundDeliveryStoBloc(getOutboundDeliveryStoListUseCase: sl()),
+  );
+}
+
+void _registerOutboundDeliveryStoItemsDependencies() {
+  sl
+    ..registerLazySingleton<OutboundDeliveryStoItemRemoteDataSource>(
+      () => OutboundDeliveryStoItemRemoteDataSourceImpl(dioClient: sl()),
+    )
+    ..registerLazySingleton<OutboundDeliveryStoItemRepository>(
+      () => OutboundDeliveryStoItemRepositoryImpl(sl()),
+    )
+    ..registerLazySingleton(() => GetStockDocItemFromSAPUseCase(sl()))
+    ..registerLazySingleton(() => GetCompletedStoItemsUseCase(sl()));
+
+  sl.registerFactory(
+    () => OutboundDeliveryStoItemBloc(
+      getStockDocItemFromSAPUseCase: sl(),
+      getCompletedStoItemsUseCase: sl(),
     ),
   );
 }

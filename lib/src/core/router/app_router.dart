@@ -10,11 +10,19 @@ import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/login_pag
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/reset_password.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/splash_page.dart';
 import 'package:neuconnectz_dynea/src/features/auth/presentation/pages/verify_otp_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/pages/outbound_delivery_sto_items_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/pages/outbound_delivery_sto_list_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/completed_grn_item_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/completed_reservation_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_listing_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_items_page.dart';
@@ -166,12 +174,48 @@ GoRoute _grnItems() {
   );
 }
 
+GoRoute _completedGrnItemDetail() {
+  return GoRoute(
+    path: '/${AppRoutes.completedGrnItemDetail}',
+    name: AppRoutes.completedGrnItemDetail,
+    builder: (context, state) {
+      final args = state.extra as GrnItemEntity;
+      return CompletedGrnItemDetailPage(item: args);
+    },
+  );
+}
+
 List<GoRoute> putAwayRoutes = [
   _documentSelection(),
   _grnListing(),
   _grnItems(),
   _stockCheck(),
+  _completedGrnItemDetail(),
+  _outboundDeliveryStoListing(),
+  _outboundDeliveryStoItems(),
 ];
+
+GoRoute _outboundDeliveryStoListing() {
+  return GoRoute(
+    path: '/${AppRoutes.outboundDeliveryStoListing}',
+    name: AppRoutes.outboundDeliveryStoListing,
+    builder: (context, state) {
+      final args = state.extra as OutboundDeliveryStoListParams;
+      return OutboundDeliveryStoListingPage(params: args);
+    },
+  );
+}
+
+GoRoute _outboundDeliveryStoItems() {
+  return GoRoute(
+    path: '/${AppRoutes.outboundDeliveryStoItemsListing}',
+    name: AppRoutes.outboundDeliveryStoItemsListing,
+    builder: (context, state) {
+      final params = state.extra as OutboundDeliveryStoItemsPageParams;
+      return OutboundDeliveryStoItemsPage(params: params);
+    },
+  );
+}
 
 GoRoute _reservationListing() {
   return GoRoute(
@@ -195,7 +239,22 @@ GoRoute _reservationItems() {
   );
 }
 
-List<GoRoute> reservationRoutes = [_reservationListing(), _reservationItems()];
+GoRoute _completeGrnItemDetails() {
+  return GoRoute(
+    path: '/${AppRoutes.completedReservationItemDetail}',
+    name: AppRoutes.completedReservationItemDetail,
+    builder: (context, state) {
+      final args = state.extra as ReservationItemEntity;
+      return CompletedReservationDetailPage(item: args);
+    },
+  );
+}
+
+List<GoRoute> reservationRoutes = [
+  _reservationListing(),
+  _reservationItems(),
+  _completeGrnItemDetails(),
+];
 
 GoRoute _stockCheck() {
   return GoRoute(

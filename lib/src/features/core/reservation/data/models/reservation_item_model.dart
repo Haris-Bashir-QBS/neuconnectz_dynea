@@ -79,6 +79,7 @@ class ReservationItemModel {
   final String unitOfEntry;
   final double quantityWithdrawn;
   final double remainingQuantity;
+  final double quantity;
   final List<ReservationBinDetailModel> binDetails;
 
   ReservationItemModel({
@@ -100,10 +101,11 @@ class ReservationItemModel {
     required this.quantityWithdrawn,
     required this.remainingQuantity,
     required this.binDetails,
+    this.quantity = 0,
   });
 
   factory ReservationItemModel.fromJson(Map<String, dynamic> json) {
-    double _toDouble(dynamic value) {
+    double toDouble(dynamic value) {
       if (value == null) return 0;
       if (value is num) return value.toDouble();
       return double.tryParse(value.toString()) ?? 0;
@@ -112,8 +114,9 @@ class ReservationItemModel {
     final rawBinDetails =
         (json['additionalBinDetails'] ??
                 json['binDetails'] ??
-                json['reservationBinDetails']) as List<dynamic>? ??
-            const [];
+                json['reservationBinDetails'])
+            as List<dynamic>? ??
+        const [];
 
     return ReservationItemModel(
       reservation: json['reservation'] ?? 0,
@@ -127,41 +130,44 @@ class ReservationItemModel {
       batch: json['batch'] ?? '',
       distrDifferences: json['distrDifferences'] ?? '',
       specialStock: json['specialStock'] ?? '',
-      requirementQuantity: _toDouble(json['requirementQuantity']),
+      requirementQuantity: toDouble(json['requirementQuantity']),
       baseUnitOfMeasure: json['baseUnitOfMeasure'] ?? '',
-      qtyInUnitOfEntry: _toDouble(json['qtyInUnitOfEntry']),
+      qtyInUnitOfEntry: toDouble(json['qtyInUnitOfEntry']),
       unitOfEntry: json['unitOfEntry'] ?? '',
-      quantityWithdrawn: _toDouble(json['quantityWithdrawn']),
-      remainingQuantity: _toDouble(json['remainingQuantity']),
-      binDetails: rawBinDetails
-          .map(
-            (e) => ReservationBinDetailModel.fromJson(
-              e as Map<String, dynamic>,
-            ),
-          )
-          .toList(),
+      quantityWithdrawn: toDouble(json['quantityWithdrawn']),
+      remainingQuantity: toDouble(json['remainingQuantity']),
+      quantity: toDouble(json['quantity']),
+      binDetails:
+          rawBinDetails
+              .map(
+                (e) => ReservationBinDetailModel.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
   ReservationItemEntity toEntity() => ReservationItemEntity(
-        reservation: reservation,
-        itemNumberOfReservation: itemNumberOfReservation,
-        itemDeleted: itemDeleted,
-        movementAllowed: movementAllowed,
-        finalIssue: finalIssue,
-        material: material,
-        plant: plant,
-        storageLocation: storageLocation,
-        batch: batch,
-        distrDifferences: distrDifferences,
-        specialStock: specialStock,
-        requirementQuantity: requirementQuantity,
-        baseUnitOfMeasure: baseUnitOfMeasure,
-        qtyInUnitOfEntry: qtyInUnitOfEntry,
-        unitOfEntry: unitOfEntry,
-        quantityWithdrawn: quantityWithdrawn,
-        remainingQuantity: remainingQuantity,
-        binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
+    reservation: reservation,
+    itemNumberOfReservation: itemNumberOfReservation,
+    itemDeleted: itemDeleted,
+    movementAllowed: movementAllowed,
+    finalIssue: finalIssue,
+    material: material,
+    plant: plant,
+    storageLocation: storageLocation,
+    batch: batch,
+    distrDifferences: distrDifferences,
+    specialStock: specialStock,
+    requirementQuantity: requirementQuantity,
+    baseUnitOfMeasure: baseUnitOfMeasure,
+    qtyInUnitOfEntry: qtyInUnitOfEntry,
+    unitOfEntry: unitOfEntry,
+    quantityWithdrawn: quantityWithdrawn,
+    remainingQuantity: remainingQuantity,
+    quantity: quantity,
+    binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
   );
 }
 
@@ -196,12 +202,11 @@ class ReservationBinDetailModel {
     );
   }
 
-  ReservationItemBinDetailEntity toEntity() =>
-      ReservationItemBinDetailEntity(
-        binCode: binCode,
-        storageType: storageType,
-        storageSection: storageSection,
-        proposedQuantity: proposedQuantity,
-        actualQuantity: actualQuantity,
-      );
+  ReservationItemBinDetailEntity toEntity() => ReservationItemBinDetailEntity(
+    binCode: binCode,
+    storageType: storageType,
+    storageSection: storageSection,
+    proposedQuantity: proposedQuantity,
+    actualQuantity: actualQuantity,
+  );
 }

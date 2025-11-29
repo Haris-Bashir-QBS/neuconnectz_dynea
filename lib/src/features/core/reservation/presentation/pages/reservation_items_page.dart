@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
@@ -10,13 +11,14 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/re
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/picking_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bin_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/completed_reservation_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/widgets/reservation_item_card.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/widgets/reservation_quantity_bottom_sheet.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
+
+import '../../../../../core/router/app_routes.dart';
 
 class ReservationItemsPage extends StatelessWidget {
   final ReservationItemParams params;
@@ -128,10 +130,9 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
   }
 
   Future<void> _showCompletedDetails(ReservationItemEntity item) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CompletedReservationDetailPage(item: item),
-      ),
+    await context.pushNamed(
+      AppRoutes.completedReservationItemDetail,
+      extra: item,
     );
     if (!mounted) return;
     _loadCompleted(refresh: true);
@@ -283,6 +284,7 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
               final item = state.completedItems[index];
               return ReservationItemCard(
                 item: item,
+                quantity: item.quantity,
                 ctaText: 'View Details',
                 onTap: () => _showCompletedDetails(item),
               );

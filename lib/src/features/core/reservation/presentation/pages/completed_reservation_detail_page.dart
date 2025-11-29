@@ -15,30 +15,17 @@ class CompletedReservationDetailPage extends StatelessWidget {
 
   const CompletedReservationDetailPage({super.key, required this.item});
 
-  double get _totalProposedQty =>
-      item.binDetails.fold(0.0, (sum, bin) => sum + bin.proposedQuantity);
-
-  double get _totalActualQty =>
-      item.binDetails.fold(0.0, (sum, bin) => sum + bin.actualQuantity);
-
-  double get _variance => max(0, _totalProposedQty - _totalActualQty);
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: AppTexts.completed),
+      appBar: CustomAppBar(title: AppTexts.quantity),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomText(
-                text: AppTexts.pickingAgainstReservation,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
-                color: AppPalette.darkGreyColor,
-              ),
               16.verticalSpace,
               _sectionTitle("Material Details"),
               12.verticalSpace,
@@ -54,7 +41,8 @@ class CompletedReservationDetailPage extends StatelessWidget {
                   const Spacer(),
                   if (item.binDetails.isNotEmpty)
                     _sectionTitle(
-                      "Total Issued: ${_totalActualQty.formatWithCommas}",
+                      "Total Issued:",
+                      // " ${_totalActualQty.formatWithCommas}",
                     ),
                 ],
               ),
@@ -149,47 +137,9 @@ class CompletedReservationDetailPage extends StatelessWidget {
             children: [
               Expanded(
                 child: CustomTextFormField(
-                  label: "Requirement Qty",
+                  label: "Quantity",
                   readOnly: true,
-                  initialValue:
-                      "${item.requirementQuantity.formatWithCommas} ${item.baseUnitOfMeasure}",
-                  fillColor: AppPalette.lightGreyColor,
-                  enabled: false,
-                ),
-              ),
-              10.horizontalSpace,
-              Expanded(
-                child: CustomTextFormField(
-                  label: "Issued Qty",
-                  readOnly: true,
-                  initialValue:
-                      "${item.quantityWithdrawn.formatWithCommas} ${item.baseUnitOfMeasure}",
-                  fillColor: AppPalette.lightGreyColor,
-                  enabled: false,
-                ),
-              ),
-            ],
-          ),
-          10.verticalSpace,
-          Row(
-            children: [
-              Expanded(
-                child: CustomTextFormField(
-                  label: "Remaining Qty",
-                  readOnly: true,
-                  initialValue:
-                      "${item.remainingQuantity.formatWithCommas} ${item.baseUnitOfMeasure}",
-                  fillColor: AppPalette.lightGreyColor,
-                  enabled: false,
-                ),
-              ),
-              10.horizontalSpace,
-              Expanded(
-                child: CustomTextFormField(
-                  label: "Variance",
-                  readOnly: true,
-                  initialValue:
-                      "${_variance.formatWithCommas} ${item.baseUnitOfMeasure}",
+                  initialValue: item.quantity.formatWithCommas,
                   fillColor: AppPalette.lightGreyColor,
                   enabled: false,
                 ),
@@ -253,20 +203,20 @@ class CompletedReservationDetailPage extends StatelessWidget {
             fontSize: 14.sp,
           ),
         ),
+        // Expanded(
+        //   flex: 2,
+        //   child: CustomText(
+        //     text: "Proposed",
+        //     fontWeight: FontWeight.w500,
+        //     color: AppPalette.greyColor,
+        //     fontSize: 14.sp,
+        //     textAlign: TextAlign.center,
+        //   ),
+        // ),
         Expanded(
           flex: 2,
           child: CustomText(
-            text: "Proposed",
-            fontWeight: FontWeight.w500,
-            color: AppPalette.greyColor,
-            fontSize: 14.sp,
-            textAlign: TextAlign.center,
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: CustomText(
-            text: "Actual",
+            text: "Quantity",
             fontWeight: FontWeight.w500,
             color: AppPalette.greyColor,
             fontSize: 14.sp,
@@ -297,9 +247,9 @@ class CompletedReservationDetailPage extends StatelessWidget {
               ],
             ),
           ),
+          //  Expanded(flex: 2, child: _quantityPill(bin.proposedQuantity)),
+          //  8.horizontalSpace,
           Expanded(flex: 2, child: _quantityPill(bin.proposedQuantity)),
-          8.horizontalSpace,
-          Expanded(flex: 2, child: _quantityPill(bin.actualQuantity)),
         ],
       ),
     );
@@ -323,4 +273,3 @@ class CompletedReservationDetailPage extends StatelessWidget {
     );
   }
 }
-

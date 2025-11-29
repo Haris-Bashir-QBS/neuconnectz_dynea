@@ -9,10 +9,12 @@ class ReservationItemCard extends StatelessWidget {
   final ReservationItemEntity item;
   final VoidCallback onTap;
   final String ctaText;
+  final double? quantity;
 
   const ReservationItemCard({
     super.key,
     required this.item,
+    this.quantity,
     required this.onTap,
     this.ctaText = 'Tap to Process',
   });
@@ -46,7 +48,9 @@ class ReservationItemCard extends StatelessWidget {
                         ),
                       ),
                       CustomText(
-                        text: item.remainingQuantity.formatWithCommas,
+                        text:
+                            quantity?.formatWithCommas ??
+                            item.remainingQuantity.formatWithCommas,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                       ),

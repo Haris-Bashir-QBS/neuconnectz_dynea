@@ -1,49 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:neuconnectz_dynea/src/core/barrels/auth_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
+import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/putaway_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_quanitity_bottom_sheet.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_widget.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_item_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/items/outbound_delivery_sto_item_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/widgets/outbound_delivery_sto_item_card.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../../core/constants/app_texts.dart';
-import '../../../../../widgets/custom_toast.dart';
+class OutboundDeliveryStoItemsPage extends StatelessWidget {
+  final OutboundDeliveryStoItemsPageParams params;
 
-class GrnItemsPage extends StatelessWidget {
-  final GrnItemsPageParams params;
-
-  const GrnItemsPage({super.key, required this.params});
+  const OutboundDeliveryStoItemsPage({super.key, required this.params});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<GrnBloc>(),
-      child: _GrnItemsView(params: params),
+      create: (context) => sl<OutboundDeliveryStoItemBloc>(),
+      child: _OutboundDeliveryStoItemsView(params: params),
     );
   }
 }
 
-class _GrnItemsView extends StatefulWidget {
-  final GrnItemsPageParams params;
+class _OutboundDeliveryStoItemsView extends StatefulWidget {
+  final OutboundDeliveryStoItemsPageParams params;
 
-  const _GrnItemsView({required this.params});
+  const _OutboundDeliveryStoItemsView({required this.params});
 
   @override
-  State<_GrnItemsView> createState() => _GrnItemsViewState();
+  State<_OutboundDeliveryStoItemsView> createState() =>
+      _OutboundDeliveryStoItemsViewState();
 }
 
-class _GrnItemsViewState extends State<_GrnItemsView> {
+class _OutboundDeliveryStoItemsViewState
+    extends State<_OutboundDeliveryStoItemsView> {
   final ScrollController _pendingScrollController = ScrollController();
   final ScrollController _completedScrollController = ScrollController();
   int _selectedTab = 0;
@@ -69,164 +64,121 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
   }
 
   void _loadPendingData() {
-    final params = GrnItemQueryParams(
+    final params = OutboundDeliveryStoItemParams(
+      deliveryNo: widget.params.delivery,
+      itemNo: '',
+      material: '',
       plant: widget.params.plant,
-      location: widget.params.location,
-      materialDoc: widget.params.grn.materialDocument,
-      materialDocYear: widget.params.grn.materialDocYear,
+      storageLocation: widget.params.storageLocation,
+      movementType: widget.params.movementType,
       lastCount: 10,
       skipRecords: 0,
     );
-    context.read<GrnBloc>().add(
-      LoadGrnItemsEvent(params: params, refresh: true),
-    );
+    context.read<OutboundDeliveryStoItemBloc>().add(
+          LoadStoItemsEvent(params: params, refresh: true),
+        );
   }
 
   void _onPendingScroll() {
     if (_pendingScrollController.position.pixels ==
         _pendingScrollController.position.maxScrollExtent) {
-      final state = context.read<GrnBloc>().state;
-      if (state.pendingSection.hasMore && !state.pendingSection.isLoadingMore) {
-        final params = GrnItemQueryParams(
+      final state = context.read<OutboundDeliveryStoItemBloc>().state;
+      if (state.pendingSection.hasMore &&
+          !state.pendingSection.isLoadingMore) {
+        final params = OutboundDeliveryStoItemParams(
+          deliveryNo: widget.params.delivery,
+          itemNo: '',
+          material: '',
           plant: widget.params.plant,
-          location: widget.params.location,
-          materialDoc: widget.params.grn.materialDocument,
-          materialDocYear: widget.params.grn.materialDocYear,
+          storageLocation: widget.params.storageLocation,
+          movementType: widget.params.movementType,
           lastCount: 10,
           skipRecords: state.pendingSection.skipRecords,
         );
-        context.read<GrnBloc>().add(
-          LoadGrnItemsEvent(params: params, refresh: false),
-        );
+        context.read<OutboundDeliveryStoItemBloc>().add(
+              LoadStoItemsEvent(params: params, refresh: false),
+            );
       }
     }
   }
 
   void _loadCompletedData({bool refresh = true}) {
-    final params = GrnItemQueryParams(
+    final params = OutboundDeliveryStoItemParams(
+      deliveryNo: widget.params.delivery,
+      itemNo: '',
+      material: '',
       plant: widget.params.plant,
-      location: widget.params.location,
-      materialDoc: widget.params.grn.materialDocument,
-      materialDocYear: widget.params.grn.materialDocYear,
+      storageLocation: widget.params.storageLocation,
+      movementType: widget.params.movementType,
       lastCount: 10,
       skipRecords: 0,
     );
 
-    context.read<GrnBloc>().add(
-      LoadCompletedGrnItemsEvent(params: params, refresh: refresh),
-    );
+    context.read<OutboundDeliveryStoItemBloc>().add(
+          LoadCompletedStoItemsEvent(params: params, refresh: refresh),
+        );
   }
 
   void _onCompletedScroll() {
     if (_completedScrollController.position.pixels ==
         _completedScrollController.position.maxScrollExtent) {
-      final state = context.read<GrnBloc>().state;
+      final state = context.read<OutboundDeliveryStoItemBloc>().state;
       if (state.completedSection.hasMore &&
           !state.completedSection.isLoadingMore) {
-        final params = GrnItemQueryParams(
+        final params = OutboundDeliveryStoItemParams(
+          deliveryNo: widget.params.delivery,
+          itemNo: '',
+          material: '',
           plant: widget.params.plant,
-          location: widget.params.location,
-          materialDoc: widget.params.grn.materialDocument,
-          materialDocYear: widget.params.grn.materialDocYear,
+          storageLocation: widget.params.storageLocation,
+          movementType: widget.params.movementType,
           lastCount: 10,
           skipRecords: state.completedSection.skipRecords,
         );
-        context.read<GrnBloc>().add(
-          LoadCompletedGrnItemsEvent(params: params, refresh: false),
-        );
+        context.read<OutboundDeliveryStoItemBloc>().add(
+              LoadCompletedStoItemsEvent(params: params, refresh: false),
+            );
       }
     }
   }
 
-  Future<void> _showQuantityBottomSheet(GrnItemEntity item) async {
-    await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      builder:
-          (context) => BlocProvider(
-            create: (_) => sl<PutAwayBloc>(),
-            child: GrnQuantityBottomSheet(
-              item: item,
-              grn: widget.params.grn,
-              showLoader: false,
-              onBinsSelected: (bins) {
-                debugPrint(
-                  "Bins submitted: ${bins.map((b) => {'code': b.binCode, 'qty': b.selectedQuantity}).toList()}",
-                );
-              },
-              onTapClose: () {
-                debugPrint('Bottom sheet closed');
-              },
-            ),
-          ),
-    );
-
-    if (!mounted) return;
-
-    _loadPendingData();
-    _loadCompletedData();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<GrnBloc, GrnState>(
-      listenWhen: (previous, current) {
-        final pendingChanged =
-            previous.pendingSection.errorMessage !=
-            current.pendingSection.errorMessage;
-        final completedChanged =
-            previous.completedSection.errorMessage !=
-            current.completedSection.errorMessage;
-        return pendingChanged || completedChanged;
-      },
-      listener: (context, state) {
-        final pendingError = state.pendingSection.errorMessage;
-        final completedError = state.completedSection.errorMessage;
-        if (pendingError != null && pendingError.isNotEmpty) {
-          CustomToast.error(context, pendingError);
-        } else if (completedError != null && completedError.isNotEmpty) {
-          CustomToast.error(context, completedError);
-        }
-      },
-      child: BlocBuilder<GrnBloc, GrnState>(
-        builder: (context, state) {
-          final pendingSection = state.pendingSection;
-          final completedSection = state.completedSection;
+    return BlocBuilder<OutboundDeliveryStoItemBloc,
+        OutboundDeliveryStoItemState>(
+      builder: (context, state) {
+        final pendingSection = state.pendingSection;
+        final completedSection = state.completedSection;
 
-          return Scaffold(
-            appBar: CustomAppBar(title: AppTexts.putAwayAgainstGrn),
-            body: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(child: _buildTab(0, AppTexts.pending)),
-                    Expanded(child: _buildTab(1, AppTexts.completed)),
-                  ],
-                ),
-                10.verticalSpace,
-                ItemListingHeader(
-                  leftHeading: AppTexts.materialName,
-                  rightHeading: AppTexts.quantity,
-                ),
-                SizedBox(height: 8.h),
-                Expanded(
-                  child:
-                      _selectedTab == 0
-                          ? _buildPendingList(pendingSection)
-                          : _buildCompleteList(completedSection),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+        return Scaffold(
+          appBar: const CustomAppBar(title: AppTexts.outboundDeliverySto),
+          body: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(child: _buildTab(0, AppTexts.pending)),
+                  Expanded(child: _buildTab(1, AppTexts.completed)),
+                ],
+              ),
+              10.verticalSpace,
+              ItemListingHeader(
+                leftHeading: AppTexts.materialName,
+                rightHeading: AppTexts.quantity,
+              ),
+              SizedBox(height: 8.h),
+              Expanded(
+                child: _selectedTab == 0
+                    ? _buildPendingList(pendingSection)
+                    : _buildCompleteList(completedSection),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildPendingList(GrnItemsSectionState pendingState) {
+  Widget _buildPendingList(StoItemsSectionState pendingState) {
     if (pendingState.isLoading && pendingState.items.isEmpty) {
       return ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -281,16 +233,18 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
             );
           }
           final item = pendingState.items[index];
-          return GrnItemWidget(
+          return OutboundDeliveryStoItemCard(
             item: item,
-            onTap: () => _showQuantityBottomSheet(item),
+            onTap: () {
+              // Handle tap - show bottom sheet or navigate
+            },
           );
         },
       ),
     );
   }
 
-  Widget _buildCompleteList(GrnItemsSectionState completedState) {
+  Widget _buildCompleteList(StoItemsSectionState completedState) {
     if (completedState.isLoading && completedState.items.isEmpty) {
       return ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -335,8 +289,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
         controller: _completedScrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 16.w),
-        itemCount:
-            completedState.items.length +
+        itemCount: completedState.items.length +
             (completedState.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == completedState.items.length) {
@@ -346,11 +299,11 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
             );
           }
           final item = completedState.items[index];
-          return GrnItemWidget(
+          return OutboundDeliveryStoItemCard(
             item: item,
-            onTap:
-                () =>
-                    context.push(AppRoutes.completedGrnItemDetail, extra: item),
+            onTap: () {
+              // Handle tap - navigate to detail page
+            },
           );
         },
       ),
@@ -382,7 +335,8 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
           ),
         ),
         child: Center(
-          child: BlocBuilder<GrnBloc, GrnState>(
+          child: BlocBuilder<OutboundDeliveryStoItemBloc,
+              OutboundDeliveryStoItemState>(
             buildWhen: (previous, current) {
               if (index == 0) {
                 return previous.pendingSection.items.length !=
@@ -392,10 +346,9 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
                   current.completedSection.items.length;
             },
             builder: (context, state) {
-              final count =
-                  index == 0
-                      ? state.pendingSection.items.length
-                      : state.completedSection.items.length;
+              final count = index == 0
+                  ? state.pendingSection.items.length
+                  : state.completedSection.items.length;
               final text = count > 0 ? '$label ($count)' : label;
 
               return CustomText(

@@ -26,9 +26,9 @@ class OutboundDeliveryStoItemParams extends Equatable {
       'deliveryNo': deliveryNo,
       'itemNo': itemNo,
       'material': material,
+      'movementType': "641",
       'plant': plant,
       'storageLocation': storageLocation,
-      'movementType': "641",
       'lastCount': lastCount,
       'skipRecords': skipRecords,
     };

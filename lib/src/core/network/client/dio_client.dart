@@ -110,14 +110,13 @@ class DioClient {
 
   /// Get customized Dio options (headers & timeout)
   Options _getOptions(Map<String, dynamic>? customHeaders, Duration? timeout) {
-    final options = Options();
-    if (customHeaders != null) {
-      options.headers = {..._dio.options.headers, ...customHeaders};
-    }
-    if (timeout != null) {
-      _dio.options.connectTimeout = timeout;
-      _dio.options.receiveTimeout = timeout;
-    }
-    return options;
+    return Options(
+      headers: {
+        ..._dio.options.headers,
+        if (customHeaders != null) ...customHeaders,
+      },
+      sendTimeout: timeout,
+      receiveTimeout: timeout,
+    );
   }
 }

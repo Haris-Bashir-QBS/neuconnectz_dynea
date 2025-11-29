@@ -48,7 +48,7 @@ void _runApp() {
 
         /// =========== Features ====================
         BlocProvider(create: (_) => sl<PlantWarehouseBloc>()),
-        BlocProvider(create: (_) => sl<GrnBloc>()),
+        //BlocProvider(create: (_) => sl<GrnBloc>()),
         BlocProvider(create: (_) => sl<BinBloc>()),
         //  BlocProvider(create: (_) => sl<DashboardAnalyticsBloc>()),
       ],

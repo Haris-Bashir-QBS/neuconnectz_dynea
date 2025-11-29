@@ -207,4 +207,6 @@ final class AppTexts {
       "Manage & create picking against STO";
   static const outboundDeliverySalesSubtitle =
       "Manage & create picking against sales";
+
+  static const viewDetails = "View Details";
 }

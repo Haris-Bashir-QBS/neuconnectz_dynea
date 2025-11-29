@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:neuconnectz_dynea/src/core/barrels/auth_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
@@ -18,6 +17,7 @@ import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_texts.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../widgets/custom_toast.dart';
 
 class GrnItemsPage extends StatelessWidget {
@@ -348,9 +348,9 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
           final item = completedState.items[index];
           return GrnItemWidget(
             item: item,
-            onTap:
-                () =>
-                    context.push(AppRoutes.completedGrnItemDetail, extra: item),
+            onTap: () {
+              context.pushNamed(AppRoutes.completedGrnItemDetail, extra: item);
+            },
           );
         },
       ),

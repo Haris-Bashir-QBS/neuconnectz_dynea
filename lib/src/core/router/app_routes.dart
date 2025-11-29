@@ -1,5 +1,3 @@
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/completed_grn_item_detail_page.dart';
-
 class AppRoutes {
   AppRoutes._();
   //============================== Auth ==============================

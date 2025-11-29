@@ -75,16 +75,15 @@ class _OutboundDeliveryStoItemsViewState
       skipRecords: 0,
     );
     context.read<OutboundDeliveryStoItemBloc>().add(
-          LoadStoItemsEvent(params: params, refresh: true),
-        );
+      LoadStoItemsEvent(params: params, refresh: true),
+    );
   }
 
   void _onPendingScroll() {
     if (_pendingScrollController.position.pixels ==
         _pendingScrollController.position.maxScrollExtent) {
       final state = context.read<OutboundDeliveryStoItemBloc>().state;
-      if (state.pendingSection.hasMore &&
-          !state.pendingSection.isLoadingMore) {
+      if (state.pendingSection.hasMore && !state.pendingSection.isLoadingMore) {
         final params = OutboundDeliveryStoItemParams(
           deliveryNo: widget.params.delivery,
           itemNo: '',
@@ -96,8 +95,8 @@ class _OutboundDeliveryStoItemsViewState
           skipRecords: state.pendingSection.skipRecords,
         );
         context.read<OutboundDeliveryStoItemBloc>().add(
-              LoadStoItemsEvent(params: params, refresh: false),
-            );
+          LoadStoItemsEvent(params: params, refresh: false),
+        );
       }
     }
   }
@@ -115,8 +114,8 @@ class _OutboundDeliveryStoItemsViewState
     );
 
     context.read<OutboundDeliveryStoItemBloc>().add(
-          LoadCompletedStoItemsEvent(params: params, refresh: refresh),
-        );
+      LoadCompletedStoItemsEvent(params: params, refresh: refresh),
+    );
   }
 
   void _onCompletedScroll() {
@@ -136,16 +135,18 @@ class _OutboundDeliveryStoItemsViewState
           skipRecords: state.completedSection.skipRecords,
         );
         context.read<OutboundDeliveryStoItemBloc>().add(
-              LoadCompletedStoItemsEvent(params: params, refresh: false),
-            );
+          LoadCompletedStoItemsEvent(params: params, refresh: false),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OutboundDeliveryStoItemBloc,
-        OutboundDeliveryStoItemState>(
+    return BlocBuilder<
+      OutboundDeliveryStoItemBloc,
+      OutboundDeliveryStoItemState
+    >(
       builder: (context, state) {
         final pendingSection = state.pendingSection;
         final completedSection = state.completedSection;
@@ -167,9 +168,10 @@ class _OutboundDeliveryStoItemsViewState
               ),
               SizedBox(height: 8.h),
               Expanded(
-                child: _selectedTab == 0
-                    ? _buildPendingList(pendingSection)
-                    : _buildCompleteList(completedSection),
+                child:
+                    _selectedTab == 0
+                        ? _buildPendingList(pendingSection)
+                        : _buildCompleteList(completedSection),
               ),
             ],
           ),
@@ -289,7 +291,8 @@ class _OutboundDeliveryStoItemsViewState
         controller: _completedScrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 16.w),
-        itemCount: completedState.items.length +
+        itemCount:
+            completedState.items.length +
             (completedState.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == completedState.items.length) {
@@ -301,6 +304,7 @@ class _OutboundDeliveryStoItemsViewState
           final item = completedState.items[index];
           return OutboundDeliveryStoItemCard(
             item: item,
+            ctoText: AppTexts.viewDetails,
             onTap: () {
               // Handle tap - navigate to detail page
             },
@@ -335,8 +339,10 @@ class _OutboundDeliveryStoItemsViewState
           ),
         ),
         child: Center(
-          child: BlocBuilder<OutboundDeliveryStoItemBloc,
-              OutboundDeliveryStoItemState>(
+          child: BlocBuilder<
+            OutboundDeliveryStoItemBloc,
+            OutboundDeliveryStoItemState
+          >(
             buildWhen: (previous, current) {
               if (index == 0) {
                 return previous.pendingSection.items.length !=
@@ -346,9 +352,10 @@ class _OutboundDeliveryStoItemsViewState
                   current.completedSection.items.length;
             },
             builder: (context, state) {
-              final count = index == 0
-                  ? state.pendingSection.items.length
-                  : state.completedSection.items.length;
+              final count =
+                  index == 0
+                      ? state.pendingSection.items.length
+                      : state.completedSection.items.length;
               final text = count > 0 ? '$label ($count)' : label;
 
               return CustomText(

@@ -39,13 +39,13 @@ class GrnItemsSectionState extends Equatable {
 
   @override
   List<Object?> get props => [
-        items,
-        totalRows,
-        skipRecords,
-        isLoading,
-        isLoadingMore,
-        errorMessage,
-      ];
+    items,
+    totalRows,
+    skipRecords,
+    isLoading,
+    isLoadingMore,
+    errorMessage,
+  ];
 }
 
 abstract class GrnState extends Equatable {
@@ -64,26 +64,20 @@ abstract class GrnState extends Equatable {
 }
 
 class GrnInitial extends GrnState {
-  const GrnInitial({
-    super.pendingSection,
-    super.completedSection,
-  });
+  const GrnInitial({super.pendingSection, super.completedSection});
 }
 
-class PendingGrnLoading extends GrnState {
-  const PendingGrnLoading({
-    super.pendingSection,
-    super.completedSection,
-  });
+class GrnHeaderListLoading extends GrnState {
+  const GrnHeaderListLoading({super.pendingSection, super.completedSection});
 }
 
-class PendingGrnSuccess extends GrnState {
+class GrnHeaderListFetched extends GrnState {
   final List<GrnEntity> items;
   final int totalRows;
   final int skipRecords;
   final bool isLoadingMore;
 
-  const PendingGrnSuccess({
+  const GrnHeaderListFetched({
     required this.items,
     required this.totalRows,
     required this.skipRecords,
@@ -96,18 +90,18 @@ class PendingGrnSuccess extends GrnState {
 
   @override
   List<Object?> get props => [
-        ...baseProps,
-        items,
-        totalRows,
-        skipRecords,
-        isLoadingMore,
-      ];
+    ...baseProps,
+    items,
+    totalRows,
+    skipRecords,
+    isLoadingMore,
+  ];
 }
 
-class PendingGrnFailure extends GrnState {
+class GrnHeaderListFetchFailure extends GrnState {
   final String message;
 
-  const PendingGrnFailure({
+  const GrnHeaderListFetchFailure({
     required this.message,
     super.pendingSection,
     super.completedSection,
@@ -118,17 +112,11 @@ class PendingGrnFailure extends GrnState {
 }
 
 class GrnItemsLoading extends GrnState {
-  const GrnItemsLoading({
-    super.pendingSection,
-    super.completedSection,
-  });
+  const GrnItemsLoading({super.pendingSection, super.completedSection});
 }
 
 class GrnItemsSuccess extends GrnState {
-  const GrnItemsSuccess({
-    super.pendingSection,
-    super.completedSection,
-  });
+  const GrnItemsSuccess({super.pendingSection, super.completedSection});
 }
 
 class GrnItemsFailure extends GrnState {

@@ -33,7 +33,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
     if (event.refresh) {
       // Refresh: reset skipRecords to 0
       emit(
-        PendingGrnLoading(
+        GrnHeaderListLoading(
           pendingSection: state.pendingSection,
           completedSection: state.completedSection,
         ),
@@ -52,7 +52,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
       result.fold(
         (failure) {
           emit(
-            PendingGrnFailure(
+            GrnHeaderListFetchFailure(
               message: failure.message,
               pendingSection: state.pendingSection,
               completedSection: state.completedSection,
@@ -61,7 +61,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         },
         (result) {
           emit(
-            PendingGrnSuccess(
+            GrnHeaderListFetched(
               items: result.items,
               totalRows: result.totalRows,
               skipRecords: result.items.length,
@@ -74,11 +74,11 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
     } else {
       // Load more: append to existing items
       final currentState = state;
-      if (currentState is! PendingGrnSuccess) return;
+      if (currentState is! GrnHeaderListFetched) return;
       if (currentState.isLoadingMore || !currentState.hasMore) return;
 
       emit(
-        PendingGrnSuccess(
+        GrnHeaderListFetched(
           items: currentState.items,
           totalRows: currentState.totalRows,
           skipRecords: currentState.skipRecords,
@@ -102,7 +102,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
       result.fold(
         (failure) {
           emit(
-            PendingGrnSuccess(
+            GrnHeaderListFetched(
               items: currentState.items,
               totalRows: currentState.totalRows,
               skipRecords: currentState.skipRecords,
@@ -116,7 +116,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         (newResult) {
           final updatedItems = [...currentState.items, ...newResult.items];
           emit(
-            PendingGrnSuccess(
+            GrnHeaderListFetched(
               items: updatedItems,
               totalRows: newResult.totalRows,
               skipRecords: updatedItems.length,

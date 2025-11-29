@@ -219,15 +219,19 @@ class _OutboundDeliveryStoListingViewState
     );
   }
 
-  void _navigateToItemsPage(OutboundDeliveryStoEntity stoHeader) {
-    context.pushNamed(
-      AppRoutes.outboundDeliveryStoItemsListing,
-      extra: OutboundDeliveryStoItemsPageParams(
-        delivery: stoHeader.delivery,
-        plant: widget.params.plant,
-        storageLocation: widget.params.storageLocation,
-        movementType: widget.params.movementType,
-      ),
-    );
+  void _navigateToItemsPage(OutboundDeliveryStoEntity stoHeader) async {
+    await context
+        .pushNamed(
+          AppRoutes.outboundDeliveryStoItemsListing,
+          extra: OutboundDeliveryStoItemsPageParams(
+            delivery: stoHeader.delivery,
+            plant: widget.params.plant,
+            storageLocation: widget.params.storageLocation,
+            movementType: widget.params.movementType,
+          ),
+        )
+        .then((value) {
+          _loadInitialData();
+        });
   }
 }

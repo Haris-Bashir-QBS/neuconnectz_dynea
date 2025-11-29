@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:neuconnectz_dynea/src/core/barrels/auth_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_list_params.dart';
@@ -100,7 +101,9 @@ class __GrnListingViewState extends State<_GrnListingView> {
         _scrollController.position.maxScrollExtent) {
       final state = context.read<GrnBloc>().state;
 
-      if (state is PendingGrnSuccess && state.hasMore && !state.isLoadingMore) {
+      if (state is GrnHeaderListFetched &&
+          state.hasMore &&
+          !state.isLoadingMore) {
         final params = GrnListParams(
           plant: widget.params.plant.code,
           location: widget.params.warehouse.storageLocationCode ?? '',
@@ -159,14 +162,15 @@ class __GrnListingViewState extends State<_GrnListingView> {
   Widget _buildPendingList() {
     return BlocConsumer<GrnBloc, GrnState>(
       listener: (context, state) {
-        if (state is PendingGrnFailure) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+        if (state is GrnHeaderListFetchFailure) {
+          CustomToast.error(context, state.message);
+        }
+        if (state is GrnHeaderListFetched) {
+          context.unfocusFocusScope();
         }
       },
       builder: (context, state) {
-        if (state is PendingGrnLoading) {
+        if (state is GrnHeaderListLoading) {
           return Column(
             children: [
               ItemListingHeaderShimmer(),
@@ -182,7 +186,7 @@ class __GrnListingViewState extends State<_GrnListingView> {
           );
         }
 
-        if (state is PendingGrnFailure) {
+        if (state is GrnHeaderListFetchFailure) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -202,7 +206,7 @@ class __GrnListingViewState extends State<_GrnListingView> {
           );
         }
 
-        if (state is PendingGrnSuccess) {
+        if (state is GrnHeaderListFetched) {
           if (state.items.isEmpty) {
             return Center(
               child: CustomText(
@@ -260,7 +264,7 @@ class __GrnListingViewState extends State<_GrnListingView> {
 
   void _navigateToGrnItemsListingPage(
     BuildContext context,
-    PendingGrnSuccess state,
+    GrnHeaderListFetched state,
     int index,
   ) async {
     await context

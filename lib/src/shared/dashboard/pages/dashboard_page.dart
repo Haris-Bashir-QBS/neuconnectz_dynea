@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/utils/app_static_data.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/menu_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/widgets/custom_bottom_bar.dart';
 import 'package:neuconnectz_dynea/src/shared/home/presentation/pages/home_page.dart';
+import 'package:neuconnectz_dynea/src/shared/inventory/presentation/blocs/plant_warehouse_bloc.dart';
+import 'package:neuconnectz_dynea/src/shared/selection/pages/document_selection_page.dart';
+import 'package:neuconnectz_dynea/src/shared/selection/params/document_selection_params.dart';
 import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:terminate_restart/terminate_restart.dart';
 
@@ -134,11 +139,19 @@ class _DashboardPageState extends State<DashboardPage> {
       case 0:
         return const HomePage();
       case 1:
-        //return const ProductionOrdersListingPage();
-        return Container();
+        return BlocProvider(
+          create: (_) => sl<PlantWarehouseBloc>(),
+          child: DocumentSelectionPage(
+            params: DocumentSelectionConfigs.reservation(isScaffold: false),
+          ),
+        );
       case 2:
-        // return ItrListingPage(isScaffold: false);
-        return Container();
+        return BlocProvider(
+          create: (_) => sl<PlantWarehouseBloc>(),
+          child: DocumentSelectionPage(
+            params: DocumentSelectionConfigs.grn(isScaffold: false),
+          ),
+        );
       case 3:
         return const MenuPage();
       default:

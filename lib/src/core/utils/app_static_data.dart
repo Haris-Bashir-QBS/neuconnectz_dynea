@@ -143,6 +143,11 @@ final class AppStaticData {
             AppRoutes.documentSelection,
             extra: DocumentSelectionConfigs.outboundDeliverySto(),
           );
+        } else if (item == AppTexts.outboundDeliverySales) {
+          context.pushNamed(
+            AppRoutes.documentSelection,
+            extra: DocumentSelectionConfigs.outboundDeliverySales(),
+          );
         }
       },
     ),

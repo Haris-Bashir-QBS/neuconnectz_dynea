@@ -70,7 +70,7 @@ class _OutboundDeliveryStoItemsViewState
       material: '',
       plant: widget.params.plant,
       storageLocation: widget.params.storageLocation,
-      movementType: widget.params.movementType,
+      //movementType: widget.params.movementType,
       lastCount: 10,
       skipRecords: 0,
     );
@@ -90,7 +90,7 @@ class _OutboundDeliveryStoItemsViewState
           material: '',
           plant: widget.params.plant,
           storageLocation: widget.params.storageLocation,
-          movementType: widget.params.movementType,
+          // movementType: widget.params.movementType,
           lastCount: 10,
           skipRecords: state.pendingSection.skipRecords,
         );
@@ -108,7 +108,7 @@ class _OutboundDeliveryStoItemsViewState
       material: '',
       plant: widget.params.plant,
       storageLocation: widget.params.storageLocation,
-      movementType: widget.params.movementType,
+      // movementType: widget.params.movementType,
       lastCount: 10,
       skipRecords: 0,
     );
@@ -130,7 +130,7 @@ class _OutboundDeliveryStoItemsViewState
           material: '',
           plant: widget.params.plant,
           storageLocation: widget.params.storageLocation,
-          movementType: widget.params.movementType,
+          // movementType: widget.params.movementType,
           lastCount: 10,
           skipRecords: state.completedSection.skipRecords,
         );

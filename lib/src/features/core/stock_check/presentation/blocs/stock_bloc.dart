@@ -25,12 +25,14 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     Emitter<StockState> emit,
   ) async {
     final query = event.params.copyWith(skipRecords: 0);
+    final shouldClear = event.clearExisting || state.items.isEmpty;
+
     emit(
       state.copyWith(
         params: query,
         isLoading: true,
-        items: const [],
-        totalCount: 0,
+        items: shouldClear ? const [] : state.items,
+        totalCount: shouldClear ? 0 : state.totalCount,
         clearError: true,
       ),
     );
@@ -95,7 +97,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       searchQuery: null,
       skipRecords: 0,
     );
-    add(LoadStocksEvent(params: params));
+    add(LoadStocksEvent(params: params, clearExisting: true));
   }
 
   void _onSearch(
@@ -107,7 +109,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       searchQuery: (query == null || query.isEmpty) ? null : query,
       skipRecords: 0,
     );
-    add(LoadStocksEvent(params: params));
+    add(LoadStocksEvent(params: params, clearExisting: true));
   }
 }
 

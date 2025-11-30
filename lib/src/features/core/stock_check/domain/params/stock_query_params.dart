@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum StockFilterType { all, material, storageType, storageBin }
+enum StockFilterType { all, material, storageType, storageBin, batch }
 
 class StockQueryParams extends Equatable {
   final String plant;

@@ -4,35 +4,23 @@ import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 
 import '../../domain/entities/stock_entity.dart';
+import '../../domain/params/stock_query_params.dart';
 
 class StockCard extends StatefulWidget {
   final StockEntity item;
+  final StockFilterType? priorityField;
 
-  const StockCard({super.key, required this.item});
+  const StockCard({super.key, required this.item, this.priorityField});
 
   @override
   State<StockCard> createState() => _StockCardState();
 }
 
-class _StockCardState extends State<StockCard>
-    with SingleTickerProviderStateMixin {
+class _StockCardState extends State<StockCard> {
   bool expanded = false;
-  late AnimationController _controller;
-  late Animation<double> rotateAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    rotateAnim = Tween<double>(begin: 0, end: 0.5).animate(_controller);
-  }
 
   void toggle() {
     setState(() => expanded = !expanded);
-    expanded ? _controller.forward() : _controller.reverse();
   }
 
   @override
@@ -60,26 +48,6 @@ class _StockCardState extends State<StockCard>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Circle Number
-                Container(
-                  width: 34.w,
-                  height: 34.w,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue.shade50,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    item.quant.toString(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ),
-
-                12.horizontalSpace,
-
                 /// Material name + description
                 Expanded(
                   child: Column(
@@ -89,7 +57,7 @@ class _StockCardState extends State<StockCard>
                         item.material,
                         style: TextStyle(
                           fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       3.verticalSpace,
@@ -109,7 +77,7 @@ class _StockCardState extends State<StockCard>
                   item.availableStock.formatWithCommas,
                   style: TextStyle(
                     fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: item.availableStock < 0 ? Colors.red : Colors.black,
                   ),
                 ),
@@ -131,12 +99,7 @@ class _StockCardState extends State<StockCard>
                   padding: EdgeInsets.all(16.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _detailRow("Storage Type:", item.storageType),
-                      _detailRow("Storage Section:", item.storageLocation),
-                      _detailRow("Storage Bin:", item.storageBin),
-                      _detailRow("Batch No:", item.batch ?? "N/A"),
-                    ],
+                    children: _buildDetailRows(),
                   ),
                 ),
               ],
@@ -165,9 +128,10 @@ class _StockCardState extends State<StockCard>
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                   6.horizontalSpace,
-                  RotationTransition(
-                    turns: rotateAnim,
-                    child: const Icon(Icons.expand_more, color: Colors.white),
+                  Icon(
+                    expanded ? Icons.visibility_off_rounded : Icons.visibility,
+                    color: Colors.white,
+                    size: 18.sp,
                   ),
                 ],
               ),
@@ -176,6 +140,48 @@ class _StockCardState extends State<StockCard>
         ],
       ),
     );
+  }
+
+  List<Widget> _buildDetailRows() {
+    final item = widget.item;
+    final priorityField = widget.priorityField;
+
+    // Define all detail rows
+    final allRows = [
+      _DetailRowData("Quant:", item.quant.toInt().toString()),
+      _DetailRowData("Storage Type:", item.storageType),
+      _DetailRowData("Storage Section:", item.storageLocation),
+      _DetailRowData("Storage Bin:", item.storageBin),
+      _DetailRowData("Batch No:", item.batch ?? "N/A"),
+    ];
+
+    // Reorder based on priority field
+    if (priorityField != null && priorityField != StockFilterType.all) {
+      int? priorityIndex;
+      switch (priorityField) {
+        case StockFilterType.storageType:
+          priorityIndex = 1; // Storage Type
+          break;
+        case StockFilterType.storageBin:
+          priorityIndex = 3; // Storage Bin
+          break;
+        case StockFilterType.batch:
+          priorityIndex = 4; // Batch No
+          break;
+        case StockFilterType.material:
+          // Material is already shown in header, so no reordering needed
+          break;
+        default:
+          break;
+      }
+
+      if (priorityIndex != null && priorityIndex < allRows.length) {
+        final priorityRow = allRows.removeAt(priorityIndex);
+        allRows.insert(0, priorityRow);
+      }
+    }
+
+    return allRows.map((row) => _detailRow(row.label, row.value)).toList();
   }
 
   Widget _detailRow(String label, String value) {
@@ -195,11 +201,22 @@ class _StockCardState extends State<StockCard>
           Expanded(
             child: Text(
               value.isEmpty ? "-" : value,
-              style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w400,
+                color: AppPalette.greyColor,
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _DetailRowData {
+  final String label;
+  final String value;
+
+  _DetailRowData(this.label, this.value);
 }

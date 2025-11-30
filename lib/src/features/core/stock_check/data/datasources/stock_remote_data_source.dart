@@ -34,6 +34,9 @@ class StockRemoteDataSourceImpl implements StockRemoteDataSource {
         case StockFilterType.storageBin:
           query['storageBin'] = params.searchQuery;
           break;
+        case StockFilterType.batch:
+          query['batch'] = params.searchQuery;
+          break;
         case StockFilterType.all:
           query['keyword'] = params.searchQuery;
           break;

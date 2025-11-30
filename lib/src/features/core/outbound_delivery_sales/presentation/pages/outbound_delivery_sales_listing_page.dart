@@ -9,13 +9,13 @@ import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/item_listing_header_shimmer.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/entities/outbound_delivery_sto_entity.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_event.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_state.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/widgets/outbound_delivery_sto_card.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_item_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_list_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/widgets/outbound_delivery_sales_card.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_search_field.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
@@ -23,32 +23,32 @@ import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
 
 import '../../../../../core/router/app_routes.dart';
 
-class OutboundDeliveryStoListingPage extends StatelessWidget {
-  final OutboundDeliveryStoListParams params;
+class OutboundDeliverySalesListingPage extends StatelessWidget {
+  final OutboundDeliverySalesListingPageParams params;
 
-  const OutboundDeliveryStoListingPage({super.key, required this.params});
+  const OutboundDeliverySalesListingPage({super.key, required this.params});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<OutboundDeliveryStoBloc>(),
-      child: _OutboundDeliveryStoListingView(params: params),
+      create: (context) => sl<OutboundDeliverySalesBloc>(),
+      child: _OutboundDeliverySalesListingView(params: params),
     );
   }
 }
 
-class _OutboundDeliveryStoListingView extends StatefulWidget {
-  final OutboundDeliveryStoListParams params;
+class _OutboundDeliverySalesListingView extends StatefulWidget {
+  final OutboundDeliverySalesListingPageParams params;
 
-  const _OutboundDeliveryStoListingView({required this.params});
+  const _OutboundDeliverySalesListingView({required this.params});
 
   @override
-  State<_OutboundDeliveryStoListingView> createState() =>
-      _OutboundDeliveryStoListingViewState();
+  State<_OutboundDeliverySalesListingView> createState() =>
+      _OutboundDeliverySalesListingViewState();
 }
 
-class _OutboundDeliveryStoListingViewState
-    extends State<_OutboundDeliveryStoListingView> {
+class _OutboundDeliverySalesListingViewState
+    extends State<_OutboundDeliverySalesListingView> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
   late final ScrollController _scrollController;
@@ -86,35 +86,35 @@ class _OutboundDeliveryStoListingViewState
   }
 
   void _loadInitialData() {
-    final params = OutboundDeliveryStoListParams(
+    final params = OutboundDeliverySalesListParams(
       plant: widget.params.plant,
       storageLocation: widget.params.storageLocation,
-      // movementType: widget.params.movementType,
+      deliveryNo: _searchKeyword.isEmpty ? null : _searchKeyword,
       lastCount: 10,
       skipRecords: 0,
     );
 
-    context.read<OutboundDeliveryStoBloc>().add(
-      LoadOutboundDeliveryStoListEvent(params: params, refresh: true),
+    context.read<OutboundDeliverySalesBloc>().add(
+      LoadOutboundDeliverySalesListEvent(params: params, refresh: true),
     );
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      final state = context.read<OutboundDeliveryStoBloc>().state;
+      final state = context.read<OutboundDeliverySalesBloc>().state;
 
-      if (state.hasMore && !state.loadingMore) {
-        final params = OutboundDeliveryStoListParams(
+      if (state.listHasMore && !state.listIsLoadingMore) {
+        final params = OutboundDeliverySalesListParams(
           plant: widget.params.plant,
           storageLocation: widget.params.storageLocation,
-          // movementType: widget.params.movementType,
+          deliveryNo: _searchKeyword.isEmpty ? null : _searchKeyword,
           lastCount: 10,
-          skipRecords: state.skipRecords,
+          skipRecords: state.listSkipRecords,
         );
 
-        context.read<OutboundDeliveryStoBloc>().add(
-          LoadOutboundDeliveryStoListEvent(params: params, refresh: false),
+        context.read<OutboundDeliverySalesBloc>().add(
+          LoadOutboundDeliverySalesListEvent(params: params, refresh: false),
         );
       }
     }
@@ -123,21 +123,21 @@ class _OutboundDeliveryStoListingViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: AppTexts.outboundDeliverySto),
+      appBar: CustomAppBar(title: AppTexts.outboundDeliverySales),
       body: Column(
         children: [
           CustomSearchField(controller: _searchController),
           SizedBox(height: 8.h),
-          Expanded(child: _buildList()),
+          Expanded(child: _buildSalesOrderList()),
         ],
       ),
     );
   }
 
-  Widget _buildList() {
-    return BlocBuilder<OutboundDeliveryStoBloc, OutboundDeliveryStoState>(
+  Widget _buildSalesOrderList() {
+    return BlocBuilder<OutboundDeliverySalesBloc, OutboundDeliverySalesState>(
       builder: (context, state) {
-        if (state.loading && state.items.isEmpty) {
+        if (state.listLoading && state.listItems.isEmpty) {
           return Column(
             children: [
               ItemListingHeaderShimmer(),
@@ -153,13 +153,13 @@ class _OutboundDeliveryStoListingViewState
           );
         }
 
-        if (state.error != null && state.items.isEmpty) {
+        if (state.listError != null && state.listItems.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomText(
-                  text: state.error!,
+                  text: state.listError!,
                   fontSize: 16.sp,
                   color: AppPalette.greyColor,
                 ),
@@ -173,10 +173,10 @@ class _OutboundDeliveryStoListingViewState
           );
         }
 
-        if (state.items.isEmpty) {
+        if (state.listItems.isEmpty) {
           return Center(
             child: CustomText(
-              text: AppTexts.noResultsFound,
+              text: 'No sales orders found',
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
               color: AppPalette.greyColor,
@@ -197,17 +197,19 @@ class _OutboundDeliveryStoListingViewState
                 child: ListView.builder(
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 15.w),
-                  itemCount: state.items.length + (state.loadingMore ? 1 : 0),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  itemCount:
+                      state.listItems.length +
+                      (state.listIsLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index >= state.items.length) {
-                      return const GrnListItemShimmer();
+                    if (index == state.listItems.length) {
+                      return GrnListItemShimmer();
                     }
-                    return OutboundDeliveryStoCard(
-                      item: state.items[index],
-                      onTap: () {
-                        _navigateToItemsPage(state.items[index]);
-                      },
+
+                    final item = state.listItems[index];
+                    return OutboundDeliverySalesCard(
+                      item: item,
+                      onTap: () => _navigateToSalesOrderItemsPage(item),
                     );
                   },
                 ),
@@ -219,19 +221,20 @@ class _OutboundDeliveryStoListingViewState
     );
   }
 
-  void _navigateToItemsPage(OutboundDeliveryStoEntity stoHeader) async {
-    await context
-        .pushNamed(
-          AppRoutes.outboundDeliveryStoItemsListing,
-          extra: OutboundDeliveryStoItemsPageParams(
-            delivery: stoHeader.delivery,
-            plant: widget.params.plant,
-            storageLocation: widget.params.storageLocation,
-            //movementType: widget.params.movementType,
-          ),
-        )
-        .then((value) {
-          _loadInitialData();
-        });
+  void _navigateToSalesOrderItemsPage(OutboundDeliverySalesEntity item) async {
+    final params = OutboundDeliverySalesItemsPageParams(
+      delivery: item.delivery,
+      plant: widget.params.plant,
+      storageLocation: widget.params.storageLocation,
+      warehouseCode: widget.params.warehouseCode,
+      warehouse: widget.params.warehouse,
+    );
+
+    await context.pushNamed(AppRoutes.outboundDeliverySalesItems, extra: params).then((
+      value,
+    ) {
+      _loadInitialData();
+    });
   }
 }
+

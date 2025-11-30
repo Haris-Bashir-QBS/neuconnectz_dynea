@@ -9,11 +9,15 @@ abstract class StockEvent extends Equatable {
 
 class LoadStocksEvent extends StockEvent {
   final StockQueryParams params;
+  final bool clearExisting;
 
-  const LoadStocksEvent({required this.params});
+  const LoadStocksEvent({
+    required this.params,
+    this.clearExisting = true,
+  });
 
   @override
-  List<Object?> get props => [params];
+  List<Object?> get props => [params, clearExisting];
 }
 
 class LoadMoreStocksEvent extends StockEvent {

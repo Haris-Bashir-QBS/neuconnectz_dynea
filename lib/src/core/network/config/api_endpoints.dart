@@ -11,6 +11,7 @@ var _plant = "$_rootApi/IPlantFeature";
 var _warehouse = "$_rootApi/IWarehouseFeature";
 var _stocks = "$_rootApi/IStocksFeature";
 var _stockTransferOrder = "$_rootApi/IStockTransferOrderFeature";
+var _salesOrder = "$_rootApi/ISalesOrderFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -61,7 +62,12 @@ enum ApiEndpoints {
   /// ===================== Outbound Delivery (STO) =====================
   listAllStockDocFromSAP,
   stoItems,
-  completedStoItems;
+  completedStoItems,
+
+  /// ===================== Outbound Delivery (Sales Order) =====================
+  listAllSalesOrderDocFromSAP,
+  listAllSalesOrderItemFromSAP,
+  completedSalesorderItems;
 
   String get value {
     switch (this) {
@@ -131,9 +137,6 @@ enum ApiEndpoints {
       case ApiEndpoints.listStockItems:
         return "$_stocks/ListAllStocks";
 
-      /// ======================== Stock Check  =========================
-      case ApiEndpoints.listAllStockDocFromSAP:
-        return "$_stockTransferOrder/ListAllStockDocFromSAP";
 
       /// ======================== Plant/Warehouse ======================
       case ApiEndpoints.listAllPlantsAssignedToUser:
@@ -142,10 +145,21 @@ enum ApiEndpoints {
         return "$_warehouse/ListAllWarehousesByUserPlants";
 
       /// ======================== Outbound Delivery (STO) ===============
+  
+      case ApiEndpoints.listAllStockDocFromSAP:
+        return "$_stockTransferOrder/ListAllStockDocFromSAP";
       case ApiEndpoints.stoItems:
         return "$_stockTransferOrder/StockDocItemFromSAP";
       case ApiEndpoints.completedStoItems:
         return "$_stockTransferOrder/CompletedStoItems";
+        
+      /// ======================== Outbound Delivery (Sales Order) ===============
+      case ApiEndpoints.listAllSalesOrderDocFromSAP:
+        return "$_salesOrder/ListAllSalesOrderDocFromSAP";
+      case ApiEndpoints.listAllSalesOrderItemFromSAP:
+        return "$_salesOrder/ListAllSalesOrderItemFromSAP";
+      case ApiEndpoints.completedSalesorderItems:
+        return "$_salesOrder/completedSalesorderItems";
     }
   }
 }

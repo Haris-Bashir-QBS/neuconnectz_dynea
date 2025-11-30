@@ -6,7 +6,7 @@ class OutboundDeliveryStoItemParams extends Equatable {
   final String material;
   final String plant;
   final String storageLocation;
-  final String movementType;
+  //final String movementType;
   final int lastCount;
   final int skipRecords;
 
@@ -16,7 +16,7 @@ class OutboundDeliveryStoItemParams extends Equatable {
     required this.material,
     required this.plant,
     required this.storageLocation,
-    required this.movementType,
+    // required this.movementType,
     this.lastCount = 10,
     this.skipRecords = 0,
   });
@@ -26,7 +26,7 @@ class OutboundDeliveryStoItemParams extends Equatable {
       'deliveryNo': deliveryNo,
       'itemNo': itemNo,
       'material': material,
-      'movementType': "641",
+      // 'movementType': "641",
       'plant': plant,
       'storageLocation': storageLocation,
       'lastCount': lastCount,
@@ -41,7 +41,7 @@ class OutboundDeliveryStoItemParams extends Equatable {
     material,
     plant,
     storageLocation,
-    movementType,
+    //  movementType,
     lastCount,
     skipRecords,
   ];

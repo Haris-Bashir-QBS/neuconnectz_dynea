@@ -65,7 +65,7 @@ class _StockListingViewState extends State<_StockListingView> {
     super.dispose();
   }
 
-  void _loadStocks() {
+  void _loadStocks({bool clearExisting = true}) {
     context.read<StockBloc>().add(
       LoadStocksEvent(
         params: StockQueryParams(
@@ -77,6 +77,7 @@ class _StockListingViewState extends State<_StockListingView> {
                   ? null
                   : _searchController.text.trim(),
         ),
+        clearExisting: clearExisting,
       ),
     );
   }
@@ -105,6 +106,8 @@ class _StockListingViewState extends State<_StockListingView> {
         return AppTexts.searchStorageType;
       case StockFilterType.storageBin:
         return AppTexts.searchStorageBin;
+      case StockFilterType.batch:
+        return AppTexts.searchBatch;
       case StockFilterType.all:
         return AppTexts.search;
     }
@@ -125,12 +128,7 @@ class _StockListingViewState extends State<_StockListingView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomText(
-                  text:
-                      '${plant.code} • ${warehouse.storageLocationCode ?? ''}',
-                  fontSize: 14.sp,
-                  color: AppPalette.greyColor,
-                ),
+                _buildInfoChips(plant.code, warehouse.storageLocationCode ?? ''),
                 8.verticalSpace,
                 _buildFilterRow(),
                 12.verticalSpace,
@@ -153,6 +151,7 @@ class _StockListingViewState extends State<_StockListingView> {
           Expanded(
             child: BlocBuilder<StockBloc, StockState>(
               builder: (context, state) {
+                // Show shimmer only on initial load when items are empty
                 if (state.isLoading && state.items.isEmpty) {
                   return ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -168,7 +167,7 @@ class _StockListingViewState extends State<_StockListingView> {
                   );
                 }
 
-                if (state.items.isEmpty) {
+                if (state.items.isEmpty && !state.isLoading) {
                   return Center(
                     child: CustomText(
                       text: AppTexts.noStocksFound,
@@ -189,18 +188,69 @@ class _StockListingViewState extends State<_StockListingView> {
                     itemCount: itemCount,
                     itemBuilder: (context, index) {
                       if (index == state.items.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: CircularProgressIndicator()),
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.h),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppPalette.primaryColor,
+                            ),
+                          ),
                         );
                       }
 
                       final item = state.items[index];
-                      return StockCard(item: item);
+                      return StockCard(
+                        item: item,
+                        priorityField: _selectedFilter,
+                      );
                     },
                   ),
                 );
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChips(String plant, String storageLocation) {
+    return Wrap(
+      spacing: 8.w,
+      runSpacing: 8.h,
+      children: [
+        _buildInfoChip('Plant: $plant'),
+        if (storageLocation.isNotEmpty)
+          _buildInfoChip('Location: $storageLocation'),
+      ],
+    );
+  }
+
+  Widget _buildInfoChip(String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.w,
+        vertical: 6.h,
+      ),
+      decoration: BoxDecoration(
+        color: AppPalette.lightGreyColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: 14.sp,
+            color: AppPalette.greyColor,
+          ),
+          4.horizontalSpace,
+          Text(
+            label,
+            style: TextStyle(
+              color: AppPalette.darkGreyColor,
+              fontWeight: FontWeight.w500,
+              fontSize: 12.sp,
             ),
           ),
         ],
@@ -221,6 +271,7 @@ class _StockListingViewState extends State<_StockListingView> {
                 StockFilterType.material => AppTexts.material,
                 StockFilterType.storageType => AppTexts.storageType,
                 StockFilterType.storageBin => AppTexts.storageBin,
+                StockFilterType.batch => AppTexts.batch,
               };
 
               return Padding(

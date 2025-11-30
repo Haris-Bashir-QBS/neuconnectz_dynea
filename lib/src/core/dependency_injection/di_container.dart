@@ -34,6 +34,7 @@ Future<void> _initAuthDependencies() async {
   _registerStockDependencies();
   _registerOutboundDeliveryStoDependencies();
   _registerOutboundDeliveryStoItemsDependencies();
+  _registerOutboundDeliverySalesDependencies();
 }
 
 void _registerAuthRemoteDatasources() {
@@ -245,6 +246,30 @@ void _registerOutboundDeliveryStoItemsDependencies() {
     () => OutboundDeliveryStoItemBloc(
       getStockDocItemFromSAPUseCase: sl(),
       getCompletedStoItemsUseCase: sl(),
+    ),
+  );
+}
+
+void _registerOutboundDeliverySalesDependencies() {
+  sl
+    ..registerLazySingleton<OutboundDeliverySalesRemoteDataSource>(
+      () => OutboundDeliverySalesRemoteDataSourceImpl(dio: sl()),
+    )
+    ..registerLazySingleton<OutboundDeliverySalesRepository>(
+      () => OutboundDeliverySalesRepositoryImpl(remoteDataSource: sl()),
+    )
+    ..registerLazySingleton(() => GetOutboundDeliverySalesListUseCase(sl()))
+    ..registerLazySingleton(() => GetOutboundDeliverySalesItemsUseCase(sl()))
+    ..registerLazySingleton(
+      () => GetCompletedOutboundDeliverySalesItemsUseCase(sl()),
+    );
+
+
+  sl.registerFactory(
+    () => OutboundDeliverySalesBloc(
+      getOutboundDeliverySalesListUseCase: sl(),
+      getOutboundDeliverySalesItemsUseCase: sl(),
+      getCompletedOutboundDeliverySalesItemsUseCase: sl(),
     ),
   );
 }

@@ -3,14 +3,14 @@ import 'package:equatable/equatable.dart';
 class OutboundDeliveryStoListParams extends Equatable {
   final String plant;
   final String storageLocation;
-  final String movementType;
+  //final String movementType;
   final int lastCount;
   final int skipRecords;
 
   const OutboundDeliveryStoListParams({
     required this.plant,
     required this.storageLocation,
-    required this.movementType,
+    //required this.movementType,
     this.lastCount = 10,
     this.skipRecords = 0,
   });
@@ -19,7 +19,7 @@ class OutboundDeliveryStoListParams extends Equatable {
     return {
       'plant': plant,
       'storageLocation': storageLocation,
-      'movementType': movementType,
+      //'movementType': movementType,
       'lastCount': lastCount,
       'skipRecords': skipRecords,
     };
@@ -27,10 +27,10 @@ class OutboundDeliveryStoListParams extends Equatable {
 
   @override
   List<Object?> get props => [
-        plant,
-        storageLocation,
-        movementType,
-        lastCount,
-        skipRecords,
-      ];
+    plant,
+    storageLocation,
+    // movementType,
+    lastCount,
+    skipRecords,
+  ];
 }

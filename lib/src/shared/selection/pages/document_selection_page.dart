@@ -65,36 +65,40 @@ class _DocumentSelectionViewState extends State<_DocumentSelectionView> {
   @override
   Widget build(BuildContext context) {
     final requiresMovementType = widget.params.requiresMovementType;
+    final isScaffold = widget.params.isScaffold;
+
+    final body = Stack(
+      children: [
+        BlocConsumer<PlantWarehouseBloc, WarehouseAndPlantState>(
+          listener: (context, state) {
+            if (state.hasError) {
+              CustomToast.error(context, state.errorMessage ?? '');
+            }
+          },
+          builder:
+              (context, state) => Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                child: _buildForm(state, requiresMovementType),
+              ),
+        ),
+        BlocBuilder<PlantWarehouseBloc, WarehouseAndPlantState>(
+          builder:
+              (context, state) =>
+                  InlineLinearLoader(isVisible: state.isLoading),
+        ),
+      ],
+    );
+
+    if (!isScaffold) {
+      return body;
+    }
 
     return Scaffold(
       appBar: CustomAppBar(
         title: widget.params.title,
         onTapLeading: () => Navigator.of(context).pop(),
       ),
-      body: Stack(
-        children: [
-          BlocConsumer<PlantWarehouseBloc, WarehouseAndPlantState>(
-            listener: (context, state) {
-              if (state.hasError) {
-                CustomToast.error(context, state.errorMessage ?? '');
-              }
-            },
-            builder:
-                (context, state) => Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 16.h,
-                  ),
-                  child: _buildForm(state, requiresMovementType),
-                ),
-          ),
-          BlocBuilder<PlantWarehouseBloc, WarehouseAndPlantState>(
-            builder:
-                (context, state) =>
-                    InlineLinearLoader(isVisible: state.isLoading),
-          ),
-        ],
-      ),
+      body: body,
     );
   }
 

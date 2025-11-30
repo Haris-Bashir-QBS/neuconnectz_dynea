@@ -74,5 +74,13 @@ import 'package:neuconnectz_dynea/src/features/core/stock_check/data/repositorie
 import 'package:neuconnectz_dynea/src/features/core/stock_check/domain/repositories/stock_repository.dart';
 import 'package:neuconnectz_dynea/src/features/core/stock_check/domain/usecases/get_stocks_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/blocs/stock_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/datasources/remote/outbound_delivery_sales_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/datasources/remote/outbound_delivery_sales_remote_data_source_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/repositories/outbound_delivery_sales_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/repositories/outbound_delivery_sales_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_outbound_delivery_sales_list_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_outbound_delivery_sales_items_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_completed_outbound_delivery_sales_items_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
 
 part 'di_container.dart';

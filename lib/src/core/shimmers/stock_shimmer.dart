@@ -28,9 +28,8 @@ class StockCardShimmer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Shimmer circle
-              _shimmerBox(width: 34.w, height: 34.w, radius: 50),
-
-              12.horizontalSpace,
+              // _shimmerBox(width: 34.w, height: 34.w, radius: 50),
+              // 12.horizontalSpace,
 
               // Title + description shimmer
               Expanded(
@@ -47,7 +46,7 @@ class StockCardShimmer extends StatelessWidget {
               12.horizontalSpace,
 
               // Stock shimmer
-              _shimmerBox(width: 40.w, height: 14.h),
+              _shimmerBox(width: 80.w, height: 24.h),
             ],
           ),
 

@@ -28,6 +28,12 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pag
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/reservation_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/pages/stock_listing_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/params/stock_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_item_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/pages/completed_outbound_delivery_sales_detail_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/pages/outbound_delivery_sales_items_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/pages/outbound_delivery_sales_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
 import 'package:neuconnectz_dynea/src/shared/selection/pages/document_selection_page.dart';
@@ -43,6 +49,7 @@ final GoRouter appRouter = GoRouter(
     ...authRoutes,
     ...putAwayRoutes,
     ...reservationRoutes,
+    ...salesOrderRoutes,
 
     /// ====================== Core Routes ======================
     ShellRoute(
@@ -266,3 +273,42 @@ GoRoute _stockCheck() {
     },
   );
 }
+
+GoRoute _outboundDeliverySalesListing() {
+  return GoRoute(
+    path: '/${AppRoutes.outboundDeliverySalesListing}',
+    name: AppRoutes.outboundDeliverySalesListing,
+    builder: (context, state) {
+      final args = state.extra as OutboundDeliverySalesListingPageParams;
+      return OutboundDeliverySalesListingPage(params: args);
+    },
+  );
+}
+
+GoRoute _outboundDeliverySalesItems() {
+  return GoRoute(
+    path: '/${AppRoutes.outboundDeliverySalesItems}',
+    name: AppRoutes.outboundDeliverySalesItems,
+    builder: (context, state) {
+      final args = state.extra as OutboundDeliverySalesItemsPageParams;
+      return OutboundDeliverySalesItemsPage(params: args);
+    },
+  );
+}
+
+GoRoute _completedOutboundDeliverySalesItemDetail() {
+  return GoRoute(
+    path: '/${AppRoutes.completedOutboundDeliverySalesItemDetail}',
+    name: AppRoutes.completedOutboundDeliverySalesItemDetail,
+    builder: (context, state) {
+      final args = state.extra as OutboundDeliverySalesItemEntity;
+      return CompletedOutboundDeliverySalesDetailPage(item: args);
+    },
+  );
+}
+
+List<GoRoute> salesOrderRoutes = [
+  _outboundDeliverySalesListing(),
+  _outboundDeliverySalesItems(),
+  _completedOutboundDeliverySalesItemDetail(),
+];

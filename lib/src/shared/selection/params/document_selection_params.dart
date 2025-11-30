@@ -7,16 +7,19 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_listing_page_params.dart';
 
 class DocumentSelectionParams<T extends Object> {
   final String title;
   final bool requiresMovementType;
+  final bool isScaffold;
   final SelectionDestination<T> destination;
 
   const DocumentSelectionParams({
     required this.title,
     required this.destination,
     this.requiresMovementType = false,
+    this.isScaffold = true,
   });
 }
 
@@ -36,9 +39,12 @@ class SelectionDestination<T extends Object> {
 }
 
 class DocumentSelectionConfigs {
-  static DocumentSelectionParams<GrnListingPageParams> grn() {
+  static DocumentSelectionParams<GrnListingPageParams> grn({
+    bool isScaffold = true,
+  }) {
     return DocumentSelectionParams(
       title: AppTexts.putAwayAgainstGrn,
+      isScaffold: isScaffold,
       destination: SelectionDestination(
         routeName: AppRoutes.grnListing,
         buildArgs:
@@ -51,10 +57,13 @@ class DocumentSelectionConfigs {
     );
   }
 
-  static DocumentSelectionParams<ReservationListingPageParams> reservation() {
+  static DocumentSelectionParams<ReservationListingPageParams> reservation({
+    bool isScaffold = true,
+  }) {
     return DocumentSelectionParams(
       title: AppTexts.pickingAgainstReservation,
       requiresMovementType: true,
+      isScaffold: isScaffold,
       destination: SelectionDestination(
         routeName: AppRoutes.reservationListing,
         buildArgs: ({
@@ -74,9 +83,12 @@ class DocumentSelectionConfigs {
     );
   }
 
-  static DocumentSelectionParams<StockListingPageParams> stockCheck() {
+  static DocumentSelectionParams<StockListingPageParams> stockCheck({
+    bool isScaffold = true,
+  }) {
     return DocumentSelectionParams(
       title: AppTexts.stockCheck,
+      isScaffold: isScaffold,
       destination: SelectionDestination(
         routeName: AppRoutes.stockCheck,
         buildArgs:
@@ -89,10 +101,14 @@ class DocumentSelectionConfigs {
     );
   }
 
-  static DocumentSelectionParams<OutboundDeliveryStoListParams> outboundDeliverySto() {
+  static DocumentSelectionParams<OutboundDeliveryStoListParams>
+  outboundDeliverySto({
+    bool isScaffold = true,
+  }) {
     return DocumentSelectionParams(
       title: AppTexts.outboundDeliverySto,
-      requiresMovementType: true,
+      requiresMovementType: false,
+      isScaffold: isScaffold,
       destination: SelectionDestination(
         routeName: AppRoutes.outboundDeliveryStoListing,
         buildArgs: ({
@@ -103,7 +119,33 @@ class DocumentSelectionConfigs {
           return OutboundDeliveryStoListParams(
             plant: plant.code,
             storageLocation: warehouse.storageLocationCode ?? '',
-            movementType: movementType?.movementType ?? "",
+            //movementType: movementType?.movementType ?? "",
+          );
+        },
+      ),
+    );
+  }
+
+  static DocumentSelectionParams<OutboundDeliverySalesListingPageParams>
+      outboundDeliverySales({
+    bool isScaffold = true,
+  }) {
+    return DocumentSelectionParams(
+      title: AppTexts.outboundDeliverySales,
+      requiresMovementType: false,
+      isScaffold: isScaffold,
+      destination: SelectionDestination(
+        routeName: AppRoutes.outboundDeliverySalesListing,
+        buildArgs: ({
+          required PlantEntity plant,
+          required WarehouseEntity warehouse,
+          MovementTypeEntity? movementType,
+        }) {
+          return OutboundDeliverySalesListingPageParams(
+            plant: plant.code,
+            storageLocation: warehouse.storageLocationCode ?? '',
+            warehouseCode: warehouse.code,
+            warehouse: warehouse,
           );
         },
       ),

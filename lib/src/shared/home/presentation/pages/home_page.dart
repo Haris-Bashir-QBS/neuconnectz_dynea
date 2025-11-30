@@ -246,6 +246,12 @@ class PickingSection extends StatelessWidget {
           iconColor: Color(0xFFFF8A65),
           iconPath: AppAssets.grnAddTwoIcon,
           spanFullWidth: true,
+          onTap: () {
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.outboundDeliverySales(),
+            );
+          },
         ),
       ],
     );

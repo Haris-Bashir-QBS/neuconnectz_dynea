@@ -191,9 +191,11 @@ final class AppTexts {
   static const String material = "Material";
   static const String storageType = "Storage Type";
   static const String storageBin = "Storage Bin";
+  static const String batch = "Batch";
   static const String searchMaterial = "Search Material";
   static const String searchStorageType = "Search Storage Type";
   static const String searchStorageBin = "Search Storage Bin";
+  static const String searchBatch = "Search Batch";
   static const String warehouse = "Warehouse";
   static const String availableQuantity = "Available Quantity";
   static const String availableStock = "Available Stock";

@@ -161,9 +161,17 @@ class _OutboundDeliverySalesItemsViewState
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedTab = index;
-        });
+        if (_selectedTab != index) {
+          setState(() {
+            _selectedTab = index;
+          });
+          // Load data for the selected tab
+          if (index == 0) {
+            _loadPending(refresh: true);
+          } else {
+            _loadCompleted(refresh: true);
+          }
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),

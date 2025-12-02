@@ -55,10 +55,10 @@ class CompletedOutboundDeliverySalesDetailPage extends StatelessWidget {
                 children: [
                   _sectionTitle("Bin Details"),
                   const Spacer(),
-                  if (item.binDetails.isNotEmpty)
-                    _sectionTitle(
-                      "Total Issued: ${_totalActualQty.formatWithCommas}",
-                    ),
+                  //if (item.binDetails.isNotEmpty)
+                  // _sectionTitle(
+                  //   "Total Issued: ${_totalActualQty.formatWithCommas}",
+                  // ),
                 ],
               ),
               12.verticalSpace,
@@ -165,8 +165,7 @@ class CompletedOutboundDeliverySalesDetailPage extends StatelessWidget {
                 child: CustomTextFormField(
                   label: "Variance",
                   readOnly: true,
-                  initialValue:
-                      "${_variance.formatWithCommas} ${item.baseUom}",
+                  initialValue: "${_variance.formatWithCommas} ${item.baseUom}",
                   fillColor: AppPalette.lightGreyColor,
                   enabled: false,
                 ),
@@ -300,4 +299,3 @@ class CompletedOutboundDeliverySalesDetailPage extends StatelessWidget {
     );
   }
 }
-

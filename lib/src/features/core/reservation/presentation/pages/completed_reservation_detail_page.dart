@@ -15,7 +15,6 @@ class CompletedReservationDetailPage extends StatelessWidget {
 
   const CompletedReservationDetailPage({super.key, required this.item});
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +37,12 @@ class CompletedReservationDetailPage extends StatelessWidget {
               Row(
                 children: [
                   _sectionTitle("Bin Details"),
-                  const Spacer(),
-                  if (item.binDetails.isNotEmpty)
-                    _sectionTitle(
-                      "Total Issued:",
-                      // " ${_totalActualQty.formatWithCommas}",
-                    ),
+                  // const Spacer(),
+                  // if (item.binDetails.isNotEmpty)
+                  //   _sectionTitle(
+                  //     "Total Issued:",
+                  //     // " ${_totalActualQty.formatWithCommas}",
+                  //   ),
                 ],
               ),
               12.verticalSpace,

@@ -6,9 +6,8 @@ import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/entities/grn_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/params/grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/grn_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/blocs/putaway_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_quanitity_bottom_sheet.dart';
+import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_widget.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
@@ -139,35 +138,20 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
   }
 
   Future<void> _showQuantityBottomSheet(GrnItemEntity item) async {
-    await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      builder:
-          (context) => BlocProvider(
-            create: (_) => sl<PutAwayBloc>(),
-            child: GrnQuantityBottomSheet(
-              item: item,
-              grn: widget.params.grn,
-              showLoader: false,
-              onBinsSelected: (bins) {
-                debugPrint(
-                  "Bins submitted: ${bins.map((b) => {'code': b.binCode, 'qty': b.selectedQuantity}).toList()}",
-                );
-              },
-              onTapClose: () {
-                debugPrint('Bottom sheet closed');
-              },
-            ),
-          ),
+    final result = await context.pushNamed<bool>(
+      AppRoutes.grnQuantity,
+      extra: GrnQuantityPageParams(
+        grn: widget.params.grn,
+        item: item,
+      ),
     );
 
     if (!mounted) return;
 
-    _loadPendingData();
-    _loadCompletedData();
+    if (result == true) {
+      _loadPendingData();
+      _loadCompletedData();
+    }
   }
 
   @override
@@ -362,13 +346,16 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedTab = index;
-        });
-        if (index == 0) {
-          _loadPendingData();
-        } else {
-          _loadCompletedData();
+        if (_selectedTab != index) {
+          setState(() {
+            _selectedTab = index;
+          });
+          // Load data for the selected tab
+          if (index == 0) {
+            _loadPendingData();
+          } else {
+            _loadCompletedData();
+          }
         }
       },
       child: Container(

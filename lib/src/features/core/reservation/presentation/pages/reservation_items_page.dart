@@ -8,12 +8,9 @@ import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/picking_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bin_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/widgets/reservation_item_card.dart';
-import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/widgets/reservation_quantity_bottom_sheet.dart';
-import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
@@ -100,33 +97,22 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
   }
 
   Future<void> _showQuantityBottomSheet(item) async {
-    await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      useSafeArea: false,
-      builder:
-          (context) => MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (_) => sl<ReservationBinBloc>()),
-              BlocProvider(create: (_) => sl<BinBloc>()),
-              BlocProvider(create: (_) => sl<PickingBloc>()),
-            ],
-            child: ReservationQuantityBottomSheet(
-              item: item,
-              plant: widget.params.plant,
-              storageLocation: widget.params.storageLocation,
-              movementType: widget.params.movementType,
-              warehouseCode: widget.params.warehouseCode,
-              warehouse: widget.params.warehouse,
-            ),
-          ),
+    final result = await context.pushNamed<bool>(
+      AppRoutes.reservationQuantity,
+      extra: ReservationQuantityPageParams(
+        item: item,
+        plant: widget.params.plant,
+        storageLocation: widget.params.storageLocation,
+        movementType: widget.params.movementType,
+        warehouseCode: widget.params.warehouseCode,
+        warehouse: widget.params.warehouse,
+      ),
     );
 
     if (!mounted) return;
-    _loadPending(refresh: true);
+    if (result == true) {
+      _loadPending(refresh: true);
+    }
   }
 
   Future<void> _showCompletedDetails(ReservationItemEntity item) async {
@@ -170,9 +156,17 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedTab = index;
-        });
+        if (_selectedTab != index) {
+          setState(() {
+            _selectedTab = index;
+          });
+          // Load data for the selected tab
+          if (index == 0) {
+            _loadPending(refresh: true);
+          } else {
+            _loadCompleted(refresh: true);
+          }
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),

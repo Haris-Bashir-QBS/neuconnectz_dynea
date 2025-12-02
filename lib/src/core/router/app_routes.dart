@@ -17,10 +17,12 @@ class AppRoutes {
   // =========================== PutAway against GRN ============================
   static const grnListing = 'grn_listing';
   static const grnItems = 'grn_items';
+  static const grnQuantity = 'grn_quantity';
   static const completedGrnItemDetail = "completed_grn_item_detail";
   // ============================ Reservation ============================
   static const reservationListing = 'reservation_listing';
   static const reservationItems = 'reservation_items';
+  static const reservationQuantity = 'reservation_quantity';
   static const completedReservationItemDetail =
       "completed_reservation_item_detail";
 

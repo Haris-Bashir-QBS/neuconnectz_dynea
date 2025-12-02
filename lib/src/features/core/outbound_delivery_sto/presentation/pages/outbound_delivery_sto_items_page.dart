@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
+import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/items/outbound_delivery_sto_item_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/widgets/outbound_delivery_sto_item_card.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
@@ -237,8 +240,20 @@ class _OutboundDeliveryStoItemsViewState
           final item = pendingState.items[index];
           return OutboundDeliveryStoItemCard(
             item: item,
-            onTap: () {
-              // Handle tap - show bottom sheet or navigate
+            onTap: () async {
+              final result = await context.pushNamed<bool>(
+                AppRoutes.outboundDeliveryStoQuantity,
+                extra: OutboundDeliveryStoQuantityPageParams(
+                  item: item,
+                  plant: widget.params.plant,
+                  storageLocation: widget.params.storageLocation,
+                  warehouseCode: widget.params.warehouseCode,
+                ),
+              );
+              if (!mounted) return;
+              if (result == true) {
+                _loadPendingData();
+              }
             },
           );
         },

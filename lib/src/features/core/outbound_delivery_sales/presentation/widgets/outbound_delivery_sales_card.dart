@@ -10,11 +10,7 @@ class OutboundDeliverySalesCard extends StatelessWidget {
   final OutboundDeliverySalesEntity item;
   final VoidCallback? onTap;
 
-  const OutboundDeliverySalesCard({
-    super.key,
-    required this.item,
-    this.onTap,
-  });
+  const OutboundDeliverySalesCard({super.key, required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +67,17 @@ class OutboundDeliverySalesCard extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 8.h),
-                      _detailRow('Sales Organization: ${item.salesOrganization}'),
+                      _detailRow(
+                        'Sales Organization: ${item.salesOrganization}',
+                      ),
                       SizedBox(height: 4.h),
                       _detailRow('Delivery Type: ${item.deliveryType}'),
                       SizedBox(height: 4.h),
-                      _detailRow('Receiving Plant: ${item.receivingPlant.isEmpty ? "N/A" : item.receivingPlant}'),
-                      SizedBox(height: 4.h),
-                      _detailRow('Delivery Block: ${item.deliveryBlock}'),
+                      _detailRow(
+                        'Receiving Plant: ${item.receivingPlant.isEmpty ? "N/A" : item.receivingPlant}',
+                      ),
+                      // SizedBox(height: 4.h),
+                      // _detailRow('Delivery Block: ${item.deliveryBlock}'),
                       // SizedBox(height: 4.h),
                       // _detailRow('Overall Status: ${item.overallStatus}'),
                       // SizedBox(height: 4.h),
@@ -99,4 +99,3 @@ class OutboundDeliverySalesCard extends StatelessWidget {
     color: AppPalette.greyColor,
   );
 }
-

@@ -102,9 +102,7 @@ class DocumentSelectionConfigs {
   }
 
   static DocumentSelectionParams<OutboundDeliveryStoListParams>
-  outboundDeliverySto({
-    bool isScaffold = true,
-  }) {
+  outboundDeliverySto({bool isScaffold = true}) {
     return DocumentSelectionParams(
       title: AppTexts.outboundDeliverySto,
       requiresMovementType: false,
@@ -119,6 +117,7 @@ class DocumentSelectionConfigs {
           return OutboundDeliveryStoListParams(
             plant: plant.code,
             storageLocation: warehouse.storageLocationCode ?? '',
+            warehouseCode: warehouse.code,
             //movementType: movementType?.movementType ?? "",
           );
         },
@@ -127,9 +126,7 @@ class DocumentSelectionConfigs {
   }
 
   static DocumentSelectionParams<OutboundDeliverySalesListingPageParams>
-      outboundDeliverySales({
-    bool isScaffold = true,
-  }) {
+  outboundDeliverySales({bool isScaffold = true}) {
     return DocumentSelectionParams(
       title: AppTexts.outboundDeliverySales,
       requiresMovementType: false,

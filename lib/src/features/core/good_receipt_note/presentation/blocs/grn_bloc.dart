@@ -156,6 +156,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         materialDoc: event.params.materialDoc,
         materialDocYear: event.params.materialDocYear,
         lastCount: event.params.lastCount,
+        trNumber: event.params.trNumber,
         skipRecords: 0, // Start from beginning
       );
 
@@ -209,6 +210,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         location: event.params.location,
         materialDoc: event.params.materialDoc,
         materialDocYear: event.params.materialDocYear,
+        trNumber: event.params.trNumber,
         lastCount: event.params.lastCount,
         skipRecords: pendingState.skipRecords,
       );
@@ -272,6 +274,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         location: event.params.location,
         materialDoc: event.params.materialDoc,
         materialDocYear: event.params.materialDocYear,
+        trNumber: event.params.trNumber,
         lastCount: event.params.lastCount,
         skipRecords: 0,
       );
@@ -327,6 +330,7 @@ class GrnBloc extends Bloc<GrnEvent, GrnState> {
         materialDoc: event.params.materialDoc,
         materialDocYear: event.params.materialDocYear,
         lastCount: event.params.lastCount,
+        trNumber: event.params.trNumber,
         skipRecords: completedState.skipRecords,
       );
 

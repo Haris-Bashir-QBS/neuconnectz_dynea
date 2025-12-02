@@ -31,6 +31,7 @@ class AppRoutes {
   static const String outboundDeliveryStoListing = 'outboundDeliveryStoListing';
   static const String outboundDeliveryStoItemsListing =
       'outboundDeliveryStoItemsListing';
+  static const String outboundDeliveryStoQuantity = 'outbound_delivery_sto_quantity';
   // ============================ Outbound Delivery (Sales Order) ============================
   static const outboundDeliverySalesListing = 'outbound_delivery_sales_listing';
   static const outboundDeliverySalesItems = 'outbound_delivery_sales_items';

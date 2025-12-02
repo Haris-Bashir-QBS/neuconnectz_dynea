@@ -108,6 +108,7 @@ class _OutboundDeliveryStoListingViewState
         final params = OutboundDeliveryStoListParams(
           plant: widget.params.plant,
           storageLocation: widget.params.storageLocation,
+
           // movementType: widget.params.movementType,
           lastCount: 10,
           skipRecords: state.skipRecords,
@@ -227,6 +228,7 @@ class _OutboundDeliveryStoListingViewState
             delivery: stoHeader.delivery,
             plant: widget.params.plant,
             storageLocation: widget.params.storageLocation,
+            warehouseCode: widget.params.warehouseCode ?? "",
             //movementType: widget.params.movementType,
           ),
         )

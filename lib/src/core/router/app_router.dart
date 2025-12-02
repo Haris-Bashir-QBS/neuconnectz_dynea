@@ -14,6 +14,7 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/domain/ent
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/pages/outbound_delivery_sto_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/pages/outbound_delivery_sto_list_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/pages/outbound_delivery_sto_quantity_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/completed_grn_item_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_listing_page_params.dart';
@@ -22,6 +23,7 @@ import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentati
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_listing_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/pages/grn_quantity_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/pages/completed_reservation_detail_page.dart';
@@ -215,7 +217,8 @@ List<GoRoute> putAwayRoutes = [
   _stockCheck(),
   _completedGrnItemDetail(),
   _outboundDeliveryStoListing(),
-  _outboundDeliveryStoItems(),
+      _outboundDeliveryStoItems(),
+      _outboundDeliveryStoQuantity(),
 ];
 
 GoRoute _outboundDeliveryStoListing() {
@@ -236,6 +239,17 @@ GoRoute _outboundDeliveryStoItems() {
     builder: (context, state) {
       final params = state.extra as OutboundDeliveryStoItemsPageParams;
       return OutboundDeliveryStoItemsPage(params: params);
+    },
+  );
+}
+
+GoRoute _outboundDeliveryStoQuantity() {
+  return GoRoute(
+    path: '/${AppRoutes.outboundDeliveryStoQuantity}',
+    name: AppRoutes.outboundDeliveryStoQuantity,
+    builder: (context, state) {
+      final params = state.extra as OutboundDeliveryStoQuantityPageParams;
+      return OutboundDeliveryStoQuantityPage(params: params);
     },
   );
 }

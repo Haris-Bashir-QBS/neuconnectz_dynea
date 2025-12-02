@@ -240,13 +240,25 @@ void _registerOutboundDeliveryStoItemsDependencies() {
       () => OutboundDeliveryStoItemRepositoryImpl(sl()),
     )
     ..registerLazySingleton(() => GetStockDocItemFromSAPUseCase(sl()))
-    ..registerLazySingleton(() => GetCompletedStoItemsUseCase(sl()));
+    ..registerLazySingleton(() => GetCompletedStoItemsUseCase(sl()))
+    // Stocks by Storage Bin dependencies
+    ..registerLazySingleton<StocksByStorageBinRemoteDataSource>(
+      () => StocksByStorageBinRemoteDataSourceImpl(client: sl()),
+    )
+    ..registerLazySingleton<StocksByStorageBinRepository>(
+      () => StocksByStorageBinRepositoryImpl(remoteDataSource: sl()),
+    )
+    ..registerLazySingleton(() => GetStocksByStorageBinUseCase(sl()));
 
   sl.registerFactory(
     () => OutboundDeliveryStoItemBloc(
       getStockDocItemFromSAPUseCase: sl(),
       getCompletedStoItemsUseCase: sl(),
     ),
+  );
+
+  sl.registerFactory(
+    () => StocksByStorageBinBloc(useCase: sl()),
   );
 }
 

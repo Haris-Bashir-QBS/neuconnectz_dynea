@@ -21,7 +21,6 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blo
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/entities/bin_entity.dart';
-import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
@@ -40,7 +39,6 @@ class ReservationQuantityPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => sl<ReservationBinBloc>()),
-        BlocProvider(create: (_) => sl<BinBloc>()),
         BlocProvider(create: (_) => sl<PickingBloc>()),
       ],
       child: _ReservationQuantityView(params: params),
@@ -73,13 +71,6 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
   Timer? _debounceTimer;
   String _binSearchQuery = '';
 
-  static const int _pageSize = 10;
-  int _skipRecords = 0;
-
-  final List<BinEntity> _dialogBins = [];
-  bool _dialogHasMore = false;
-  bool _dialogResetPending = false;
-
   double get _targetQuantity => widget.params.item.remainingQuantity;
 
   double get _autoLoadedCoverage => _selectedBins.fold<double>(
@@ -93,42 +84,16 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
   @override
   void initState() {
     super.initState();
-    _loadBins();
+    _loadWarehouseBinsByMaterial();
   }
 
-  void _loadBins() {
+  void _loadWarehouseBinsByMaterial() {
     context.read<ReservationBinBloc>().add(
       LoadWarehouseBinsByMaterialEvent(
         warehouseCode: widget.params.warehouseCode,
         material: widget.params.item.material,
       ),
     );
-  }
-
-  void _loadAllBins({
-    String? keyword,
-    String? storageType,
-    bool resetPagination = false,
-  }) {
-    if (resetPagination) {
-      _skipRecords = 0;
-      _dialogBins.clear();
-      _dialogHasMore = false;
-      _dialogResetPending = true;
-    }
-
-    context.read<BinBloc>().add(
-      LoadBinsEvent(
-        warehouseCode: widget.params.item.storageLocation,
-        storageType: storageType,
-        keyword: keyword,
-        lastCount: _pageSize,
-        skipRecords: _skipRecords,
-      ),
-    );
-
-    // Prepare for next page on subsequent calls
-    _skipRecords += _pageSize;
   }
 
   double get _totalSelectedQuantity =>
@@ -337,7 +302,8 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
             child: CustomTextFormField(
               label: "Actual Quantity",
               readOnly: true,
-              initialValue: widget.params.item.remainingQuantity.formatWithCommas,
+              initialValue:
+                  widget.params.item.remainingQuantity.formatWithCommas,
               fillColor: AppPalette.lightGreyColor,
               enabled: false,
             ),
@@ -454,85 +420,104 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
     }
 
     // Capture the bloc before showing dialog
-    final binBloc = context.read<BinBloc>();
+    final reservationBinBloc = context.read<ReservationBinBloc>();
 
-    _loadAllBins(keyword: _binSearchQuery, resetPagination: true);
+    // Load bins by material
+    _loadWarehouseBinsByMaterial();
 
     if (!mounted) return;
 
     showDialog(
       context: context,
-      builder: (context) => BlocProvider.value(
-        value: binBloc,
-        child: BlocBuilder<BinBloc, BinState>(
-          builder: (context, state) {
-            // Start with locally cached dialog bins
-            List<BinEntity> bins = _dialogBins;
+      builder:
+          (context) => BlocProvider.value(
+            value: reservationBinBloc,
+            child: BlocBuilder<ReservationBinBloc, ReservationBinState>(
+              builder: (context, state) {
+                List<BinEntity> bins = [];
 
-            if (state is BinSuccess) {
-              if (_dialogResetPending) {
-                _dialogBins
-                  ..clear()
-                  ..addAll(state.bins);
-                _dialogResetPending = false;
-              } else {
-                _dialogBins.addAll(state.bins);
-              }
+                if (state is ReservationBinSuccess) {
+                  bins = state.bins;
 
-              bins = _dialogBins;
-              _dialogHasMore = state.bins.length == _pageSize;
-            } else if (state is BinFailure) {
-              _dialogHasMore = false;
-            }
+                  // Filter bins by search query if provided
+                  if (_binSearchQuery.isNotEmpty) {
+                    bins =
+                        bins.where((bin) {
+                          final searchLower = _binSearchQuery.toLowerCase();
+                          return bin.binCode.toLowerCase().contains(
+                                searchLower,
+                              ) ||
+                              bin.storageType.toLowerCase().contains(
+                                searchLower,
+                              ) ||
+                              (bin.storageSection.isNotEmpty &&
+                                  bin.storageSection
+                                      .toLowerCase()
+                                      .contains(searchLower));
+                        }).toList();
+                  }
+                }
 
-            final bool isInitialLoading =
-                state is BinLoading && bins.isEmpty;
+                final bool isInitialLoading =
+                    state is ReservationBinLoading && bins.isEmpty;
 
-            return GenericSelectionDialog<BinEntity>(
-              items: bins,
-              controller: _binSearchController,
-              loading: isInitialLoading,
-              isTable: true,
-              tableHeaders: ["Storage Type", "Section", "Bin Code"],
-              tableRowBuilder: (bin) => [
-                bin.storageType,
-                bin.storageSection,
-                bin.binCode,
-              ],
-              noDataText: state is BinFailure
-                  ? state.message
-                  : AppErrors.noBinsFound,
-              headingText: "Select Bin",
-              searchLabel: "Search Bin Code",
-              titleBuilder: (bin) => CustomText(
-                text: bin.binCode,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-              ),
-              subTitleBuilder: (bin) => CustomText(
-                text: bin.storageType,
-                fontSize: 12.sp,
-                color: AppPalette.darkGreyColor,
-              ),
-              onChanged: (value) {
-                _binSearchQuery = value;
-                _loadAllBins(keyword: value, resetPagination: true);
+                // Check if any bin has a section (not empty)
+                final hasSection = bins.isNotEmpty && bins.any(
+                  (bin) => bin.storageSection.isNotEmpty,
+                );
+
+                return GenericSelectionDialog<BinEntity>(
+                  items: bins,
+                  controller: _binSearchController,
+                  loading: isInitialLoading,
+                  isTable: true,
+                  tableHeaders: hasSection
+                      ? ["Storage Type", "Section", "Bin Code"]
+                      : ["Storage Type", "Bin Code"],
+                  tableRowBuilder: (bin) => hasSection
+                      ? [
+                          bin.storageType,
+                          bin.storageSection,
+                          bin.binCode,
+                        ]
+                      : [
+                          bin.storageType,
+                          bin.binCode,
+                        ],
+                  noDataText:
+                      state is ReservationBinFailure
+                          ? state.message
+                          : AppErrors.noBinsFound,
+                  headingText: "Select Bin",
+                  searchLabel: "Search Bin Code",
+                  titleBuilder:
+                      (bin) => CustomText(
+                        text: bin.binCode,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                  subTitleBuilder:
+                      (bin) => CustomText(
+                        text: bin.storageType,
+                        fontSize: 12.sp,
+                        color: AppPalette.darkGreyColor,
+                      ),
+                  onChanged: (value) {
+                    _binSearchQuery = value;
+                    // Rebuild to filter bins
+                    setState(() {});
+                  },
+                  onSelected: (bin) {
+                    Navigator.pop(context);
+                    _onBinSelected(bin);
+                  },
+                  // No pagination for GetWarehouseBinsByMaterial
+                  hasMore: false,
+                  onPaginate: null,
+                );
               },
-              onSelected: (bin) {
-                Navigator.pop(context);
-                _onBinSelected(bin);
-              },
-              // Infinite scroll pagination
-              hasMore: _dialogHasMore,
-              onPaginate: _dialogHasMore
-                  ? () {
-                      _loadAllBins(keyword: _binSearchQuery);
-                    }
-                  : null,
-            );
-          },
-        ),
-      ),
+            ),
+          ),
     );
   }
 
@@ -550,8 +535,15 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
       return;
     }
 
+    // Get proposed quantity from the bloc state
+    final reservationBinState = context.read<ReservationBinBloc>().state;
+    double? proposedQty;
+    if (reservationBinState is ReservationBinSuccess) {
+      proposedQty = reservationBinState.proposedQuantities[bin.id];
+    }
+
     setState(() {
-      _appendBin(bin);
+      _appendBin(bin, proposedQuantity: proposedQty);
     });
 
     _binCodeController.clear();
@@ -791,8 +783,8 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
   Widget _actionButtons() {
     return Row(
       children: [
-        Expanded(flex: 3, child: _cancelButton()),
-        SizedBox(width: 5.w),
+        //Expanded(flex: 3, child: _cancelButton()),
+        //SizedBox(width: 5.w),
         Expanded(flex: 5, child: _submitButton()),
       ],
     );
@@ -817,8 +809,8 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
         final isSubmitting = state is CreatePickingLoading;
 
         return CustomButton(
-          text: AppTexts.addToList,
-          icon: Icons.list,
+          text: AppTexts.proceed,
+          // icon: Icons.list,
           isLoading: isSubmitting,
           onPressed: () {
             FocusScope.of(context).unfocus();
@@ -863,8 +855,8 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
             );
 
             context.read<PickingBloc>().add(
-                  CreatePickingEvent(request: request),
-                );
+              CreatePickingEvent(request: request),
+            );
           },
           radius: 12.r,
         );
@@ -888,4 +880,3 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
     super.dispose();
   }
 }
-

@@ -5,11 +5,13 @@ class OutboundDeliveryStoListParams extends Equatable {
   final String storageLocation;
   //final String movementType;
   final int lastCount;
+  final String? warehouseCode;
   final int skipRecords;
 
   const OutboundDeliveryStoListParams({
     required this.plant,
     required this.storageLocation,
+    this.warehouseCode,
     //required this.movementType,
     this.lastCount = 10,
     this.skipRecords = 0,
@@ -22,6 +24,7 @@ class OutboundDeliveryStoListParams extends Equatable {
       //'movementType': movementType,
       'lastCount': lastCount,
       'skipRecords': skipRecords,
+      'warehouseCode': warehouseCode,
     };
   }
 

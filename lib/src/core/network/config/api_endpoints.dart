@@ -63,6 +63,7 @@ enum ApiEndpoints {
   listAllStockDocFromSAP,
   stoItems,
   completedStoItems,
+  getStocksByStorageBin,
 
   /// ===================== Outbound Delivery (Sales Order) =====================
   listAllSalesOrderDocFromSAP,
@@ -152,6 +153,8 @@ enum ApiEndpoints {
         return "$_stockTransferOrder/StockDocItemFromSAP";
       case ApiEndpoints.completedStoItems:
         return "$_stockTransferOrder/CompletedStoItems";
+      case ApiEndpoints.getStocksByStorageBin:
+        return "$_binManagement/GetStocksByStorageBin";
         
       /// ======================== Outbound Delivery (Sales Order) ===============
       case ApiEndpoints.listAllSalesOrderDocFromSAP:

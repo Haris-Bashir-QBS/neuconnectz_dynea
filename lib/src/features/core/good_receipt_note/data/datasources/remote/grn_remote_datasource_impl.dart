@@ -65,6 +65,7 @@ class GrnRemoteDataSourceImpl implements GrnRemoteDataSource {
         'plant': params.plant,
         'location': params.location,
         'materialdoc': params.materialDoc,
+        'trNumber': params.trNumber,
         'year': params.materialDocYear,
         'lastCount': params.lastCount,
         'skipRecords': params.skipRecords,

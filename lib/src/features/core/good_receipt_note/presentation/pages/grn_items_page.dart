@@ -73,6 +73,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
       location: widget.params.location,
       materialDoc: widget.params.grn.materialDocument,
       materialDocYear: widget.params.grn.materialDocYear,
+      trNumber: widget.params.grn.trNumber,
       lastCount: 10,
       skipRecords: 0,
     );
@@ -91,6 +92,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
           location: widget.params.location,
           materialDoc: widget.params.grn.materialDocument,
           materialDocYear: widget.params.grn.materialDocYear,
+          trNumber: widget.params.grn.trNumber,
           lastCount: 10,
           skipRecords: state.pendingSection.skipRecords,
         );
@@ -107,6 +109,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
       location: widget.params.location,
       materialDoc: widget.params.grn.materialDocument,
       materialDocYear: widget.params.grn.materialDocYear,
+      trNumber: widget.params.grn.trNumber,
       lastCount: 10,
       skipRecords: 0,
     );
@@ -127,6 +130,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
           location: widget.params.location,
           materialDoc: widget.params.grn.materialDocument,
           materialDocYear: widget.params.grn.materialDocYear,
+          trNumber: widget.params.grn.trNumber,
           lastCount: 10,
           skipRecords: state.completedSection.skipRecords,
         );
@@ -140,10 +144,7 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
   Future<void> _showQuantityBottomSheet(GrnItemEntity item) async {
     final result = await context.pushNamed<bool>(
       AppRoutes.grnQuantity,
-      extra: GrnQuantityPageParams(
-        grn: widget.params.grn,
-        item: item,
-      ),
+      extra: GrnQuantityPageParams(grn: widget.params.grn, item: item),
     );
 
     if (!mounted) return;

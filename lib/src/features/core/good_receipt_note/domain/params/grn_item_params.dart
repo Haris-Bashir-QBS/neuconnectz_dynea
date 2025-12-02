@@ -5,12 +5,14 @@ class GrnItemQueryParams {
   final int materialDocYear;
   final int lastCount;
   final int skipRecords;
+  final int trNumber;
 
   const GrnItemQueryParams({
     required this.plant,
     required this.location,
     required this.materialDoc,
     required this.materialDocYear,
+    required this.trNumber,
     this.lastCount = 10,
     this.skipRecords = 0,
   });

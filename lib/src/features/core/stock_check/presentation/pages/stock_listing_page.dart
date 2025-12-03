@@ -142,8 +142,8 @@ class _StockListingViewState extends State<_StockListingView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoChips(plant.code, warehouse.storageLocationCode ?? ''),
-                8.verticalSpace,
+                //  _buildInfoChips(plant.code, warehouse.storageLocationCode ?? ''),
+                // 8.verticalSpace,
                 _buildFilterRow(),
                 12.verticalSpace,
                 CustomSearchField(
@@ -242,10 +242,7 @@ class _StockListingViewState extends State<_StockListingView> {
 
   Widget _buildInfoChip(String label) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12.w,
-        vertical: 6.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: AppPalette.lightGreyColor.withOpacity(0.5),
         borderRadius: BorderRadius.circular(8.r),
@@ -253,11 +250,7 @@ class _StockListingViewState extends State<_StockListingView> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.info_outline,
-            size: 14.sp,
-            color: AppPalette.greyColor,
-          ),
+          Icon(Icons.info_outline, size: 14.sp, color: AppPalette.greyColor),
           4.horizontalSpace,
           Text(
             label,

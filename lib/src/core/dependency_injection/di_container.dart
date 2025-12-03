@@ -224,10 +224,21 @@ void _registerOutboundDeliveryStoDependencies() {
     ..registerLazySingleton<OutboundDeliveryStoRepository>(
       () => OutboundDeliveryStoRepositoryImpl(sl()),
     )
-    ..registerLazySingleton(() => GetOutboundDeliveryStoListUseCase(sl()));
+    ..registerLazySingleton(() => GetOutboundDeliveryStoListUseCase(sl()))
+    // STO creation dependencies
+    ..registerLazySingleton<StoRemoteDataSource>(
+      () => StoRemoteDataSourceImpl(dio: sl()),
+    )
+    ..registerLazySingleton<StoRepository>(
+      () => StoRepositoryImpl(remoteDataSource: sl()),
+    )
+    ..registerLazySingleton(() => CreateStockTransferOrderUseCase(sl()));
 
   sl.registerFactory(
-    () => OutboundDeliveryStoBloc(getOutboundDeliveryStoListUseCase: sl()),
+    () => OutboundDeliveryStoBloc(
+      getOutboundDeliveryStoListUseCase: sl(),
+      createStockTransferOrderUseCase: sl(),
+    ),
   );
 }
 

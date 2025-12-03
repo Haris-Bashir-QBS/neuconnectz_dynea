@@ -113,6 +113,20 @@ class _StockListingViewState extends State<_StockListingView> {
     }
   }
 
+  String _getHeaderLabel() {
+    switch (_selectedFilter) {
+      case StockFilterType.material:
+      case StockFilterType.all:
+        return AppTexts.material;
+      case StockFilterType.storageType:
+        return AppTexts.storageType;
+      case StockFilterType.storageBin:
+        return AppTexts.storageBin;
+      case StockFilterType.batch:
+        return AppTexts.batch;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final plant = widget.params.plant;
@@ -144,7 +158,7 @@ class _StockListingViewState extends State<_StockListingView> {
             ),
           ),
           ItemListingHeader(
-            leftHeading: AppTexts.material,
+            leftHeading: _getHeaderLabel(),
             rightHeading: AppTexts.availableStock,
           ),
           8.verticalSpace,

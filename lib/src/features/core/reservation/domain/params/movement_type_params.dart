@@ -26,4 +26,3 @@ class MovementTypeQueryParams extends Equatable {
   @override
   List<Object?> get props => [keyword, lastCount, skipRecords];
 }
-

@@ -50,7 +50,7 @@ enum ApiEndpoints {
   getWarehouseBinsByMaterial,
 
   /// ========================  Movement Types =========================
-  listMovementTypes,
+  listMovementTypesAssignedToUser,
 
   /// ========================  Stocks =================================
   listStockItems,
@@ -64,6 +64,7 @@ enum ApiEndpoints {
   stoItems,
   completedStoItems,
   getStocksByStorageBin,
+  createStockTransferOrder,
 
   /// ===================== Outbound Delivery (Sales Order) =====================
   listAllSalesOrderDocFromSAP,
@@ -131,13 +132,12 @@ enum ApiEndpoints {
         return "$_binManagement/GetWarehouseBinsByMaterial";
 
       /// ======================== Movement Types =======================
-      case ApiEndpoints.listMovementTypes:
-        return "$_movementType/ListAllMovementTypes";
+      case ApiEndpoints.listMovementTypesAssignedToUser:
+        return "$_movementType/ListAllMovementTypesAssignedToUser";
 
       /// ======================== Stocks ===============================
       case ApiEndpoints.listStockItems:
         return "$_stocks/ListAllStocks";
-
 
       /// ======================== Plant/Warehouse ======================
       case ApiEndpoints.listAllPlantsAssignedToUser:
@@ -146,7 +146,7 @@ enum ApiEndpoints {
         return "$_warehouse/ListAllWarehousesByUserPlants";
 
       /// ======================== Outbound Delivery (STO) ===============
-  
+
       case ApiEndpoints.listAllStockDocFromSAP:
         return "$_stockTransferOrder/ListAllStockDocFromSAP";
       case ApiEndpoints.stoItems:
@@ -155,7 +155,9 @@ enum ApiEndpoints {
         return "$_stockTransferOrder/CompletedStoItems";
       case ApiEndpoints.getStocksByStorageBin:
         return "$_binManagement/GetStocksByStorageBin";
-        
+      case ApiEndpoints.createStockTransferOrder:
+        return "$_stockTransferOrder/CreateStockTransferOrder";
+
       /// ======================== Outbound Delivery (Sales Order) ===============
       case ApiEndpoints.listAllSalesOrderDocFromSAP:
         return "$_salesOrder/ListAllSalesOrderDocFromSAP";

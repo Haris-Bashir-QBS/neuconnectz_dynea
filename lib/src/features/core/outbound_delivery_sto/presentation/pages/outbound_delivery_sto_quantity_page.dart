@@ -14,7 +14,11 @@ import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/utils/app_static_data.dart';
 import 'package:neuconnectz_dynea/src/core/utils/utils.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/scan_button.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/data/models/create_stock_transfer_order_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/stocks_by_storage_bin_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_event.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_state.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/stocks_by_storage_bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/entities/bin_entity.dart';
@@ -38,6 +42,7 @@ class OutboundDeliveryStoQuantityPage extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<BinBloc>()),
         BlocProvider(create: (_) => sl<StocksByStorageBinBloc>()),
+        BlocProvider(create: (_) => sl<OutboundDeliveryStoBloc>()),
       ],
       child: _OutboundDeliveryStoQuantityView(params: params),
     );
@@ -168,6 +173,19 @@ class _OutboundDeliveryStoQuantityViewState
                   }
                 }
               });
+            }
+          },
+        ),
+        BlocListener<OutboundDeliveryStoBloc, OutboundDeliveryStoState>(
+          listener: (context, state) {
+            if (state.createStockTransferOrderError != null) {
+              CustomToast.error(context, state.createStockTransferOrderError!);
+            } else if (state.createStockTransferOrderResponse != null) {
+              CustomToast.success(
+                context,
+                state.createStockTransferOrderResponse!.message,
+              );
+              context.pop(true);
             }
           },
         ),
@@ -740,57 +758,85 @@ class _OutboundDeliveryStoQuantityViewState
   }
 
   Widget _submitButton() {
-    return CustomButton(
-      text: AppTexts.proceed,
-      // icon: Icons.list,
-      onPressed: () {
-        FocusScope.of(context).unfocus();
+    return BlocBuilder<OutboundDeliveryStoBloc, OutboundDeliveryStoState>(
+      builder: (context, state) {
+        final isSubmitting = state.creatingStockTransferOrder;
 
-        if (_selectedBin == null) {
-          CustomToast.error(context, "Please select a bin.");
-          return;
-        }
+        return CustomButton(
+          text: AppTexts.proceed,
+          isLoading: isSubmitting,
+          onPressed: () {
+            FocusScope.of(context).unfocus();
 
-        final batchesWithQuantity =
-            _batchStocks.where((stock) {
+            if (_selectedBin == null) {
+              CustomToast.error(context, "Please select a bin.");
+              return;
+            }
+
+            final batchesWithQuantity =
+                _batchStocks.where((stock) {
+                  final qty =
+                      double.tryParse(
+                        _batchQuantityControllers[stock.id]?.text ?? '0',
+                      ) ??
+                      0.0;
+                  return qty > 0;
+                }).toList();
+
+            if (batchesWithQuantity.isEmpty) {
+              CustomToast.error(
+                context,
+                "Please enter quantity for at least one batch.",
+              );
+              return;
+            }
+
+            // Validate that total equals delivery quantity
+            if (_totalSelectedQuantity > widget.params.item.deliveryQuantity) {
+              CustomToast.error(
+                context,
+                "Total quantity cannot exceed delivery quantity (${widget.params.item.deliveryQuantity.formatWithCommas})",
+              );
+              return;
+            }
+
+            if (_totalSelectedQuantity < widget.params.item.deliveryQuantity) {
+              CustomToast.error(
+                context,
+                "Total quantity must equal delivery quantity (${widget.params.item.deliveryQuantity.formatWithCommas})",
+              );
+              return;
+            }
+
+            // Create batch quantities map
+            final batchQuantitiesMap = <String, double>{};
+            for (var stock in _batchStocks) {
               final qty =
                   double.tryParse(
                     _batchQuantityControllers[stock.id]?.text ?? '0',
                   ) ??
                   0.0;
-              return qty > 0;
-            }).toList();
+              if (qty > 0) {
+                batchQuantitiesMap[stock.id] = qty;
+              }
+            }
 
-        if (batchesWithQuantity.isEmpty) {
-          CustomToast.error(
-            context,
-            "Please enter quantity for at least one batch.",
-          );
-          return;
-        }
+            // Create the request
+            final request = CreateStockTransferOrderRequestModel.fromEntities(
+              item: widget.params.item,
+              selectedPlant: widget.params.plant,
+              selectedWarehouse: widget.params.warehouseCode,
+              stocks: _batchStocks,
+              batchQuantitiesMap: batchQuantitiesMap,
+            );
 
-        // Validate that total equals delivery quantity
-        if (_totalSelectedQuantity > widget.params.item.deliveryQuantity) {
-          CustomToast.error(
-            context,
-            "Total quantity cannot exceed delivery quantity (${widget.params.item.deliveryQuantity.formatWithCommas})",
-          );
-          return;
-        }
-
-        if (_totalSelectedQuantity < widget.params.item.deliveryQuantity) {
-          CustomToast.error(
-            context,
-            "Total quantity must equal delivery quantity (${widget.params.item.deliveryQuantity.formatWithCommas})",
-          );
-          return;
-        }
-
-        // TODO: Create request and submit
-        CustomToast.success(context, "Successfully added to list");
-        context.pop(true);
+            context.read<OutboundDeliveryStoBloc>().add(
+              CreateStockTransferOrderEvent(request: request),
+            );
+          },
+          radius: 12.r,
+        );
       },
-      radius: 12.r,
     );
   }
 }

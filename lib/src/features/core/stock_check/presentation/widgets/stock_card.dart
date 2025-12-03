@@ -48,26 +48,28 @@ class _StockCardState extends State<StockCard> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Material name + description
+                /// Main field based on priority filter
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item.material,
+                        _getMainFieldValue(),
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      3.verticalSpace,
-                      Text(
-                        item.description,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: AppPalette.greyColor,
+                      if (_shouldShowDescription()) ...[
+                        3.verticalSpace,
+                        Text(
+                          item.description,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppPalette.greyColor,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -142,12 +144,39 @@ class _StockCardState extends State<StockCard> {
     );
   }
 
+  String _getMainFieldValue() {
+    final priorityField = widget.priorityField;
+    
+    if (priorityField == null || priorityField == StockFilterType.all || priorityField == StockFilterType.material) {
+      return widget.item.material;
+    }
+    
+    switch (priorityField) {
+      case StockFilterType.storageType:
+        return widget.item.storageType;
+      case StockFilterType.storageBin:
+        return widget.item.storageBin;
+      case StockFilterType.batch:
+        return widget.item.batch ?? "N/A";
+      default:
+        return widget.item.material;
+    }
+  }
+
+  bool _shouldShowDescription() {
+    final priorityField = widget.priorityField;
+    return priorityField == null || 
+           priorityField == StockFilterType.all || 
+           priorityField == StockFilterType.material;
+  }
+
   List<Widget> _buildDetailRows() {
     final item = widget.item;
     final priorityField = widget.priorityField;
 
-    // Define all detail rows
+    // Define all detail rows - always include material
     final allRows = [
+      _DetailRowData("Material:", item.material),
       _DetailRowData("Quant:", item.quant.toInt().toString()),
       _DetailRowData("Storage Type:", item.storageType),
       _DetailRowData("Storage Section:", item.storageLocation),
@@ -155,21 +184,18 @@ class _StockCardState extends State<StockCard> {
       _DetailRowData("Batch No:", item.batch ?? "N/A"),
     ];
 
-    // Reorder based on priority field
-    if (priorityField != null && priorityField != StockFilterType.all) {
+    // Reorder based on priority field - move priority field to first position
+    if (priorityField != null && priorityField != StockFilterType.all && priorityField != StockFilterType.material) {
       int? priorityIndex;
       switch (priorityField) {
         case StockFilterType.storageType:
-          priorityIndex = 1; // Storage Type
+          priorityIndex = 2; // Storage Type (after Material and Quant)
           break;
         case StockFilterType.storageBin:
-          priorityIndex = 3; // Storage Bin
+          priorityIndex = 4; // Storage Bin
           break;
         case StockFilterType.batch:
-          priorityIndex = 4; // Batch No
-          break;
-        case StockFilterType.material:
-          // Material is already shown in header, so no reordering needed
+          priorityIndex = 5; // Batch No
           break;
         default:
           break;

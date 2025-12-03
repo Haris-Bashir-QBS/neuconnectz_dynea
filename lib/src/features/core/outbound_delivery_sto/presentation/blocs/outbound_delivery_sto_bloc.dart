@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/usecases/create_stock_transfer_order_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/usecases/get_outbound_delivery_sto_list_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_event.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_state.dart';
@@ -6,10 +7,14 @@ import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presen
 class OutboundDeliveryStoBloc
     extends Bloc<OutboundDeliveryStoEvent, OutboundDeliveryStoState> {
   final GetOutboundDeliveryStoListUseCase getOutboundDeliveryStoListUseCase;
+  final CreateStockTransferOrderUseCase createStockTransferOrderUseCase;
 
-  OutboundDeliveryStoBloc({required this.getOutboundDeliveryStoListUseCase})
-      : super(const OutboundDeliveryStoState()) {
+  OutboundDeliveryStoBloc({
+    required this.getOutboundDeliveryStoListUseCase,
+    required this.createStockTransferOrderUseCase,
+  }) : super(const OutboundDeliveryStoState()) {
     on<LoadOutboundDeliveryStoListEvent>(_onLoadList);
+    on<CreateStockTransferOrderEvent>(_onCreateStockTransferOrder);
   }
 
   Future<void> _onLoadList(
@@ -58,6 +63,30 @@ class OutboundDeliveryStoBloc
           clearError: true,
         ));
       },
+    );
+  }
+
+  Future<void> _onCreateStockTransferOrder(
+    CreateStockTransferOrderEvent event,
+    Emitter<OutboundDeliveryStoState> emit,
+  ) async {
+    emit(state.copyWith(
+      creatingStockTransferOrder: true,
+      clearCreateError: true,
+      clearCreateResponse: true,
+    ));
+
+    final result = await createStockTransferOrderUseCase(event.request);
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        creatingStockTransferOrder: false,
+        createStockTransferOrderError: failure.message,
+      )),
+      (response) => emit(state.copyWith(
+        creatingStockTransferOrder: false,
+        createStockTransferOrderResponse: response,
+      )),
     );
   }
 }

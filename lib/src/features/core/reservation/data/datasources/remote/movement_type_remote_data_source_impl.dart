@@ -1,3 +1,4 @@
+import 'package:neuconnectz_dynea/src/core/barrels/auth_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/network/client/dio_client.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/api_endpoints.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/error_handler.dart';
@@ -16,6 +17,7 @@ class MovementTypeRemoteDataSourceImpl implements MovementTypeRemoteDataSource {
   }) async {
     return ApiErrorHandler.executeGuarded(() async {
       final queryParams = {
+        'userId': SessionManager.userId,
         'lastCount': params.lastCount,
         'skipRecords': params.skipRecords,
         if (params.keyword != null && params.keyword!.isNotEmpty)
@@ -23,7 +25,7 @@ class MovementTypeRemoteDataSourceImpl implements MovementTypeRemoteDataSource {
       };
 
       final response = await dio.get(
-        endpoint: ApiEndpoints.listMovementTypes.value,
+        endpoint: ApiEndpoints.listMovementTypesAssignedToUser.value,
         queryParams: queryParams,
       );
 
@@ -31,4 +33,3 @@ class MovementTypeRemoteDataSourceImpl implements MovementTypeRemoteDataSource {
     });
   }
 }
-

@@ -2,7 +2,9 @@ import 'package:neuconnectz_dynea/src/core/errors/api_exceptions.dart';
 import 'package:neuconnectz_dynea/src/core/network/client/dio_client.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/api_endpoints.dart';
 import 'package:neuconnectz_dynea/src/core/network/config/error_handler.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/datasources/remote/outbound_delivery_sales_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/models/create_sales_order_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/models/outbound_delivery_sales_item_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/models/outbound_delivery_sales_list_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_item_params.dart';
@@ -52,10 +54,19 @@ class OutboundDeliverySalesRemoteDataSourceImpl
   Future<OutboundDeliverySalesItemResponseModel> listCompletedSalesOrderItems({
     required OutboundDeliverySalesItemParams params,
   }) async {
-    return _fetchSalesOrderItems(
-      endpoint: ApiEndpoints.completedSalesorderItems.value,
-      params: params,
-    );
+    return ApiErrorHandler.executeGuarded(() async {
+      final queryParams = {
+        'DeliveryNo': params.deliveryNo,
+      };
+
+      final response = await dio.get(
+        endpoint: ApiEndpoints.getCompletedItemsInSalesWithBatch.value,
+        queryParams: queryParams,
+      );
+      return OutboundDeliverySalesItemResponseModel.fromJson(
+        response.data ?? {},
+      );
+    });
   }
 
   Future<OutboundDeliverySalesItemResponseModel> _fetchSalesOrderItems({
@@ -77,6 +88,31 @@ class OutboundDeliverySalesRemoteDataSourceImpl
       );
       return OutboundDeliverySalesItemResponseModel.fromJson(
         response.data ?? {},
+      );
+    });
+  }
+
+  @override
+  Future<ApiResponse<bool>> createSalesOrder({
+    required CreateSalesOrderRequestModel request,
+  }) async {
+    return ApiErrorHandler.executeGuarded(() async {
+      final response = await dio.post(
+        endpoint: ApiEndpoints.createSalesOrder.value,
+        data: request.toJson(),
+      );
+
+      final code = response.statusCode;
+
+      if (code == 200 || code == 201) {
+        return ApiResponse<bool>.fromJson(response.data);
+      }
+
+      throw ServerException(
+        statusCode: code,
+        message:
+            response.data?['message'] ??
+            'Failed to create sales order.',
       );
     });
   }

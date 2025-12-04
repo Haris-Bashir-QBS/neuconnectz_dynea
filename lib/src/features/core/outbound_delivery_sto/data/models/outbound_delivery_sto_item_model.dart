@@ -15,8 +15,20 @@ class OutboundDeliveryStoItemResponseModel
   factory OutboundDeliveryStoItemResponseModel.fromJson(
     Map<String, dynamic> json,
   ) {
-    final dataMap = json['data'] as Map<String, dynamic>?;
-    final dataList = dataMap?['data'] as List<dynamic>?;
+    // Handle both old format (with data.data) and new format (with data array directly)
+    List<dynamic>? dataList;
+    int totalRows = 0;
+    
+    if (json['data'] is List) {
+      // New format: data is directly a list
+      dataList = json['data'] as List<dynamic>?;
+      totalRows = json['totalRows'] as int? ?? (dataList?.length ?? 0);
+    } else if (json['data'] is Map) {
+      // Old format: data is a map with data and totalRows
+      final dataMap = json['data'] as Map<String, dynamic>?;
+      dataList = dataMap?['data'] as List<dynamic>?;
+      totalRows = dataMap?['totalRows'] as int? ?? (dataList?.length ?? 0);
+    }
 
     return OutboundDeliveryStoItemResponseModel(
       data: dataList
@@ -55,9 +67,17 @@ class OutboundDeliveryStoItemModel extends OutboundDeliveryStoItemEntity {
   });
 
   factory OutboundDeliveryStoItemModel.fromJson(Map<String, dynamic> json) {
+    // Handle item as both int and string
+    int itemValue = 0;
+    if (json['item'] is int) {
+      itemValue = json['item'] as int;
+    } else if (json['item'] is String) {
+      itemValue = int.tryParse(json['item'] as String) ?? 0;
+    }
+
     return OutboundDeliveryStoItemModel(
       delivery: json['delivery']?.toString() ?? '',
-      item: json['item'] ?? 0,
+      item: itemValue,
       material: json['material']?.toString() ?? '',
       itemDescription: json['itemDescription']?.toString() ?? '',
       itemCategory: json['itemCategory']?.toString() ?? '',
@@ -80,13 +100,35 @@ class OutboundDeliveryStoItemModel extends OutboundDeliveryStoItemEntity {
 
 class BinDetailModel extends BinDetail {
   const BinDetailModel({
-    required super.binCode,
+    required super.sourceStorageBin,
     required super.quantity,
+    super.sourceStorageSection,
+    super.sourceStorageType,
+    super.batches,
   });
 
   factory BinDetailModel.fromJson(Map<String, dynamic> json) {
     return BinDetailModel(
-      binCode: json['binCode']?.toString() ?? '',
+      sourceStorageBin: json['sourceStorageBin']?.toString() ?? '',
+      quantity: (json['quantity'] as num?)?.toDouble() ?? 0.0,
+      sourceStorageSection: json['sourceStorageSection']?.toString(),
+      sourceStorageType: json['sourceStorageType']?.toString(),
+      batches: (json['batches'] as List<dynamic>?)
+          ?.map((e) => BatchDetailModel.fromJson(e))
+          .toList(),
+    );
+  }
+}
+
+class BatchDetailModel extends BatchDetail {
+  const BatchDetailModel({
+    required super.batchName,
+    required super.quantity,
+  });
+
+  factory BatchDetailModel.fromJson(Map<String, dynamic> json) {
+    return BatchDetailModel(
+      batchName: json['batchName']?.toString() ?? '',
       quantity: (json['quantity'] as num?)?.toDouble() ?? 0.0,
     );
   }

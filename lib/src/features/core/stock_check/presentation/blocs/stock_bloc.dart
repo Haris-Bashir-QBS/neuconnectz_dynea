@@ -24,7 +24,13 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     LoadStocksEvent event,
     Emitter<StockState> emit,
   ) async {
-    final query = event.params.copyWith(skipRecords: 0);
+    // Use event params directly, just reset skipRecords
+    // Explicitly pass searchQuery to preserve null values
+    final query = event.params.copyWith(
+      skipRecords: 0,
+      searchQuery: event.params.searchQuery,
+      clearSearchQuery: event.params.searchQuery == null,
+    );
     final shouldClear = event.clearExisting || state.items.isEmpty;
 
     emit(
@@ -96,6 +102,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       filterType: event.filterType,
       searchQuery: null,
       skipRecords: 0,
+      clearSearchQuery: true,
     );
     add(LoadStocksEvent(params: params, clearExisting: true));
   }
@@ -108,6 +115,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     final params = state.params.copyWith(
       searchQuery: (query == null || query.isEmpty) ? null : query,
       skipRecords: 0,
+      clearSearchQuery: query == null || query.isEmpty,
     );
     add(LoadStocksEvent(params: params, clearExisting: true));
   }

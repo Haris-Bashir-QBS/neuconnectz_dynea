@@ -16,14 +16,12 @@ import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/utils/app_static_data.dart';
 import 'package:neuconnectz_dynea/src/core/utils/utils.dart';
 import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/scan_button.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/data/models/create_stock_transfer_order_request_model.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/data/models/create_sales_order_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/data/models/get_and_update_stocks_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/stocks_by_storage_bin_params.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_event.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_state.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/stocks_by_storage_bin_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_quantity_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/entities/bin_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/stock_check/domain/entities/stock_entity.dart';
@@ -35,10 +33,10 @@ import 'package:neuconnectz_dynea/src/core/utils/bin_group_helper.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_toast.dart';
 import 'package:neuconnectz_dynea/src/widgets/generic_selection_dialog.dart';
 
-class OutboundDeliveryStoQuantityPage extends StatelessWidget {
-  final OutboundDeliveryStoQuantityPageParams params;
+class OutboundDeliverySalesQuantityPage extends StatelessWidget {
+  final OutboundDeliverySalesQuantityPageParams params;
 
-  const OutboundDeliveryStoQuantityPage({super.key, required this.params});
+  const OutboundDeliverySalesQuantityPage({super.key, required this.params});
 
   @override
   Widget build(BuildContext context) {
@@ -46,25 +44,25 @@ class OutboundDeliveryStoQuantityPage extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<BinBloc>()),
         BlocProvider(create: (_) => sl<StocksByStorageBinBloc>()),
-        BlocProvider(create: (_) => sl<OutboundDeliveryStoBloc>()),
+        BlocProvider(create: (_) => sl<OutboundDeliverySalesBloc>()),
       ],
-      child: _OutboundDeliveryStoQuantityView(params: params),
+      child: _OutboundDeliverySalesQuantityView(params: params),
     );
   }
 }
 
-class _OutboundDeliveryStoQuantityView extends StatefulWidget {
-  final OutboundDeliveryStoQuantityPageParams params;
+class _OutboundDeliverySalesQuantityView extends StatefulWidget {
+  final OutboundDeliverySalesQuantityPageParams params;
 
-  const _OutboundDeliveryStoQuantityView({required this.params});
+  const _OutboundDeliverySalesQuantityView({required this.params});
 
   @override
-  State<_OutboundDeliveryStoQuantityView> createState() =>
-      _OutboundDeliveryStoQuantityViewState();
+  State<_OutboundDeliverySalesQuantityView> createState() =>
+      _OutboundDeliverySalesQuantityViewState();
 }
 
-class _OutboundDeliveryStoQuantityViewState
-    extends State<_OutboundDeliveryStoQuantityView> {
+class _OutboundDeliverySalesQuantityViewState
+    extends State<_OutboundDeliverySalesQuantityView> {
   final ScrollController _scrollController = ScrollController();
   final _binCodeController = TextEditingController();
   final _binSearchController = TextEditingController();
@@ -168,6 +166,19 @@ class _OutboundDeliveryStoQuantityViewState
     );
   }
 
+  Future<void> _syncStocksFromSap() async {
+    final request = GetAndUpdateStocksRequestModel(
+      plant: widget.params.plant,
+      storageLocation: widget.params.storageLocation,
+      warehouseNumber: widget.params.warehouseCode,
+      material: widget.params.item.material,
+    );
+
+    context.read<OutboundDeliverySalesBloc>().add(
+      GetAndUpdateStocksFromSapEvent(request: request),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -179,9 +190,12 @@ class _OutboundDeliveryStoQuantityViewState
               CustomToast.error(context, state.message);
             } else if (state is StocksByStorageBinSuccess) {
               setState(() {
+                // Add new stocks to existing ones (don't replace)
                 for (var stock in state.stocks) {
+                  // Only add if not already present
                   if (!_batchStocks.any((s) => s.id == stock.id)) {
                     _batchStocks.add(stock);
+                    // Initialize controllers for new batches only
                     if (!_batchQuantityControllers.containsKey(stock.id)) {
                       _batchQuantityControllers[stock.id] =
                           TextEditingController();
@@ -199,22 +213,20 @@ class _OutboundDeliveryStoQuantityViewState
             }
           },
         ),
-        BlocListener<OutboundDeliveryStoBloc, OutboundDeliveryStoState>(
+        BlocListener<OutboundDeliverySalesBloc, OutboundDeliverySalesState>(
           listener: (context, state) {
-            // Handle create stock transfer order
-            if (state.createStockTransferOrder.isError) {
-              CustomToast.error(context, state.createStockTransferOrder.error!);
-            } else if (state.createStockTransferOrder.isSuccess) {
+            if (state.createSalesOrder.isError) {
+              CustomToast.error(context, state.createSalesOrder.error!);
+            } else if (state.createSalesOrder.isSuccess) {
               CustomToast.success(
                 context,
-                state.createStockTransferOrder.data!.message,
+                state.createSalesOrder.data!.message,
               );
               context.pop(true);
             }
             if (state.syncStocks.isError) {
               CustomToast.error(context, state.syncStocks.error!);
             } else if (state.syncStocks.isSuccess) {
-              // Show success message if available
               final message =
                   state.syncStocks.data?.message ??
                   'Stocks synchronized successfully';
@@ -283,20 +295,19 @@ class _OutboundDeliveryStoQuantityViewState
                             child: child,
                           );
                         },
-                        child:
-                            _showBinSelection
-                                ? Column(
-                                  key: const ValueKey('bin_selection'),
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _binSelectionHeader(),
-                                    SizedBox(height: 10.h),
-                                    _binSelectionSection(),
-                                  ],
-                                )
-                                : const SizedBox.shrink(
-                                  key: ValueKey('bin_selection_empty'),
-                                ),
+                        child: _showBinSelection
+                            ? Column(
+                                key: const ValueKey('bin_selection'),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _binSelectionHeader(),
+                                  SizedBox(height: 10.h),
+                                  _binSelectionSection(),
+                                ],
+                              )
+                            : const SizedBox.shrink(
+                                key: ValueKey('bin_selection_empty'),
+                              ),
                       ),
                       BlocBuilder<
                         StocksByStorageBinBloc,
@@ -421,35 +432,6 @@ class _OutboundDeliveryStoQuantityViewState
       ),
       padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 15.w),
       child: Column(spacing: 10.h, children: [_binCodeNumberTextField()]),
-    );
-  }
-
-  Widget _binCodeNumberTextField() {
-    // Update controller text when bin is selected
-    if (_selectedBin != null &&
-        _binCodeController.text != _selectedBin!.binCode) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _binCodeController.text = _selectedBin!.binCode;
-        }
-      });
-    }
-
-    return CustomTextFormField(
-      label: AppTexts.binCode,
-      hint: AppTexts.scanAndType,
-      controller: _binCodeController,
-      focusNode: _binCodeFocusNode,
-      readOnly: true,
-      onTap: () {
-        _binSearchController.clear();
-        _showBinSelectionDialog();
-      },
-      rightActionWidget: ScanButton(
-        onTap: () async {
-          await openScanner(scanType: FieldScanType.barcode);
-        },
-      ),
     );
   }
 
@@ -654,6 +636,35 @@ class _OutboundDeliveryStoQuantityViewState
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _binCodeNumberTextField() {
+    // Update controller text when bin is selected
+    if (_selectedBin != null &&
+        _binCodeController.text != _selectedBin!.binCode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _binCodeController.text = _selectedBin!.binCode;
+        }
+      });
+    }
+
+    return CustomTextFormField(
+      label: AppTexts.binCode,
+      hint: AppTexts.scanAndType,
+      controller: _binCodeController,
+      focusNode: _binCodeFocusNode,
+      readOnly: true,
+      onTap: () {
+        _binSearchController.clear();
+        _showBinSelectionDialog();
+      },
+      rightActionWidget: ScanButton(
+        onTap: () async {
+          await openScanner(scanType: FieldScanType.barcode);
+        },
       ),
     );
   }
@@ -1050,19 +1061,6 @@ class _OutboundDeliveryStoQuantityViewState
     _batchFieldErrors.clear();
   }
 
-  Future<void> _syncStocksFromSap() async {
-    final request = GetAndUpdateStocksRequestModel(
-      plant: widget.params.plant,
-      storageLocation: widget.params.storageLocation,
-      warehouseNumber: widget.params.warehouseCode,
-      material: widget.params.item.material,
-    );
-
-    context.read<OutboundDeliveryStoBloc>().add(
-      GetAndUpdateStocksFromSapEvent(request: request),
-    );
-  }
-
   Future<void> openScanner({required FieldScanType scanType}) async {
     String? res = await Utils.scanBarcode(context, title: AppTexts.scan);
 
@@ -1105,9 +1103,9 @@ class _OutboundDeliveryStoQuantityViewState
   }
 
   Widget _submitButton() {
-    return BlocBuilder<OutboundDeliveryStoBloc, OutboundDeliveryStoState>(
+    return BlocBuilder<OutboundDeliverySalesBloc, OutboundDeliverySalesState>(
       builder: (context, state) {
-        final isSubmitting = state.createStockTransferOrder.isLoading;
+        final isSubmitting = state.createSalesOrder.isLoading;
 
         return CustomButton(
           text: AppTexts.proceed,
@@ -1163,7 +1161,7 @@ class _OutboundDeliveryStoQuantityViewState
             }
 
             // Create the request
-            final request = CreateStockTransferOrderRequestModel.fromEntities(
+            final request = CreateSalesOrderRequestModel.fromEntities(
               item: widget.params.item,
               selectedPlant: widget.params.plant,
               selectedWarehouse: widget.params.warehouseCode,
@@ -1171,8 +1169,8 @@ class _OutboundDeliveryStoQuantityViewState
               batchQuantitiesMap: batchQuantitiesMap,
             );
             log(request.toJson().toString() ?? "");
-            context.read<OutboundDeliveryStoBloc>().add(
-              CreateStockTransferOrderEvent(request: request),
+            context.read<OutboundDeliverySalesBloc>().add(
+              CreateSalesOrderEvent(request: request),
             );
           },
           radius: 12.r,

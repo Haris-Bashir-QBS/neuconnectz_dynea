@@ -11,6 +11,7 @@ import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/doma
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/pages/completed_outbound_delivery_sales_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_items_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/widgets/outbound_delivery_sales_item_card.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
@@ -241,8 +242,20 @@ class _OutboundDeliverySalesItemsViewState
               final item = state.pendingItems[index];
               return OutboundDeliverySalesItemCard(
                 item: item,
-                onTap: () {
-                  // TODO: Show quantity bottom sheet for pending items
+                onTap: () async {
+                  final result = await context.pushNamed<bool>(
+                    AppRoutes.outboundDeliverySalesQuantity,
+                    extra: OutboundDeliverySalesQuantityPageParams(
+                      item: item,
+                      plant: widget.params.plant,
+                      storageLocation: widget.params.storageLocation,
+                      warehouseCode: widget.params.warehouseCode,
+                    ),
+                  );
+                  if (!mounted) return;
+                  if (result == true) {
+                    _loadPending(refresh: true);
+                  }
                 },
               );
             },

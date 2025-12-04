@@ -178,7 +178,12 @@ class CompletedOutboundDeliverySalesDetailPage extends StatelessWidget {
   }
 
   Widget _binDetailsSection() {
-    if (item.binDetails.isEmpty) {
+    // Use completedBinDetails if available, otherwise fall back to binDetails
+    final hasCompletedDetails = item.completedBinDetails != null && 
+        item.completedBinDetails!.isNotEmpty;
+    final hasRegularDetails = item.binDetails.isNotEmpty;
+
+    if (!hasCompletedDetails && !hasRegularDetails) {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.all(20.w),
@@ -195,6 +200,145 @@ class CompletedOutboundDeliverySalesDetailPage extends StatelessWidget {
       );
     }
 
+    // If we have completed details with batches, show the new structure
+    if (hasCompletedDetails) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: item.completedBinDetails!.map((bin) {
+          return Container(
+            margin: EdgeInsets.only(bottom: 20.h),
+            decoration: BoxDecoration(
+              color: AppPalette.whiteColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Bin header
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 15.w,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppPalette.lightGreyColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              text: "Bin: ${bin.sourceStorageBin}",
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            if (bin.sourceStorageSection.isNotEmpty) ...[
+                              SizedBox(height: 4.h),
+                              CustomText(
+                                text: "Bin Name: ${bin.sourceStorageSection}",
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                                color: AppPalette.darkGreyColor,
+                              ),
+                            ],
+                            if (bin.sourceStorageType.isNotEmpty) ...[
+                              SizedBox(height: 4.h),
+                              CustomText(
+                                text: "Storage Type: ${bin.sourceStorageType}",
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                                color: AppPalette.darkGreyColor,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (bin.batches.isNotEmpty) ...[
+                  SizedBox(height: 15.h),
+                  // Batch table headers
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: CustomText(
+                          text: "Batch No",
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppPalette.darkGreyColor,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: CustomText(
+                          text: "Quantity",
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppPalette.darkGreyColor,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10.h),
+                  // Batch rows
+                  ...bin.batches.map((batch) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: CustomText(
+                              text: batch.batchName,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              height: 45.h,
+                              padding: EdgeInsets.symmetric(horizontal: 4.w),
+                              decoration: BoxDecoration(
+                                color: AppPalette.lightGreyColor,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Center(
+                                child: CustomText(
+                                  text: batch.quantity.formatWithCommas,
+                                  fontSize: 14.sp,
+                                  color: AppPalette.darkGreyColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ] else ...[
+                  SizedBox(height: 10.h),
+                  CustomText(
+                    text: "No batches available",
+                    fontSize: 12.sp,
+                    color: AppPalette.greyColor,
+                  ),
+                ],
+              ],
+            ),
+          );
+        }).toList(),
+      );
+    }
+
+    // Fall back to regular bin details display
     return Container(
       decoration: BoxDecoration(
         color: AppPalette.whiteColor,

@@ -1,7 +1,6 @@
 abstract class ApiBase {
-  static String baseUrl = "http://192.168.80.194:7087/";
-
-  // static String baseUrl = "http://163.61.91.146:31155/";
+  // static String baseUrl = "https://lolly-brankiest-wilmer.ngrok-free.dev/";
+  static String baseUrl = "http://163.61.91.146:31146/";
   static String lockKeysBaseUrl =
       "https://prodgateway.lockkeyz.com/TOTP/ITOTPFeature/";
 }

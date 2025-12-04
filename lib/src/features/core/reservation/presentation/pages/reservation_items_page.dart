@@ -77,8 +77,12 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
   }
 
   void _onPendingScroll() {
-    if (_pendingScrollController.position.pixels ==
-        _pendingScrollController.position.maxScrollExtent) {
+    if (!_pendingScrollController.hasClients) return;
+
+    final pixels = _pendingScrollController.position.pixels;
+    final maxScroll = _pendingScrollController.position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       final bloc = context.read<ReservationBloc>();
       if (bloc.state.pendingHasMore && !bloc.state.pendingIsLoadingMore) {
         _loadPending(refresh: false);
@@ -87,8 +91,12 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
   }
 
   void _onCompletedScroll() {
-    if (_completedScrollController.position.pixels ==
-        _completedScrollController.position.maxScrollExtent) {
+    if (!_completedScrollController.hasClients) return;
+
+    final pixels = _completedScrollController.position.pixels;
+    final maxScroll = _completedScrollController.position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       final bloc = context.read<ReservationBloc>();
       if (bloc.state.completedHasMore && !bloc.state.completedIsLoadingMore) {
         _loadCompleted(refresh: false);

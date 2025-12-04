@@ -23,22 +23,24 @@ class StockRemoteDataSourceImpl implements StockRemoteDataSource {
       'skipRecords': params.skipRecords,
     };
 
-    if ((params.searchQuery ?? '').isNotEmpty) {
+    // Only add filter-specific search params if searchQuery is not null and not empty
+    final searchQuery = params.searchQuery?.trim();
+    if (searchQuery != null && searchQuery.isNotEmpty) {
       switch (params.filterType) {
         case StockFilterType.material:
-          query['material'] = params.searchQuery;
+          query['material'] = searchQuery;
           break;
         case StockFilterType.storageType:
-          query['storageType'] = params.searchQuery;
+          query['storageType'] = searchQuery;
           break;
         case StockFilterType.storageBin:
-          query['storageBin'] = params.searchQuery;
+          query['storageBin'] = searchQuery;
           break;
         case StockFilterType.batch:
-          query['batch'] = params.searchQuery;
+          query['batch'] = searchQuery;
           break;
         case StockFilterType.all:
-          query['keyword'] = params.searchQuery;
+          query['keyword'] = searchQuery;
           break;
       }
     }

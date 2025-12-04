@@ -47,3 +47,21 @@ class LoadCompletedOutboundDeliverySalesItemsEvent
   List<Object?> get props => [params, refresh];
 }
 
+class CreateSalesOrderEvent extends OutboundDeliverySalesEvent {
+  final CreateSalesOrderRequestModel request;
+
+  const CreateSalesOrderEvent({required this.request});
+
+  @override
+  List<Object?> get props => [request];
+}
+
+class GetAndUpdateStocksFromSapEvent extends OutboundDeliverySalesEvent {
+  final GetAndUpdateStocksRequestModel request;
+
+  const GetAndUpdateStocksFromSapEvent({required this.request});
+
+  @override
+  List<Object?> get props => [request];
+}
+

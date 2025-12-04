@@ -26,12 +26,27 @@ class StockQueryParams extends Equatable {
     String? searchQuery,
     int? lastCount,
     int? skipRecords,
+    bool clearSearchQuery = false,
   }) {
+    // If clearSearchQuery is true, always set to null
+    // If searchQuery is explicitly provided (not null), use it
+    // If searchQuery is null and clearSearchQuery is false, preserve current value
+    String? finalSearchQuery;
+    if (clearSearchQuery) {
+      finalSearchQuery = null;
+    } else if (searchQuery != null) {
+      // Explicitly provided non-null value
+      finalSearchQuery = searchQuery;
+    } else {
+      // Not provided, preserve current value
+      finalSearchQuery = this.searchQuery;
+    }
+    
     return StockQueryParams(
       plant: plant ?? this.plant,
       warehouseNumber: warehouseNumber ?? this.warehouseNumber,
       filterType: filterType ?? this.filterType,
-      searchQuery: searchQuery ?? this.searchQuery,
+      searchQuery: finalSearchQuery,
       lastCount: lastCount ?? this.lastCount,
       skipRecords: skipRecords ?? this.skipRecords,
     );

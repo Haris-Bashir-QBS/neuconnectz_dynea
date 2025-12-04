@@ -67,12 +67,12 @@ class ReservationCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      2.verticalSpace,
-                      CustomText(
-                        text: "Created On: $formattedDate",
-                        fontSize: 12.sp,
-                        color: AppPalette.greyColor,
-                      ),
+                      SizedBox(height: 8.h),
+                      _detailRow('Status: ${item!.reservStatus}'),
+                      SizedBox(height: 4.h),
+                      _detailRow('Requirement Type: ${item!.requirementType}'),
+                      SizedBox(height: 4.h),
+                      _detailRow('Date: $formattedDate'),
                     ],
                   ),
                 ),
@@ -83,4 +83,10 @@ class ReservationCard extends StatelessWidget {
       ),
     );
   }
+
+  Widget _detailRow(String text) => CustomText(
+        text: '• $text',
+        fontSize: 12.3.sp,
+        color: AppPalette.greyColor,
+      );
 }

@@ -100,8 +100,13 @@ class _OutboundDeliveryStoListingViewState
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    print("sdsadaddsasa");
+    if (!_scrollController.hasClients) return;
+
+    final pixels = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       final state = context.read<OutboundDeliveryStoBloc>().state;
 
       if (state.hasMore && !state.loadingMore) {
@@ -201,8 +206,11 @@ class _OutboundDeliveryStoListingViewState
                   padding: EdgeInsets.symmetric(horizontal: 15.w),
                   itemCount: state.items.length + (state.loadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index >= state.items.length) {
-                      return const GrnListItemShimmer();
+                    if (index == state.items.length) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
                     }
                     return OutboundDeliveryStoCard(
                       item: state.items[index],

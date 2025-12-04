@@ -39,6 +39,22 @@ class CustomSearchField extends StatefulWidget {
 
 class _CustomSearchFieldState extends State<CustomSearchField> {
   @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(

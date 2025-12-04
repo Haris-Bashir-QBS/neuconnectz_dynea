@@ -9,6 +9,7 @@ class OutboundDeliverySalesItemEntity extends Equatable {
   final String batch;
   final String plant;
   final String storageLocation;
+  final String? warehouseNo;
   final double deliveryQuantity;
   final String baseUom;
   final String salesUnit;
@@ -19,6 +20,7 @@ class OutboundDeliverySalesItemEntity extends Equatable {
   final String itemOverallStatus;
   final String itemMovementSts;
   final List<OutboundDeliverySalesItemBinDetailEntity> binDetails;
+  final List<CompletedSalesItemBinDetail>? completedBinDetails; // For completed items
 
   const OutboundDeliverySalesItemEntity({
     required this.delivery,
@@ -29,6 +31,7 @@ class OutboundDeliverySalesItemEntity extends Equatable {
     required this.batch,
     required this.plant,
     required this.storageLocation,
+    this.warehouseNo,
     required this.deliveryQuantity,
     required this.baseUom,
     required this.salesUnit,
@@ -39,6 +42,7 @@ class OutboundDeliverySalesItemEntity extends Equatable {
     required this.itemOverallStatus,
     required this.itemMovementSts,
     this.binDetails = const [],
+    this.completedBinDetails,
   });
 
   @override
@@ -51,6 +55,7 @@ class OutboundDeliverySalesItemEntity extends Equatable {
         batch,
         plant,
         storageLocation,
+        warehouseNo,
         deliveryQuantity,
         baseUom,
         salesUnit,
@@ -61,6 +66,7 @@ class OutboundDeliverySalesItemEntity extends Equatable {
         itemOverallStatus,
         itemMovementSts,
         binDetails,
+        completedBinDetails,
       ];
 }
 
@@ -87,5 +93,40 @@ class OutboundDeliverySalesItemBinDetailEntity extends Equatable {
         proposedQuantity,
         actualQuantity,
       ];
+}
+
+class CompletedSalesItemBinDetail extends Equatable {
+  final String sourceStorageBin;
+  final String sourceStorageType;
+  final String sourceStorageSection;
+  final List<CompletedSalesItemBatchDetail> batches;
+
+  const CompletedSalesItemBinDetail({
+    required this.sourceStorageBin,
+    required this.sourceStorageType,
+    required this.sourceStorageSection,
+    required this.batches,
+  });
+
+  @override
+  List<Object?> get props => [
+        sourceStorageBin,
+        sourceStorageType,
+        sourceStorageSection,
+        batches,
+      ];
+}
+
+class CompletedSalesItemBatchDetail extends Equatable {
+  final String batchName;
+  final double quantity;
+
+  const CompletedSalesItemBatchDetail({
+    required this.batchName,
+    required this.quantity,
+  });
+
+  @override
+  List<Object?> get props => [batchName, quantity];
 }
 

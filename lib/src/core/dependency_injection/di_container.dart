@@ -238,6 +238,7 @@ void _registerOutboundDeliveryStoDependencies() {
     () => OutboundDeliveryStoBloc(
       getOutboundDeliveryStoListUseCase: sl(),
       createStockTransferOrderUseCase: sl(),
+      getAndUpdateStocksUseCase: sl(),
     ),
   );
 }
@@ -252,6 +253,7 @@ void _registerOutboundDeliveryStoItemsDependencies() {
     )
     ..registerLazySingleton(() => GetStockDocItemFromSAPUseCase(sl()))
     ..registerLazySingleton(() => GetCompletedStoItemsUseCase(sl()))
+    ..registerLazySingleton(() => GetAndUpdateStocksUseCase(sl()))
     // Stocks by Storage Bin dependencies
     ..registerLazySingleton<StocksByStorageBinRemoteDataSource>(
       () => StocksByStorageBinRemoteDataSourceImpl(client: sl()),
@@ -268,9 +270,7 @@ void _registerOutboundDeliveryStoItemsDependencies() {
     ),
   );
 
-  sl.registerFactory(
-    () => StocksByStorageBinBloc(useCase: sl()),
-  );
+  sl.registerFactory(() => StocksByStorageBinBloc(useCase: sl()));
 }
 
 void _registerOutboundDeliverySalesDependencies() {
@@ -285,14 +285,16 @@ void _registerOutboundDeliverySalesDependencies() {
     ..registerLazySingleton(() => GetOutboundDeliverySalesItemsUseCase(sl()))
     ..registerLazySingleton(
       () => GetCompletedOutboundDeliverySalesItemsUseCase(sl()),
-    );
-
+    )
+    ..registerLazySingleton(() => CreateSalesOrderUseCase(sl()));
 
   sl.registerFactory(
     () => OutboundDeliverySalesBloc(
       getOutboundDeliverySalesListUseCase: sl(),
       getOutboundDeliverySalesItemsUseCase: sl(),
       getCompletedOutboundDeliverySalesItemsUseCase: sl(),
+      createSalesOrderUseCase: sl(),
+      getAndUpdateStocksUseCase: sl(),
     ),
   );
 }

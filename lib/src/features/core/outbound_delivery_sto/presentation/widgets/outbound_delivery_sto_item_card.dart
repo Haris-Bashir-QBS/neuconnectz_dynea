@@ -133,11 +133,12 @@ class OutboundDeliveryStoItemCard extends StatelessWidget {
           fontSize: 12.sp,
           color: AppPalette.greyColor,
         ),
-        CustomText(
-          text: 'Status: ${item.itemOverallStatus}',
-          fontSize: 12.sp,
-          color: AppPalette.greyColor,
-        ),
+        if (item.itemOverallStatus.isNotEmpty)
+          CustomText(
+            text: 'Status: ${item.itemOverallStatus}',
+            fontSize: 12.sp,
+            color: AppPalette.greyColor,
+          ),
       ],
     );
   }

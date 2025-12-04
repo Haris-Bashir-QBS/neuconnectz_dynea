@@ -97,8 +97,12 @@ class __GrnListingViewState extends State<_GrnListingView> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (!_scrollController.hasClients) return; // Safety check
+
+    final pixels = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       final state = context.read<GrnBloc>().state;
 
       if (state is GrnHeaderListFetched &&
@@ -107,7 +111,7 @@ class __GrnListingViewState extends State<_GrnListingView> {
         final params = GrnListParams(
           plant: widget.params.plant.code,
           location: widget.params.warehouse.storageLocationCode ?? '',
-          lastCount: 4,
+          lastCount: 10,
           skipRecords: state.skipRecords,
           keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
         );
@@ -230,13 +234,18 @@ class __GrnListingViewState extends State<_GrnListingView> {
                   onRefresh: () async => _loadInitialData(),
                   child: ListView.builder(
                     controller: _scrollController,
-                    physics: AlwaysScrollableScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 15.w),
                     itemCount:
                         state.items.length + (state.isLoadingMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == state.items.length) {
-                        return const GrnListItemShimmer();
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
                       }
 
                       return GrnListItemWidget(

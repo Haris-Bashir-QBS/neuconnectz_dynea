@@ -99,8 +99,14 @@ class _ReservationListingViewState extends State<_ReservationListingView> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    print("sAsasasaSA");
+    if (!_scrollController.hasClients) return;
+
+    final position = _scrollController.position;
+    final pixels = position.pixels;
+    final maxScroll = position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       final state = context.read<ReservationBloc>().state;
 
       if (state.listHasMore && !state.listIsLoadingMore) {
@@ -199,20 +205,27 @@ class _ReservationListingViewState extends State<_ReservationListingView> {
               leftHeading: 'Reservation No',
               rightHeading: 'Receiving Plant/Location',
             ),
-            10.verticalSpace,
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async => _loadInitialData(),
                 child: ListView.builder(
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.only(
+                    top: 10.h,
+                    bottom: 16.h,
+                    left: 16.w,
+                    right: 16.w,
+                  ),
                   itemCount:
                       state.listItems.length +
                       (state.listIsLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == state.listItems.length) {
-                      return GrnListItemShimmer();
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
                     }
 
                     final item = state.listItems[index];

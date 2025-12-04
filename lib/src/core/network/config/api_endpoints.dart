@@ -12,6 +12,7 @@ var _warehouse = "$_rootApi/IWarehouseFeature";
 var _stocks = "$_rootApi/IStocksFeature";
 var _stockTransferOrder = "$_rootApi/IStockTransferOrderFeature";
 var _salesOrder = "$_rootApi/ISalesOrderFeature";
+var _sapDataSync = "$_rootApi/ISAPDataSyncFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -63,13 +64,17 @@ enum ApiEndpoints {
   listAllStockDocFromSAP,
   stoItems,
   completedStoItems,
+  getCompletedItemsInStoWithBatch,
   getStocksByStorageBin,
   createStockTransferOrder,
+  getAndUpdateStocksFromSap,
 
   /// ===================== Outbound Delivery (Sales Order) =====================
   listAllSalesOrderDocFromSAP,
   listAllSalesOrderItemFromSAP,
-  completedSalesorderItems;
+  completedSalesorderItems,
+  getCompletedItemsInSalesWithBatch,
+  createSalesOrder;
 
   String get value {
     switch (this) {
@@ -153,10 +158,14 @@ enum ApiEndpoints {
         return "$_stockTransferOrder/StockDocItemFromSAP";
       case ApiEndpoints.completedStoItems:
         return "$_stockTransferOrder/CompletedStoItems";
+      case ApiEndpoints.getCompletedItemsInStoWithBatch:
+        return "$_stockTransferOrder/GetCompletedItemsInStoWithBatch";
       case ApiEndpoints.getStocksByStorageBin:
         return "$_binManagement/GetStocksByStorageBin";
       case ApiEndpoints.createStockTransferOrder:
         return "$_stockTransferOrder/CreateStockTransferOrder";
+      case ApiEndpoints.getAndUpdateStocksFromSap:
+        return "$_sapDataSync/GetAndUpdateStocksFromSap";
 
       /// ======================== Outbound Delivery (Sales Order) ===============
       case ApiEndpoints.listAllSalesOrderDocFromSAP:
@@ -165,6 +174,10 @@ enum ApiEndpoints {
         return "$_salesOrder/ListAllSalesOrderItemFromSAP";
       case ApiEndpoints.completedSalesorderItems:
         return "$_salesOrder/completedSalesorderItems";
+      case ApiEndpoints.getCompletedItemsInSalesWithBatch:
+        return "$_salesOrder/GetCompletedItemsInSalesWithBatch";
+      case ApiEndpoints.createSalesOrder:
+        return "$_salesOrder/CreateSalesOrder";
     }
   }
 }

@@ -83,18 +83,25 @@ class _StockListingViewState extends State<_StockListingView> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (!_scrollController.hasClients) return;
+
+    final pixels = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       context.read<StockBloc>().add(const LoadMoreStocksEvent());
     }
   }
 
   void _onSearchChanged() {
     _debounce?.cancel();
+    final query = _searchController.text.trim();
     _debounce = Timer(const Duration(milliseconds: 400), () {
-      context.read<StockBloc>().add(
-        SearchStockEvent(_searchController.text.trim()),
-      );
+      if (mounted) {
+        context.read<StockBloc>().add(
+          SearchStockEvent(query.isEmpty ? null : query),
+        );
+      }
     });
   }
 
@@ -150,7 +157,17 @@ class _StockListingViewState extends State<_StockListingView> {
                   controller: _searchController,
                   hint: _searchHint,
                   onClear: () {
+                    // Cancel any pending search debounce
+                    _debounce?.cancel();
+                    _debounce = null;
+                    
+                    // Temporarily remove listener to prevent search event on clear
+                    _searchController.removeListener(_onSearchChanged);
                     _searchController.clear();
+                    // Re-add listener after clearing
+                    _searchController.addListener(_onSearchChanged);
+                    
+                    // Immediately dispatch search event with null to clear params
                     context.read<StockBloc>().add(const SearchStockEvent(null));
                   },
                 ),
@@ -285,10 +302,25 @@ class _StockListingViewState extends State<_StockListingView> {
                 padding: EdgeInsets.only(right: 8.w),
                 child: GestureDetector(
                   onTap: () {
+                    // Dismiss keyboard if open
+                    FocusScope.of(context).unfocus();
+                    
+                    // Cancel any pending search debounce
+                    _debounce?.cancel();
+                    _debounce = null;
+                    
+                    // Temporarily remove listener to prevent search event on clear
+                    _searchController.removeListener(_onSearchChanged);
+                    
                     setState(() {
                       _selectedFilter = filter;
                       _searchController.clear();
                     });
+                    
+                    // Re-add listener after clearing
+                    _searchController.addListener(_onSearchChanged);
+                    
+                    // Change the filter (this will automatically clear search query in bloc)
                     context.read<StockBloc>().add(
                       ChangeStockFilterEvent(filter),
                     );

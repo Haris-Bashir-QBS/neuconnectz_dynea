@@ -1,65 +1,54 @@
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_items_result_entity.dart';
 
-class OutboundDeliverySalesItemResponseModel {
-  final bool isApiHandled;
-  final bool isRequestSuccess;
-  final int statusCode;
-  final String message;
-  final OutboundDeliverySalesItemDataModel? data;
-  final List<dynamic> exception;
-
+class OutboundDeliverySalesItemResponseModel
+    extends ApiResponse<List<OutboundDeliverySalesItemEntity>> {
   OutboundDeliverySalesItemResponseModel({
-    required this.isApiHandled,
-    required this.isRequestSuccess,
-    required this.statusCode,
-    required this.message,
-    this.data,
-    required this.exception,
+    required super.data,
+    required super.isApiHandled,
+    required super.isRequestSuccess,
+    required super.statusCode,
+    required super.message,
+    required super.exception,
   });
 
   factory OutboundDeliverySalesItemResponseModel.fromJson(
     Map<String, dynamic> json,
   ) {
+    // Handle both old format (with data.data) and new format (with data array directly)
+    List<dynamic>? dataList;
+    int totalRows = 0;
+
+    if (json['data'] is List) {
+      // New format: data is directly a list
+      dataList = json['data'] as List<dynamic>?;
+      totalRows = json['totalRows'] as int? ?? (dataList?.length ?? 0);
+    } else if (json['data'] is Map) {
+      // Old format: data is a map with data and totalRows
+      final dataMap = json['data'] as Map<String, dynamic>?;
+      dataList = dataMap?['data'] as List<dynamic>?;
+      totalRows = dataMap?['totalRows'] as int? ?? (dataList?.length ?? 0);
+    }
+
     return OutboundDeliverySalesItemResponseModel(
+      data: dataList
+              ?.map((e) => OutboundDeliverySalesItemModel.fromJson(e))
+              .map((model) => model.toEntity())
+              .toList() ??
+          [],
       isApiHandled: json['isApiHandled'] ?? false,
       isRequestSuccess: json['isRequestSuccess'] ?? false,
       statusCode: json['statusCode'] ?? 0,
       message: json['message'] ?? '',
-      data: json['data'] != null
-          ? OutboundDeliverySalesItemDataModel.fromJson(
-              json['data'] as Map<String, dynamic>,
-            )
-          : null,
       exception: json['exception'] ?? [],
     );
   }
 
   OutboundDeliverySalesItemsResultEntity toEntity() {
     return OutboundDeliverySalesItemsResultEntity(
-      totalCount: data?.totalRows ?? 0,
-      data: data?.data.map((e) => e.toEntity()).toList() ?? [],
-    );
-  }
-}
-
-class OutboundDeliverySalesItemDataModel {
-  final int totalRows;
-  final List<OutboundDeliverySalesItemModel> data;
-
-  OutboundDeliverySalesItemDataModel({
-    required this.totalRows,
-    required this.data,
-  });
-
-  factory OutboundDeliverySalesItemDataModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return OutboundDeliverySalesItemDataModel(
-      totalRows: json['totalRows'] ?? 0,
-      data: (json['data'] as List<dynamic>? ?? [])
-          .map((e) => OutboundDeliverySalesItemModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      totalCount: data?.length ?? 0,
+      data: data ?? [],
     );
   }
 }
@@ -73,6 +62,7 @@ class OutboundDeliverySalesItemModel {
   final String batch;
   final String plant;
   final String storageLocation;
+  final String? warehouseNo;
   final double deliveryQuantity;
   final String baseUom;
   final String salesUnit;
@@ -83,6 +73,7 @@ class OutboundDeliverySalesItemModel {
   final String itemOverallStatus;
   final String itemMovementSts;
   final List<OutboundDeliverySalesItemBinDetailModel> binDetails;
+  final List<CompletedSalesItemBinDetailModel>? completedBinDetails;
 
   OutboundDeliverySalesItemModel({
     required this.delivery,
@@ -93,6 +84,7 @@ class OutboundDeliverySalesItemModel {
     required this.batch,
     required this.plant,
     required this.storageLocation,
+    this.warehouseNo,
     required this.deliveryQuantity,
     required this.baseUom,
     required this.salesUnit,
@@ -103,6 +95,7 @@ class OutboundDeliverySalesItemModel {
     required this.itemOverallStatus,
     required this.itemMovementSts,
     required this.binDetails,
+    this.completedBinDetails,
   });
 
   factory OutboundDeliverySalesItemModel.fromJson(Map<String, dynamic> json) {
@@ -112,21 +105,33 @@ class OutboundDeliverySalesItemModel {
       return double.tryParse(value.toString()) ?? 0;
     }
 
+    // Handle item as both int and string
+    int itemValue = 0;
+    if (json['item'] is int) {
+      itemValue = json['item'] as int;
+    } else if (json['item'] is String) {
+      itemValue = int.tryParse(json['item'] as String) ?? 0;
+    }
+
     final rawBinDetails =
         (json['additionalBinDetails'] ??
                 json['binDetails'] ??
                 json['salesOrderBinDetails']) as List<dynamic>? ??
             const [];
 
+    final rawCompletedBinDetails =
+        json['binDetails'] as List<dynamic>?;
+
     return OutboundDeliverySalesItemModel(
       delivery: json['delivery']?.toString() ?? '',
-      item: json['item'] ?? 0,
+      item: itemValue,
       material: json['material']?.toString() ?? '',
       itemDescription: json['itemDescription']?.toString() ?? '',
       itemCategory: json['itemCategory']?.toString() ?? '',
       batch: json['batch']?.toString() ?? '',
       plant: json['plant']?.toString() ?? '',
       storageLocation: json['storageLocation']?.toString() ?? '',
+      warehouseNo: json['warehouseNo']?.toString(),
       deliveryQuantity: _toDouble(json['deliveryQuantity']),
       baseUom: json['baseUom']?.toString() ?? '',
       salesUnit: json['salesUnit']?.toString() ?? '',
@@ -143,6 +148,15 @@ class OutboundDeliverySalesItemModel {
             ),
           )
           .toList(),
+      completedBinDetails: rawCompletedBinDetails != null
+          ? rawCompletedBinDetails
+              .map(
+                (e) => CompletedSalesItemBinDetailModel.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList()
+          : null,
     );
   }
 
@@ -155,6 +169,7 @@ class OutboundDeliverySalesItemModel {
         batch: batch,
         plant: plant,
         storageLocation: storageLocation,
+        warehouseNo: warehouseNo,
         deliveryQuantity: deliveryQuantity,
         baseUom: baseUom,
         salesUnit: salesUnit,
@@ -165,6 +180,9 @@ class OutboundDeliverySalesItemModel {
         itemOverallStatus: itemOverallStatus,
         itemMovementSts: itemMovementSts,
         binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
+        completedBinDetails: completedBinDetails
+            ?.map((bin) => bin.toEntity())
+            .toList(),
       );
 }
 
@@ -208,6 +226,74 @@ class OutboundDeliverySalesItemBinDetailModel {
         storageSection: storageSection,
         proposedQuantity: proposedQuantity,
         actualQuantity: actualQuantity,
+      );
+}
+
+class CompletedSalesItemBinDetailModel {
+  final String sourceStorageBin;
+  final String sourceStorageType;
+  final String sourceStorageSection;
+  final List<CompletedSalesItemBatchDetailModel> batches;
+
+  CompletedSalesItemBinDetailModel({
+    required this.sourceStorageBin,
+    required this.sourceStorageType,
+    required this.sourceStorageSection,
+    required this.batches,
+  });
+
+  factory CompletedSalesItemBinDetailModel.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return CompletedSalesItemBinDetailModel(
+      sourceStorageBin: json['sourceStorageBin']?.toString() ?? '',
+      sourceStorageType: json['sourceStorageType']?.toString() ?? '',
+      sourceStorageSection: json['sourceStorageSection']?.toString() ?? '',
+      batches: (json['batches'] as List<dynamic>? ?? [])
+          .map(
+            (e) => CompletedSalesItemBatchDetailModel.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  CompletedSalesItemBinDetail toEntity() => CompletedSalesItemBinDetail(
+        sourceStorageBin: sourceStorageBin,
+        sourceStorageType: sourceStorageType,
+        sourceStorageSection: sourceStorageSection,
+        batches: batches.map((batch) => batch.toEntity()).toList(),
+      );
+}
+
+class CompletedSalesItemBatchDetailModel {
+  final String batchName;
+  final double quantity;
+
+  CompletedSalesItemBatchDetailModel({
+    required this.batchName,
+    required this.quantity,
+  });
+
+  factory CompletedSalesItemBatchDetailModel.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    double _toDouble(dynamic value) {
+      if (value == null) return 0;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value.toString()) ?? 0;
+    }
+
+    return CompletedSalesItemBatchDetailModel(
+      batchName: json['batchName']?.toString() ?? '',
+      quantity: _toDouble(json['quantity']),
+    );
+  }
+
+  CompletedSalesItemBatchDetail toEntity() => CompletedSalesItemBatchDetail(
+        batchName: batchName,
+        quantity: quantity,
       );
 }
 

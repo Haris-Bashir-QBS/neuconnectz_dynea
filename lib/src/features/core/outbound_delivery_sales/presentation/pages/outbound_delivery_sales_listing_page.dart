@@ -100,8 +100,12 @@ class _OutboundDeliverySalesListingViewState
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (!_scrollController.hasClients) return;
+
+    final pixels = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (pixels >= maxScroll - 200) {
       final state = context.read<OutboundDeliverySalesBloc>().state;
 
       if (state.listHasMore && !state.listIsLoadingMore) {
@@ -203,7 +207,12 @@ class _OutboundDeliverySalesListingViewState
                       (state.listIsLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == state.listItems.length) {
-                      return GrnListItemShimmer();
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                     }
 
                     final item = state.listItems[index];

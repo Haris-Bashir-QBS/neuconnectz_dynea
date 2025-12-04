@@ -36,24 +36,21 @@ class ReservationListResponseModel {
 
   ReservationResultEntity toEntity() {
     return ReservationResultEntity(
-      totalCount: data?.totalCount ?? 0,
+      totalCount: data?.totalRows ?? 0,
       data: data?.data.map((e) => e.toEntity()).toList() ?? [],
     );
   }
 }
 
 class ReservationListDataModel {
-  final int totalCount;
+  final int totalRows; // totalCount se totalRows
   final List<ReservationModel> data;
 
-  ReservationListDataModel({
-    required this.totalCount,
-    required this.data,
-  });
+  ReservationListDataModel({required this.totalRows, required this.data});
 
   factory ReservationListDataModel.fromJson(Map<String, dynamic> json) {
     return ReservationListDataModel(
-      totalCount: json['totalCount'] ?? 0,
+      totalRows: json['totalRows'] ?? json['totalCount'] ?? 0,
       data:
           (json['data'] as List<dynamic>? ?? [])
               .map((e) => ReservationModel.fromJson(e as Map<String, dynamic>))
@@ -101,23 +98,22 @@ class ReservationModel {
       order: json['order'] ?? '',
       receivingPlant: json['receivingPlant'] ?? '',
       receivingStorLoc: json['receivingStorLoc'] ?? '',
-      quantity: (json['quantity'] ?? json['requirementQuantity'] ?? 0)
-          .toDouble(),
+      quantity:
+          (json['quantity'] ?? json['requirementQuantity'] ?? 0).toDouble(),
     );
   }
 
   ReservationEntity toEntity() => ReservationEntity(
-        reservation: reservation,
-        requirementType: requirementType,
-        reservStatus: reservStatus,
-        movementType: movementType,
-        requirementsDate: requirementsDate,
-        purchaseRequisition: purchaseRequisition,
-        itemOfRequisition: itemOfRequisition,
-        order: order,
-        receivingPlant: receivingPlant,
-        receivingStorLoc: receivingStorLoc,
-        quantity: quantity,
-      );
+    reservation: reservation,
+    requirementType: requirementType,
+    reservStatus: reservStatus,
+    movementType: movementType,
+    requirementsDate: requirementsDate,
+    purchaseRequisition: purchaseRequisition,
+    itemOfRequisition: itemOfRequisition,
+    order: order,
+    receivingPlant: receivingPlant,
+    receivingStorLoc: receivingStorLoc,
+    quantity: quantity,
+  );
 }
-

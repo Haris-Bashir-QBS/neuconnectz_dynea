@@ -25,6 +25,9 @@ class OutboundDeliverySalesState extends Equatable {
   final int completedSkipRecords;
   final String? completedError;
 
+  final OperationState<ApiResponse<bool>> createSalesOrder;
+  final OperationState<ApiResponse<bool>> syncStocks;
+
   const OutboundDeliverySalesState({
     this.listLoading = false,
     this.listIsLoadingMore = false,
@@ -44,6 +47,8 @@ class OutboundDeliverySalesState extends Equatable {
     this.completedTotalRows = 0,
     this.completedSkipRecords = 0,
     this.completedError,
+    this.createSalesOrder = const OperationState(),
+    this.syncStocks = const OperationState(),
   });
 
   bool get listHasMore => listItems.length < listTotalRows;
@@ -72,6 +77,8 @@ class OutboundDeliverySalesState extends Equatable {
     int? completedSkipRecords,
     String? completedError,
     bool clearCompletedError = false,
+    OperationState<ApiResponse<bool>>? createSalesOrder,
+    OperationState<ApiResponse<bool>>? syncStocks,
   }) {
     return OutboundDeliverySalesState(
       listLoading: listLoading ?? this.listLoading,
@@ -92,33 +99,35 @@ class OutboundDeliverySalesState extends Equatable {
           completedIsLoadingMore ?? this.completedIsLoadingMore,
       completedItems: completedItems ?? this.completedItems,
       completedTotalRows: completedTotalRows ?? this.completedTotalRows,
-      completedSkipRecords:
-          completedSkipRecords ?? this.completedSkipRecords,
+      completedSkipRecords: completedSkipRecords ?? this.completedSkipRecords,
       completedError:
           clearCompletedError ? null : (completedError ?? this.completedError),
+      createSalesOrder: createSalesOrder ?? this.createSalesOrder,
+      syncStocks: syncStocks ?? this.syncStocks,
     );
   }
 
   @override
   List<Object?> get props => [
-        listLoading,
-        listIsLoadingMore,
-        listItems,
-        listTotalRows,
-        listSkipRecords,
-        listError,
-        pendingLoading,
-        pendingIsLoadingMore,
-        pendingItems,
-        pendingTotalRows,
-        pendingSkipRecords,
-        pendingError,
-        completedLoading,
-        completedIsLoadingMore,
-        completedItems,
-        completedTotalRows,
-        completedSkipRecords,
-        completedError,
-      ];
+    listLoading,
+    listIsLoadingMore,
+    listItems,
+    listTotalRows,
+    listSkipRecords,
+    listError,
+    pendingLoading,
+    pendingIsLoadingMore,
+    pendingItems,
+    pendingTotalRows,
+    pendingSkipRecords,
+    pendingError,
+    completedLoading,
+    completedIsLoadingMore,
+    completedItems,
+    completedTotalRows,
+    completedSkipRecords,
+    completedError,
+    createSalesOrder,
+    syncStocks,
+  ];
 }
-

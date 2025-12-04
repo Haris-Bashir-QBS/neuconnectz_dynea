@@ -321,7 +321,10 @@ class _OutboundDeliveryStoItemsViewState
             item: item,
             ctoText: AppTexts.viewDetails,
             onTap: () {
-              // Handle tap - navigate to detail page
+              context.pushNamed(
+                AppRoutes.completedOutboundDeliveryStoItemDetail,
+                extra: item,
+              );
             },
           );
         },

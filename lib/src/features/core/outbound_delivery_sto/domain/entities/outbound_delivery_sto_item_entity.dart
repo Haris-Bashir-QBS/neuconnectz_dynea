@@ -59,14 +59,33 @@ class OutboundDeliveryStoItemEntity extends Equatable {
 }
 
 class BinDetail extends Equatable {
-  final String binCode;
+  final String sourceStorageBin;
   final double quantity;
+  final String? sourceStorageSection;
+  final String? sourceStorageType;
+  final List<BatchDetail>? batches;
 
   const BinDetail({
-    required this.binCode,
+    required this.sourceStorageBin,
+    required this.quantity,
+    this.sourceStorageSection,
+    this.sourceStorageType,
+    this.batches,
+  });
+
+  @override
+  List<Object?> get props => [sourceStorageBin, quantity, sourceStorageSection, sourceStorageType, batches];
+}
+
+class BatchDetail extends Equatable {
+  final String batchName;
+  final double quantity;
+
+  const BatchDetail({
+    required this.batchName,
     required this.quantity,
   });
 
   @override
-  List<Object?> get props => [binCode, quantity];
+  List<Object?> get props => [batchName, quantity];
 }

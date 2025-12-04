@@ -32,9 +32,12 @@ class AppRoutes {
   static const String outboundDeliveryStoItemsListing =
       'outboundDeliveryStoItemsListing';
   static const String outboundDeliveryStoQuantity = 'outbound_delivery_sto_quantity';
+  static const String completedOutboundDeliveryStoItemDetail =
+      'completed_outbound_delivery_sto_item_detail';
   // ============================ Outbound Delivery (Sales Order) ============================
   static const outboundDeliverySalesListing = 'outbound_delivery_sales_listing';
   static const outboundDeliverySalesItems = 'outbound_delivery_sales_items';
+  static const outboundDeliverySalesQuantity = 'outbound_delivery_sales_quantity';
   static const completedOutboundDeliverySalesItemDetail =
       'completed_outbound_delivery_sales_item_detail';
 }

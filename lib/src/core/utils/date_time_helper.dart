@@ -45,13 +45,16 @@ class DateTimeHelper {
   static Future<DateTime?> pickDate({
     required BuildContext context,
     DateTime? initialDate,
+    bool allowFutureDates = true,
   }) async {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate ?? now,
-      firstDate: DateTime(now.year, now.month, now.day),
-      lastDate: DateTime(now.year + 5),
+      firstDate: DateTime(2000),
+      lastDate: allowFutureDates
+          ? DateTime(now.year + 5)
+          : DateTime(now.year, now.month, now.day),
       builder: (context, child) {
         final theme = Theme.of(context);
         return Theme(

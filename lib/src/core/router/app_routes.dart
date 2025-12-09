@@ -40,4 +40,10 @@ class AppRoutes {
   static const outboundDeliverySalesQuantity = 'outbound_delivery_sales_quantity';
   static const completedOutboundDeliverySalesItemDetail =
       'completed_outbound_delivery_sales_item_detail';
+  // ============================ Bin to Bin Transfer ============================
+  static const String binTransferReportListing = 'bin_transfer_report_listing';
+  static const String binSelection = 'bin_selection';
+  static const String sourceBinMaterialListing = 'source_bin_material_listing';
+  static const String binToBinQuantity = 'bin_to_bin_quantity';
+  static const String destinationBinSelection = 'destination_bin_selection';
 }

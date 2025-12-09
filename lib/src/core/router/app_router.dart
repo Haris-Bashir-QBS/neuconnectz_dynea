@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/observers/navigator_observer.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
@@ -44,22 +45,36 @@ import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/pres
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_quantity_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/pages/bin_selection_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/pages/bin_to_bin_quantity_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/pages/bin_transfer_report_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/pages/destination_bin_selection_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/pages/source_bin_material_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/params/bin_selection_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/params/bin_to_bin_quantity_bottom_sheet_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/params/destination_bin_selection_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/params/source_bin_material_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/dashboard_page.dart';
 import 'package:neuconnectz_dynea/src/shared/dashboard/pages/settings_page.dart';
 import 'package:neuconnectz_dynea/src/shared/selection/pages/document_selection_page.dart';
 import 'package:neuconnectz_dynea/src/shared/selection/params/document_selection_params.dart';
 import 'package:neuconnectz_dynea/src/widgets/connectivity_overlay.dart';
+// lib/src/core/router/route_observer.dart
+import 'package:flutter/material.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 final GoRouter appRouter = GoRouter(
   initialLocation: '/${AppRoutes.splash}',
   navigatorKey: SessionManager.navigatorKey,
-  observers: [UnFocusOnNavigateObserver()],
+  observers: [UnFocusOnNavigateObserver(), routeObserver],
   routes: [
     /// ====================== Auth Routes ======================
     ...authRoutes,
     ...putAwayRoutes,
     ...reservationRoutes,
     ...salesOrderRoutes,
+    ...binToBinRoutes,
 
     /// ====================== Core Routes ======================
     ShellRoute(
@@ -73,16 +88,6 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
-
-List<GoRoute> authRoutes = [
-  _splash(),
-  _login(),
-  _verifyOtp(),
-  _forgotPassword(),
-  _resetPassword(),
-  _changePassword(),
-  _settings(),
-];
 
 GoRoute _settings() {
   return GoRoute(
@@ -213,19 +218,6 @@ GoRoute _completedGrnItemDetail() {
   );
 }
 
-List<GoRoute> putAwayRoutes = [
-  _documentSelection(),
-  _grnListing(),
-  _grnItems(),
-  _grnQuantity(),
-  _stockCheck(),
-  _completedGrnItemDetail(),
-  _outboundDeliveryStoListing(),
-      _outboundDeliveryStoItems(),
-      _outboundDeliveryStoQuantity(),
-      _completedOutboundDeliveryStoItemDetail(),
-];
-
 GoRoute _outboundDeliveryStoListing() {
   return GoRoute(
     path: '/${AppRoutes.outboundDeliveryStoListing}',
@@ -266,6 +258,58 @@ GoRoute _completedOutboundDeliveryStoItemDetail() {
     builder: (context, state) {
       final item = state.extra as OutboundDeliveryStoItemEntity;
       return CompletedOutboundDeliveryStoDetailPage(item: item);
+    },
+  );
+}
+
+GoRoute _binTransferReportListing() {
+  return GoRoute(
+    path: '/${AppRoutes.binTransferReportListing}',
+    name: AppRoutes.binTransferReportListing,
+    builder: (context, state) => const BinTransferReportListingPage(),
+  );
+}
+
+GoRoute _binSelection() {
+  return GoRoute(
+    path: '/${AppRoutes.binSelection}',
+    name: AppRoutes.binSelection,
+    builder: (context, state) {
+      final args = state.extra as BinSelectionPageParams;
+      return BinSelectionPage(params: args);
+    },
+  );
+}
+
+GoRoute _sourceBinMaterialListing() {
+  return GoRoute(
+    path: '/${AppRoutes.sourceBinMaterialListing}',
+    name: AppRoutes.sourceBinMaterialListing,
+    builder: (context, state) {
+      final args = state.extra as SourceBinMaterialListingPageParams;
+      return SourceBinMaterialListingPage(params: args);
+    },
+  );
+}
+
+GoRoute _binToBinQuantity() {
+  return GoRoute(
+    path: '/${AppRoutes.binToBinQuantity}',
+    name: AppRoutes.binToBinQuantity,
+    builder: (context, state) {
+      final args = state.extra as BinToBinQuantityBottomSheetParams;
+      return BinToBinQuantityPage(params: args);
+    },
+  );
+}
+
+GoRoute _destinationBinSelection() {
+  return GoRoute(
+    path: '/${AppRoutes.destinationBinSelection}',
+    name: AppRoutes.destinationBinSelection,
+    builder: (context, state) {
+      final args = state.extra as DestinationBinSelectionPageParams;
+      return DestinationBinSelectionPage(params: args);
     },
   );
 }
@@ -313,13 +357,6 @@ GoRoute _completeGrnItemDetails() {
     },
   );
 }
-
-List<GoRoute> reservationRoutes = [
-  _reservationListing(),
-  _reservationItems(),
-  _reservationQuantity(),
-  _completeGrnItemDetails(),
-];
 
 GoRoute _stockCheck() {
   return GoRoute(
@@ -376,9 +413,49 @@ GoRoute _completedOutboundDeliverySalesItemDetail() {
   );
 }
 
+/// ====================== Routes Lists ======================
+
+List<GoRoute> authRoutes = [
+  _splash(),
+  _login(),
+  _verifyOtp(),
+  _forgotPassword(),
+  _resetPassword(),
+  _changePassword(),
+  _settings(),
+];
+
 List<GoRoute> salesOrderRoutes = [
   _outboundDeliverySalesListing(),
   _outboundDeliverySalesItems(),
   _outboundDeliverySalesQuantity(),
   _completedOutboundDeliverySalesItemDetail(),
+];
+
+List<GoRoute> reservationRoutes = [
+  _reservationListing(),
+  _reservationItems(),
+  _reservationQuantity(),
+  _completeGrnItemDetails(),
+];
+
+List<GoRoute> binToBinRoutes = [
+  _binTransferReportListing(),
+  _binSelection(),
+  _sourceBinMaterialListing(),
+  _binToBinQuantity(),
+  _destinationBinSelection(),
+];
+
+List<GoRoute> putAwayRoutes = [
+  _documentSelection(),
+  _grnListing(),
+  _grnItems(),
+  _grnQuantity(),
+  _stockCheck(),
+  _completedGrnItemDetail(),
+  _outboundDeliveryStoListing(),
+  _outboundDeliveryStoItems(),
+  _outboundDeliveryStoQuantity(),
+  _completedOutboundDeliveryStoItemDetail(),
 ];

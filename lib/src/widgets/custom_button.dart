@@ -18,6 +18,8 @@ class CustomButton extends StatelessWidget {
   final Gradient? gradient;
   final IconData? icon;
   final Widget? iconWidget;
+  final IconData? trailingIcon;
+  final Widget? trailingIconWidget;
 
   const CustomButton({
     super.key,
@@ -35,6 +37,8 @@ class CustomButton extends StatelessWidget {
     this.isKeyboardDismissOnClick = true,
     this.icon,
     this.iconWidget,
+    this.trailingIcon,
+    this.trailingIconWidget,
     this.textColor,
   });
 
@@ -46,6 +50,8 @@ class CustomButton extends StatelessWidget {
     this.height,
     this.icon,
     this.iconWidget,
+    this.trailingIcon,
+    this.trailingIconWidget,
     this.isLoading = false,
     this.radius,
     this.iconColor,
@@ -113,6 +119,15 @@ class CustomButton extends StatelessWidget {
                     10.horizontalSpace,
                   ],
                   _titleWidget(effectiveTextColor),
+                  if (trailingIcon != null || trailingIconWidget != null) ...[
+                    10.horizontalSpace,
+                    trailingIconWidget ??
+                        Icon(
+                          trailingIcon,
+                          color: iconColor ?? effectiveTextColor,
+                          size: 26.sp,
+                        ),
+                  ],
                 ],
               ],
             ),

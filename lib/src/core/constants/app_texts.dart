@@ -68,6 +68,7 @@ final class AppTexts {
   static const continuee = "Continue";
   static const areYouSure = "Are you sure?";
   static const success = "Success!";
+  static const movedSuccessfully = "Moved successfully";
   static const yes = "Yes";
   static const actionCompletedSuccessfully =
       "Your action was completed successfully.";
@@ -176,6 +177,8 @@ final class AppTexts {
   static const String stockCheck = "Stock Check";
   static const String outboundDeliverySto = "Outbound Delivery (STO)";
   static const String outboundDeliverySales = "Outbound Delivery (Sales)";
+  static const String binToBinTransfer = "Bin to Bin Transfer";
+  static const String binTransfer = "Bin Transfer";
   static const String checkStock = "Check Stock";
   static const String checkingConnection = "Checking connection...";
   static const String trNumber = "TR Number";
@@ -211,4 +214,9 @@ final class AppTexts {
       "Manage & create picking against sales";
 
   static const viewDetails = "View Details";
+  static const String tapToViewDetails = "Tap to view details";
+  static const String tapToHideDetails = "Tap to hide details";
+  static const String doubleTapToProceed = "Double tap to proceed →";
+  static const String proceedAll = "Proceed All";
+  static const String changeBin = "Change Bin";
 }

@@ -22,6 +22,11 @@ import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/stocks_by_storage_bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/items/outbound_delivery_sto_item_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/data/datasources/remote/bin_to_bin_transfer_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/data/repositories/bin_to_bin_transfer_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/repositories/bin_to_bin_transfer_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/usecases/process_bin_to_bin_transfer_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/blocs/bin_to_bin_transfer_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:neuconnectz_dynea/src/core/network/client/dio_client.dart';
 import 'package:neuconnectz_dynea/src/core/services/app_preferences.dart';
@@ -94,5 +99,11 @@ import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/doma
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_completed_outbound_delivery_sales_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/create_sales_order_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/blocs/source_bin_material_listing_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/data/datasources/remote/bin_transfer_report_remote_data_source.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/data/repositories/bin_transfer_report_repository_impl.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/repositories/bin_transfer_report_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/usecases/get_bin_transfer_report_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/blocs/bin_transfer_report_bloc.dart';
 
-part 'di_container.dart';
+part 'service_locator.dart';

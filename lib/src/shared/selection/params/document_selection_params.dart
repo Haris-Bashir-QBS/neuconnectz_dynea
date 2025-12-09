@@ -8,6 +8,7 @@ import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/plant_ent
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/params/bin_selection_page_params.dart';
 
 class DocumentSelectionParams<T extends Object> {
   final String title;
@@ -142,6 +143,29 @@ class DocumentSelectionConfigs {
             plant: plant.code,
             storageLocation: warehouse.storageLocationCode ?? '',
             warehouseCode: warehouse.code,
+            warehouse: warehouse,
+          );
+        },
+      ),
+    );
+  }
+
+  static DocumentSelectionParams<BinSelectionPageParams> binToBin({
+    bool isScaffold = true,
+  }) {
+    return DocumentSelectionParams(
+      title: AppTexts.binToBinTransfer,
+      requiresMovementType: false,
+      isScaffold: isScaffold,
+      destination: SelectionDestination(
+        routeName: AppRoutes.binSelection,
+        buildArgs: ({
+          required PlantEntity plant,
+          required WarehouseEntity warehouse,
+          MovementTypeEntity? movementType,
+        }) {
+          return BinSelectionPageParams(
+            plant: plant,
             warehouse: warehouse,
           );
         },

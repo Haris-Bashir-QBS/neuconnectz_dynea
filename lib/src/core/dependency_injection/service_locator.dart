@@ -35,6 +35,7 @@ Future<void> _initAuthDependencies() async {
   _registerOutboundDeliveryStoDependencies();
   _registerOutboundDeliveryStoItemsDependencies();
   _registerOutboundDeliverySalesDependencies();
+  _registerBinToBinDependencies();
 }
 
 void _registerAuthRemoteDatasources() {
@@ -296,5 +297,42 @@ void _registerOutboundDeliverySalesDependencies() {
       createSalesOrderUseCase: sl(),
       getAndUpdateStocksUseCase: sl(),
     ),
+  );
+}
+
+void _registerBinToBinDependencies() {
+  // GetStocksByStorageBinUseCase is already registered in _registerOutboundDeliveryStoItemsDependencies
+  sl.registerFactory(() => SourceBinMaterialListingBloc(useCase: sl()));
+
+  // Bin to Bin Transfer dependencies
+  // Data sources
+  sl.registerLazySingleton<BinToBinTransferRemoteDataSource>(
+    () => BinToBinTransferRemoteDataSourceImpl(client: sl()),
+  );
+  // Repositories
+  sl.registerLazySingleton<BinToBinTransferRepository>(
+    () => BinToBinTransferRepositoryImpl(remoteDataSource: sl()),
+  );
+  // Use cases
+  sl.registerLazySingleton(() => ProcessBinToBinTransferUseCase(sl()));
+  // BLoC
+  sl.registerFactory(
+    () => BinToBinTransferBloc(useCase: sl(), binTransferReportBloc: sl()),
+  );
+
+  // Bin Transfer Report dependencies
+  // Data sources
+  sl.registerLazySingleton<BinTransferReportRemoteDataSource>(
+    () => BinTransferReportRemoteDataSourceImpl(client: sl()),
+  );
+  // Repositories
+  sl.registerLazySingleton<BinTransferReportRepository>(
+    () => BinTransferReportRepositoryImpl(remoteDataSource: sl()),
+  );
+  // Use cases
+  sl.registerLazySingleton(() => GetBinTransferReportUseCase(repository: sl()));
+  // BLoC
+  sl.registerFactory(
+    () => BinTransferReportBloc(getBinTransferReportUseCase: sl()),
   );
 }

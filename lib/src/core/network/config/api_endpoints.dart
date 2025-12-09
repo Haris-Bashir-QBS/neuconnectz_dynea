@@ -74,7 +74,11 @@ enum ApiEndpoints {
   listAllSalesOrderItemFromSAP,
   completedSalesorderItems,
   getCompletedItemsInSalesWithBatch,
-  createSalesOrder;
+  createSalesOrder,
+
+  /// ===================== Bin to Bin Transfer =====================
+  processBinToBinTransfer,
+  getBinTransferReport;
 
   String get value {
     switch (this) {
@@ -178,6 +182,12 @@ enum ApiEndpoints {
         return "$_salesOrder/GetCompletedItemsInSalesWithBatch";
       case ApiEndpoints.createSalesOrder:
         return "$_salesOrder/CreateSalesOrder";
+
+      /// ===================== Bin to Bin Transfer =====================
+      case ApiEndpoints.processBinToBinTransfer:
+        return "$_binManagement/ProcessBinToBinTransfer";
+      case ApiEndpoints.getBinTransferReport:
+        return "$_binManagement/GetBinTransferReport";
     }
   }
 }

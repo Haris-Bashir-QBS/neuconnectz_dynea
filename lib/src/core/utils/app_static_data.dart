@@ -239,10 +239,10 @@ final class AppStaticData {
       title: "Bin to Bin",
       iconPath: AppAssets.binToBinIcon,
       onTap: (context) {
-        //context.pushNamed(AppRoutes.physicalStockCheck);
+        context.pushNamed(AppRoutes.binTransferReportListing);
       },
       onItemTap: (context, item) {
-        // context.pushNamed(AppRoutes.physicalStockCheck);
+        context.pushNamed(AppRoutes.binTransferReportListing);
       },
     ),
     ModuleItem(

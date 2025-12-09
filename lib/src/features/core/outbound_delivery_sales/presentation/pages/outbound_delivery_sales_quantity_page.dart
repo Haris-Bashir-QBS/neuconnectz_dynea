@@ -325,15 +325,21 @@ class _OutboundDeliverySalesQuantityViewState
                               ],
                             );
                           }
+                          // Show data only when not loading
+                          if (_batchStocks.isNotEmpty) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 20.h),
+                                _binDetailsHeader(),
+                                SizedBox(height: 10.h),
+                                _binBatchDetailsSection(),
+                              ],
+                            );
+                          }
                           return const SizedBox.shrink();
                         },
                       ),
-                      if (_batchStocks.isNotEmpty) ...[
-                        SizedBox(height: 20.h),
-                        _binDetailsHeader(),
-                        SizedBox(height: 10.h),
-                        _binBatchDetailsSection(),
-                      ],
                     ],
                   ),
                 ),
@@ -436,47 +442,87 @@ class _OutboundDeliverySalesQuantityViewState
   }
 
   Widget _binDetailsHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        CustomText(
-          text: "Bin Details",
-          fontWeight: FontWeight.w600,
-          fontSize: 16.sp,
-        ),
-        InkWell(
-          onTap: () {
-            Future.delayed(const Duration(milliseconds: 200), () {
-              if (mounted) {
-                setState(() {
-                  _showBinSelection = !_showBinSelection;
-                });
-              }
-            });
-          },
-          borderRadius: BorderRadius.circular(8.r),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            child: Row(
+    return BlocBuilder<OutboundDeliverySalesBloc, OutboundDeliverySalesState>(
+      builder: (context, state) {
+        final isSyncing = state.syncStocks.isLoading;
+        
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            CustomText(
+              text: "Bin Details",
+              fontWeight: FontWeight.w600,
+              fontSize: 16.sp,
+            ),
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.qr_code_scanner,
-                  size: 18.sp,
-                  color: AppPalette.primaryColor,
+                // Bin Selection toggle button
+                InkWell(
+                  onTap: () {
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      if (mounted) {
+                        setState(() {
+                          _showBinSelection = !_showBinSelection;
+                        });
+                      }
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.qr_code_scanner,
+                          size: 18.sp,
+                          color: AppPalette.primaryColor,
+                        ),
+                        SizedBox(width: 4.w),
+                        CustomText(
+                          text: "Bin Selection",
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppPalette.primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                SizedBox(width: 4.w),
-                CustomText(
-                  text: "Bin Selection",
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppPalette.primaryColor,
+                SizedBox(width: 8.w),
+                // Refresh icon button
+                InkWell(
+                  onTap: isSyncing ? null : () {
+                    FocusScope.of(context).unfocus();
+                    _syncStocksFromSap();
+                  },
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    child: isSyncing
+                        ? SizedBox(
+                            width: 18.sp,
+                            height: 18.sp,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppPalette.primaryColor,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.refresh,
+                            size: 18.sp,
+                            color: AppPalette.primaryColor,
+                          ),
+                  ),
                 ),
               ],
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -687,7 +733,7 @@ class _OutboundDeliverySalesQuantityViewState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Bin header with info and batch count
+                  // Bin header with info and batch quantity sum
                   Container(
                     padding: EdgeInsets.symmetric(
                       vertical: 12.h,
@@ -721,7 +767,7 @@ class _OutboundDeliverySalesQuantityViewState
                           ),
                         ),
                         CustomText(
-                          text: "Batches: ${stocks.length}",
+                          text: "Total Qty: ${stocks.fold<double>(0.0, (sum, stock) => sum + stock.availableStock).formatWithCommas}",
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: AppPalette.darkGreyColor,

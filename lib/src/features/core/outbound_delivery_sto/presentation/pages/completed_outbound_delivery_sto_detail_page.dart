@@ -215,7 +215,8 @@ class CompletedOutboundDeliveryStoDetailPage extends StatelessWidget {
                                   bin.sourceStorageType!.isNotEmpty) ...[
                                 SizedBox(height: 4.h),
                                 CustomText(
-                                  text: "Storage Type: ${bin.sourceStorageType}",
+                                  text:
+                                      "Storage Type: ${bin.sourceStorageType}",
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w400,
                                   color: AppPalette.darkGreyColor,
@@ -295,7 +296,7 @@ class CompletedOutboundDeliveryStoDetailPage extends StatelessWidget {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ] else ...[
                     SizedBox(height: 10.h),
                     CustomText(
@@ -311,4 +312,3 @@ class CompletedOutboundDeliveryStoDetailPage extends StatelessWidget {
     );
   }
 }
-

@@ -64,6 +64,18 @@ class OutboundDeliveryStoItemRepositoryImpl
       return Left(error);
     }
   }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> deletePickingAgainstOutboundDeliverySto({
+    required int docNum,
+  }) async {
+    try {
+      final response = await remoteDataSource.deletePickingAgainstOutboundDeliverySto(docNum: docNum);
+      return Right(response);
+    } on Failure catch (error) {
+      return Left(error);
+    }
+  }
 }
 
 

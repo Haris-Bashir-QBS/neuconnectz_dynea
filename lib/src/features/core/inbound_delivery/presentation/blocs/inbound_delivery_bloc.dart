@@ -1,10 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/entities/inbound_delivery_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/entities/inbound_delivery_list_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/params/inbound_delivery_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/params/inbound_delivery_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/repositories/inbound_delivery_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/usecases/delete_putaway_against_inbound_delivery_sto_usecase.dart';
 
 part 'inbound_delivery_event.dart';
 part 'inbound_delivery_state.dart';
@@ -12,14 +14,18 @@ part 'inbound_delivery_state.dart';
 class InboundDeliveryBloc
     extends Bloc<InboundDeliveryEvent, InboundDeliveryState> {
   final InboundDeliveryRepository repository;
+  final DeletePutawayAgainstInboundDeliveryStoUseCase deletePutawayAgainstInboundDeliveryStoUseCase;
 
-  InboundDeliveryBloc({required this.repository})
-    : super(InboundDeliveryInitial()) {
+  InboundDeliveryBloc({
+    required this.repository,
+    required this.deletePutawayAgainstInboundDeliveryStoUseCase,
+  }) : super(InboundDeliveryInitial()) {
     on<LoadPendingInboundDeliveryEvent>(_onLoadPendingInboundDelivery);
     on<LoadInboundDeliveryItemsEvent>(_onLoadInboundDeliveryItems);
     on<LoadCompletedInboundDeliveryItemsEvent>(
       _onLoadCompletedInboundDeliveryItems,
     );
+    on<DeletePutawayAgainstInboundDeliveryStoEvent>(_onDeletePutawayAgainstInboundDeliverySto);
   }
 
   Future<void> _onLoadPendingInboundDelivery(
@@ -363,5 +369,46 @@ class InboundDeliveryBloc
         },
       );
     }
+  }
+
+  Future<void> _onDeletePutawayAgainstInboundDeliverySto(
+    DeletePutawayAgainstInboundDeliveryStoEvent event,
+    Emitter<InboundDeliveryState> emit,
+  ) async {
+    emit(
+      InboundDeliveryItemsSuccess(
+        pendingSection: state.pendingSection,
+        completedSection: state.completedSection,
+        isDeleting: true,
+        deleteError: null,
+      ),
+    );
+
+    final result = await deletePutawayAgainstInboundDeliveryStoUseCase(docNum: event.docNum);
+
+    result.fold(
+      (failure) {
+        emit(
+          InboundDeliveryItemsFailure(
+            message: failure.message,
+            pendingSection: state.pendingSection,
+            completedSection: state.completedSection,
+            isDeleting: false,
+            deleteError: failure.message,
+          ),
+        );
+      },
+      (success) {
+        emit(
+          InboundDeliveryItemsSuccess(
+            pendingSection: state.pendingSection,
+            completedSection: state.completedSection,
+            isDeleting: false,
+            deleteResponse: success,
+            deleteError: null,
+          ),
+        );
+      },
+    );
   }
 }

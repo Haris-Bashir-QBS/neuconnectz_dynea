@@ -110,5 +110,33 @@ class ProductionReceiptRemoteDataSourceImpl
       );
     });
   }
+
+  @override
+  Future<ApiResponse<bool>> deletePutawayAgainstProductionReceipt({
+    required int docNum,
+  }) async {
+    return ApiErrorHandler.executeGuarded(() async {
+      final response = await dio.put(
+        endpoint: ApiEndpoints.deleteProductionReceipt.value,
+        queryParams: {'docNum': docNum},
+      );
+
+      final apiResponse = ApiResponse<bool>.fromJson(
+        response.data ?? {},
+        fromJsonT: (data) => data as bool? ?? false,
+      );
+
+      if (apiResponse.isRequestSuccess && (response.statusCode == 200 || response.statusCode == 201)) {
+        return apiResponse;
+      }
+
+      throw ServerException(
+        statusCode: apiResponse.statusCode,
+        message: apiResponse.message.isNotEmpty
+            ? apiResponse.message
+            : 'Failed to delete putaway against production receipt.',
+      );
+    });
+  }
 }
 

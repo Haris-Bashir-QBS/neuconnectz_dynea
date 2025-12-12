@@ -55,3 +55,12 @@ class CreateProductionReceiptEvent extends ProductionReceiptEvent {
   List<Object?> get props => [request];
 }
 
+class DeletePutawayAgainstProductionReceiptEvent extends ProductionReceiptEvent {
+  final int docNum;
+
+  const DeletePutawayAgainstProductionReceiptEvent({required this.docNum});
+
+  @override
+  List<Object?> get props => [docNum];
+}
+

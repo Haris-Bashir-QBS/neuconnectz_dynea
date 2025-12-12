@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:neuconnectz_dynea/src/core/errors/api_exceptions.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/data/datasources/remote/bin_transfer_report_remote_data_source.dart';
 import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/entities/bin_transfer_report_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/params/get_bin_transfer_report_params.dart';
@@ -24,6 +25,18 @@ class BinTransferReportRepositoryImpl implements BinTransferReportRepository {
       return Left(Failure(message: response.message));
     } on Failure catch (e) {
       return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> deleteBinRecord({
+    required int docNum,
+  }) async {
+    try {
+      final response = await remoteDataSource.deleteBinRecord(docNum: docNum);
+      return Right(response);
+    } on Failure catch (error) {
+      return Left(error);
     }
   }
 }

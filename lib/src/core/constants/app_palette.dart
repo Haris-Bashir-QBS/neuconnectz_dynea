@@ -5,6 +5,7 @@ final class AppPalette {
   static const Color primaryColor = Color(0xFF1B59F8);
   static const Color secondaryColor = Color(0xFFb9cff8);
   static const Color lightBlueColor = Color(0xFF9ab9fb);
+  static const Color redColor = Color(0xFFFF5A5F);
   static const Color yellowColor = Color(0xFFFABB14);
   static const Color scaffoldBackgroundColor = Color(0xFFF5F7FA);
   static const Color lightGreenColor = Color(0xFF3CD856);
@@ -36,5 +37,3 @@ final class AppPalette {
   static const Color d8Color = Color(0xFFD5A5FF);
   static const Color d9Color = Color(0xFFFFA261);
 }
-
-

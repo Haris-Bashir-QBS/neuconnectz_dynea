@@ -44,6 +44,7 @@ enum ApiEndpoints {
   completedGrnItems,
   listAllBins,
   createPutAwayAgainstGr,
+  deletePutAwayOfPurchaseOrderGrn,
 
   /// ========================  Reservation =========================
   listAllReservationsFromSAP,
@@ -51,6 +52,7 @@ enum ApiEndpoints {
   listCompletedReservationItemsFromSAP,
   createPickingAgainstReservation,
   getWarehouseBinsByMaterial,
+  deleteReservation,
 
   /// ========================  Movement Types =========================
   listMovementTypesAssignedToUser,
@@ -70,29 +72,34 @@ enum ApiEndpoints {
   getStocksByStorageBin,
   createStockTransferOrder,
   getAndUpdateStocksFromSap,
+  deleteSto,
 
   /// ===================== Outbound Delivery (Sales Order) =====================
   listAllSalesOrderDocFromSAP,
   listAllSalesOrderItemFromSAP,
   completedSalesorderItems,
+  deleteSalesOrder,
   getCompletedItemsInSalesWithBatch,
   createSalesOrder,
 
   /// ===================== Bin to Bin Transfer =====================
   processBinToBinTransfer,
   getBinTransferReport,
+  deleteBinRecord,
 
   /// ===================== Inbound Delivery =====================
   listAllInboundDeliveryFromSAP,
   listAllInboundDeliveryItemsFromSAP,
   completedInboundDeliveryItems,
   createPutAwayAgainstInboundDelivery,
+  deletePutawayAgainstInboundDeliverySto,
 
   /// ===================== Production Receipts =====================
   listProductionReceiptsFromSAP,
   listProductionReceiptItemsFromSAP,
   listCompletedProductionReceiptItems,
-  createProductionReceipt;
+  createProductionReceipt,
+  deleteProductionReceipt;
 
   String get value {
     switch (this) {
@@ -141,6 +148,8 @@ enum ApiEndpoints {
         return "$_binManagement/ListAllBinsByWarehouseAndStorageType";
       case ApiEndpoints.createPutAwayAgainstGr:
         return "$_putAway/CreatePutAwayAgainstGr";
+      case ApiEndpoints.deletePutAwayOfPurchaseOrderGrn:
+        return "$_putAway/DeletePutAwayRequest";
 
       /// ============================ Reservation =====================
       case ApiEndpoints.listAllReservationsFromSAP:
@@ -153,6 +162,8 @@ enum ApiEndpoints {
         return "$_reservation/CreateReservationList";
       case ApiEndpoints.getWarehouseBinsByMaterial:
         return "$_binManagement/GetWarehouseBinsByMaterial";
+      case ApiEndpoints.deleteReservation:
+        return "$_reservation/DeleteReservation";
 
       /// ======================== Movement Types =======================
       case ApiEndpoints.listMovementTypesAssignedToUser:
@@ -184,6 +195,8 @@ enum ApiEndpoints {
         return "$_stockTransferOrder/CreateStockTransferOrder";
       case ApiEndpoints.getAndUpdateStocksFromSap:
         return "$_sapDataSync/GetAndUpdateStocksFromSap";
+      case ApiEndpoints.deleteSto:
+        return "$_stockTransferOrder/DeleteSto";
 
       /// ======================== Outbound Delivery (Sales Order) ===============
       case ApiEndpoints.listAllSalesOrderDocFromSAP:
@@ -196,12 +209,16 @@ enum ApiEndpoints {
         return "$_salesOrder/GetCompletedItemsInSalesWithBatch";
       case ApiEndpoints.createSalesOrder:
         return "$_salesOrder/CreateSalesOrder";
+      case ApiEndpoints.deleteSalesOrder:
+        return "$_salesOrder/DeleteSalesOrder";
 
       /// ===================== Bin to Bin Transfer =====================
       case ApiEndpoints.processBinToBinTransfer:
         return "$_binManagement/ProcessBinToBinTransfer";
       case ApiEndpoints.getBinTransferReport:
         return "$_binManagement/GetBinTransferReport";
+      case ApiEndpoints.deleteBinRecord:
+        return "$_binManagement/DeleteBinRecord";
 
       /// ===================== Inbound Delivery =====================
       case ApiEndpoints.listAllInboundDeliveryFromSAP:
@@ -212,6 +229,8 @@ enum ApiEndpoints {
         return "$_inboundDelivery/GetCompletedInBoundStoItemsWithBins";
       case ApiEndpoints.createPutAwayAgainstInboundDelivery:
         return "$_inboundDelivery/CreateInboundSto";
+      case ApiEndpoints.deletePutawayAgainstInboundDeliverySto:
+        return "$_inboundDelivery/DeleteInboundSto";
 
       /// ===================== Production Receipts =====================
       case ApiEndpoints.listProductionReceiptsFromSAP:
@@ -222,6 +241,8 @@ enum ApiEndpoints {
         return "$_productionReceipt/GetCompletedProductionReceiptItemsWithBins";
       case ApiEndpoints.createProductionReceipt:
         return "$_productionReceipt/CreateProductionReceipt";
+      case ApiEndpoints.deleteProductionReceipt:
+        return "$_productionReceipt/DeleteProductionReceipt";
     }
   }
 }

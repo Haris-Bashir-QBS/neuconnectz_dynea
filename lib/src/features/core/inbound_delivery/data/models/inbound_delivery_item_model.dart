@@ -176,6 +176,7 @@ class InboundDeliveryItemModel {
               quantity: bin.quantity,
             ))
         .toList(),
+    docNum: docNum,
   );
 
   Map<String, dynamic> toJson() => {

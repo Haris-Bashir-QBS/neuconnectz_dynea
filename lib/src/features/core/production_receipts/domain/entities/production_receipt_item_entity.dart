@@ -12,6 +12,7 @@ class ProductionReceiptItemEntity extends Equatable {
   final String alternativeUOM;
   final String storageLocation;
   final List<ProductionReceiptItemBinDetailEntity> binDetails;
+  final int? docNum;
 
   const ProductionReceiptItemEntity({
     required this.warehouseNumber,
@@ -25,6 +26,7 @@ class ProductionReceiptItemEntity extends Equatable {
     required this.alternativeUOM,
     required this.storageLocation,
     this.binDetails = const [],
+    this.docNum,
   });
 
   @override
@@ -40,6 +42,7 @@ class ProductionReceiptItemEntity extends Equatable {
         alternativeUOM,
         storageLocation,
         binDetails,
+        docNum,
       ];
 }
 

@@ -20,6 +20,7 @@ class ReservationItemEntity extends Equatable {
   final String unitOfEntry;
   final double quantityWithdrawn;
   final List<ReservationItemBinDetailEntity> binDetails;
+  final int? docNum;
 
   const ReservationItemEntity({
     required this.reservation,
@@ -41,6 +42,7 @@ class ReservationItemEntity extends Equatable {
     required this.quantityWithdrawn,
     this.quantity = 0,
     this.binDetails = const [],
+    this.docNum,
   });
 
   @override
@@ -64,6 +66,7 @@ class ReservationItemEntity extends Equatable {
     remainingQuantity,
     binDetails,
     quantity,
+    docNum,
   ];
 }
 

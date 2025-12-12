@@ -16,6 +16,7 @@ class BinTransferReportModel extends BinTransferReportEntity {
     required super.totalQuantity,
     required super.materials,
     super.transferDate,
+    super.docNum,
   });
 
   factory BinTransferReportModel.fromJson(Map<String, dynamic> json) {
@@ -39,6 +40,7 @@ class BinTransferReportModel extends BinTransferReportEntity {
       totalMaterials: (json['totalMaterials'] as num?)?.toInt() ?? 0,
       totalQuantity: (json['totalQuantity'] as num?)?.toInt() ?? 0,
       materials: materialsList,
+      docNum: json['docNum'],
     );
   }
 }

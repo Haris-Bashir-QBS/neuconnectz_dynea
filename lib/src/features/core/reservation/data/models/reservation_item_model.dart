@@ -81,6 +81,7 @@ class ReservationItemModel {
   final double remainingQuantity;
   final double quantity;
   final List<ReservationBinDetailModel> binDetails;
+  final int? docNum;
 
   ReservationItemModel({
     required this.reservation,
@@ -102,6 +103,7 @@ class ReservationItemModel {
     required this.remainingQuantity,
     required this.binDetails,
     this.quantity = 0,
+    this.docNum,
   });
 
   factory ReservationItemModel.fromJson(Map<String, dynamic> json) {
@@ -145,6 +147,7 @@ class ReservationItemModel {
                 ),
               )
               .toList(),
+      docNum: json['docNum'],
     );
   }
 
@@ -168,6 +171,7 @@ class ReservationItemModel {
     remainingQuantity: remainingQuantity,
     quantity: quantity,
     binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
+    docNum: docNum,
   );
 }
 

@@ -18,7 +18,7 @@ class OutboundDeliveryStoItemResponseModel
     // Handle both old format (with data.data) and new format (with data array directly)
     List<dynamic>? dataList;
     int totalRows = 0;
-    
+
     if (json['data'] is List) {
       // New format: data is directly a list
       dataList = json['data'] as List<dynamic>?;
@@ -31,7 +31,8 @@ class OutboundDeliveryStoItemResponseModel
     }
 
     return OutboundDeliveryStoItemResponseModel(
-      data: dataList
+      data:
+          dataList
               ?.map((e) => OutboundDeliveryStoItemModel.fromJson(e))
               .toList() ??
           [],
@@ -63,6 +64,7 @@ class OutboundDeliveryStoItemModel extends OutboundDeliveryStoItemEntity {
     required super.precedingDocCateg,
     required super.itemOverallStatus,
     required super.itemGoodsMovementSts,
+    required super.docNum,
     super.binDetails,
   });
 
@@ -91,9 +93,11 @@ class OutboundDeliveryStoItemModel extends OutboundDeliveryStoItemEntity {
       precedingDocCateg: json['precedingDocCateg']?.toString() ?? '',
       itemOverallStatus: json['itemOverallStatus']?.toString() ?? '',
       itemGoodsMovementSts: json['itemGoodsMovementSts']?.toString() ?? '',
-      binDetails: (json['binDetails'] as List<dynamic>?)
-          ?.map((e) => BinDetailModel.fromJson(e))
-          .toList(),
+      binDetails:
+          (json['binDetails'] as List<dynamic>?)
+              ?.map((e) => BinDetailModel.fromJson(e))
+              .toList(),
+      docNum: json['docNum'],
     );
   }
 }
@@ -113,18 +117,16 @@ class BinDetailModel extends BinDetail {
       quantity: (json['quantity'] as num?)?.toDouble() ?? 0.0,
       sourceStorageSection: json['sourceStorageSection']?.toString(),
       sourceStorageType: json['sourceStorageType']?.toString(),
-      batches: (json['batches'] as List<dynamic>?)
-          ?.map((e) => BatchDetailModel.fromJson(e))
-          .toList(),
+      batches:
+          (json['batches'] as List<dynamic>?)
+              ?.map((e) => BatchDetailModel.fromJson(e))
+              .toList(),
     );
   }
 }
 
 class BatchDetailModel extends BatchDetail {
-  const BatchDetailModel({
-    required super.batchName,
-    required super.quantity,
-  });
+  const BatchDetailModel({required super.batchName, required super.quantity});
 
   factory BatchDetailModel.fromJson(Map<String, dynamic> json) {
     return BatchDetailModel(
@@ -133,5 +135,3 @@ class BatchDetailModel extends BatchDetail {
     );
   }
 }
-
-

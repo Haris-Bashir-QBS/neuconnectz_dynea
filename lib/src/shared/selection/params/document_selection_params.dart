@@ -201,7 +201,7 @@ class DocumentSelectionConfigs {
   static DocumentSelectionParams<ProductionReceiptListingPageParams>
   productionReceipts({bool isScaffold = true}) {
     return DocumentSelectionParams(
-      title: "Production Receipts",
+      title: "Putaway Against Production Receipts",
       requiresMovementType: false,
       isScaffold: isScaffold,
       destination: SelectionDestination(

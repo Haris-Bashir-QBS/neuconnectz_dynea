@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
 import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
+import 'package:neuconnectz_dynea/src/widgets/status_dialog.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/entities/production_receipt_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/params/production_receipt_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/blocs/production_receipt_bloc.dart';
@@ -96,8 +98,7 @@ class _ProductionReceiptItemsViewState
 
     if (pixels >= maxScroll - 200) {
       final state = context.read<ProductionReceiptBloc>().state;
-      if (state.pendingSection.hasMore &&
-          !state.pendingSection.isLoadingMore) {
+      if (state.pendingSection.hasMore && !state.pendingSection.isLoadingMore) {
         _loadPendingData(refresh: false);
       }
     }
@@ -115,7 +116,10 @@ class _ProductionReceiptItemsViewState
     );
 
     context.read<ProductionReceiptBloc>().add(
-      LoadCompletedProductionReceiptItemsEvent(params: params, refresh: refresh),
+      LoadCompletedProductionReceiptItemsEvent(
+        params: params,
+        refresh: refresh,
+      ),
     );
   }
 
@@ -149,16 +153,44 @@ class _ProductionReceiptItemsViewState
         final completedChanged =
             previous.completedSection.errorMessage !=
             current.completedSection.errorMessage;
-        return pendingChanged || completedChanged;
+        final deleteErrorChanged =
+            previous.deleteError != current.deleteError;
+        final deleteResponseChanged =
+            previous.deleteResponse != current.deleteResponse;
+        final deleteLoadingToFailure =
+            previous.isDeleting && !current.isDeleting && current.deleteError != null;
+        final deleteLoadingToSuccess =
+            previous.isDeleting && !current.isDeleting && current.deleteResponse != null;
+        return pendingChanged ||
+            completedChanged ||
+            deleteErrorChanged ||
+            deleteResponseChanged ||
+            deleteLoadingToFailure ||
+            deleteLoadingToSuccess;
       },
       listener: (context, state) {
-        final pendingError = state.pendingSection.errorMessage;
-        final completedError = state.completedSection.errorMessage;
-        if (pendingError != null && pendingError.isNotEmpty) {
-          CustomToast.error(context, pendingError);
-        } else if (completedError != null && completedError.isNotEmpty) {
-          CustomToast.error(context, completedError);
-        }
+        if (!mounted) return;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+
+          final pendingError = state.pendingSection.errorMessage;
+          final completedError = state.completedSection.errorMessage;
+          if (pendingError != null && pendingError.isNotEmpty) {
+            CustomToast.error(context, pendingError);
+          } else if (completedError != null && completedError.isNotEmpty) {
+            CustomToast.error(context, completedError);
+          } else if (state.deleteError != null && state.deleteError!.isNotEmpty) {
+            CustomToast.error(context, state.deleteError!);
+          } else if (state.deleteResponse != null) {
+            final message = state.deleteResponse!.message.isNotEmpty == true
+                ? state.deleteResponse!.message
+                : 'Putaway against production receipt deleted successfully';
+            CustomToast.success(context, message);
+            _loadPendingData(refresh: true);
+            _loadCompletedData(refresh: true);
+          }
+        });
       },
       child: BlocBuilder<ProductionReceiptBloc, ProductionReceiptState>(
         builder: (context, state) {
@@ -166,7 +198,7 @@ class _ProductionReceiptItemsViewState
           final completedSection = state.completedSection;
 
           return Scaffold(
-            appBar: CustomAppBar(title: "Production Receipt Items"),
+            appBar: CustomAppBar(title: "Putaway Against Production Receipts"),
             body: Column(
               children: [
                 Row(
@@ -182,9 +214,10 @@ class _ProductionReceiptItemsViewState
                 ),
                 SizedBox(height: 8.h),
                 Expanded(
-                  child: _selectedTab == 0
-                      ? _buildPendingList(pendingSection)
-                      : _buildCompleteList(completedSection),
+                  child:
+                      _selectedTab == 0
+                          ? _buildPendingList(pendingSection)
+                          : _buildCompleteList(completedSection),
                 ),
               ],
             ),
@@ -199,10 +232,11 @@ class _ProductionReceiptItemsViewState
       return ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: 6,
-        itemBuilder: (_, __) => Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: CardShimmer(),
-        ),
+        itemBuilder:
+            (_, __) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: CardShimmer(),
+            ),
       );
     }
 
@@ -266,10 +300,11 @@ class _ProductionReceiptItemsViewState
       return ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: 6,
-        itemBuilder: (_, __) => Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: CardShimmer(),
-        ),
+        itemBuilder:
+            (_, __) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: CardShimmer(),
+            ),
       );
     }
 
@@ -320,9 +355,36 @@ class _ProductionReceiptItemsViewState
             );
           }
           final item = completedState.items[index];
-          return ProductionReceiptRowWidget(
-            item: item,
-            onTap: () => _navigateToDetailPage(context, item),
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Slidable(
+              key: ValueKey(item.docNum),
+              endActionPane: ActionPane(
+                motion: const StretchMotion(),
+                extentRatio: 0.25,
+                children: [
+                  SlidableAction(
+                    onPressed: (_) => _showDeleteConfirmation(context, item),
+                    backgroundColor: AppPalette.redColor,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: AppTexts.delete,
+                    flex: 1,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(8.r),
+                      bottomRight: Radius.circular(8.r),
+                    ),
+                    autoClose: false,
+                    spacing: 0,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+              child: ProductionReceiptRowWidget(
+                item: item,
+                onTap: () => _navigateToDetailPage(context, item),
+              ),
+            ),
           );
         },
       ),
@@ -366,9 +428,10 @@ class _ProductionReceiptItemsViewState
                   current.completedSection.items.length;
             },
             builder: (context, state) {
-              final count = index == 0
-                  ? state.pendingSection.items.length
-                  : state.completedSection.items.length;
+              final count =
+                  index == 0
+                      ? state.pendingSection.items.length
+                      : state.completedSection.items.length;
               final text = count > 0 ? '$label ($count)' : label;
 
               return CustomText(
@@ -415,6 +478,34 @@ class _ProductionReceiptItemsViewState
     context.pushNamed(
       AppRoutes.completedProductionReceiptItemDetail,
       extra: item,
+    );
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    ProductionReceiptItemEntity item,
+  ) {
+    if (item.docNum == null) {
+      CustomToast.error(context, 'Document number not available');
+      return;
+    }
+
+    AnimatedStatusDialog.show(
+      context: context,
+      isSuccess: false,
+      title: AppTexts.deletePutawayRequest,
+      message: AppTexts.deletePutawayRequestMessage,
+      primaryButtonText: AppTexts.delete,
+      secondaryButtonText: AppTexts.cancel,
+      onPrimaryTap: () {
+        _deletePutawayAgainstProductionReceipt(context, item.docNum!);
+      },
+    );
+  }
+
+  void _deletePutawayAgainstProductionReceipt(BuildContext context, int docNum) {
+    context.read<ProductionReceiptBloc>().add(
+      DeletePutawayAgainstProductionReceiptEvent(docNum: docNum),
     );
   }
 }

@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/entities/bin_transfer_report_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/blocs/bin_transfer_report_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/blocs/bin_transfer_report_event.dart';
+import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/blocs/bin_transfer_report_state.dart';
+import 'dart:ui';
+
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
+import 'package:neuconnectz_dynea/src/widgets/custom_circular_progress_indicator.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
+import 'package:neuconnectz_dynea/src/widgets/status_dialog.dart';
 
 import '../../../../../core/constants/app_texts.dart';
+import '../../../../../widgets/custom_toast.dart';
 
 class BinTransferTransactionDetailsBottomSheet extends StatelessWidget {
   final BinTransferReportEntity report;
@@ -19,61 +28,121 @@ class BinTransferTransactionDetailsBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: AppPalette.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Drag handle
-            Center(
-              child: Container(
-                width: 40.w,
-                height: 4.h,
-                margin: EdgeInsets.only(bottom: 16.h),
+    return BlocListener<BinTransferReportBloc, BinTransferReportState>(
+      listenWhen: (previous, current) {
+        return previous is! DeleteBinRecordLoading &&
+                current is DeleteBinRecordLoading ||
+            previous is! DeleteBinRecordSuccess &&
+                current is DeleteBinRecordSuccess ||
+            previous is! DeleteBinRecordFailure &&
+                current is DeleteBinRecordFailure;
+      },
+      listener: (context, state) {
+        if (state is DeleteBinRecordSuccess) {
+          final message =
+              state.apiResponse?.message.isNotEmpty == true
+                  ? state.apiResponse!.message
+                  : 'Bin transfer deleted successfully';
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            try {
+              CustomToast.success(context, message);
+              Navigator.of(context).pop(true);
+            } catch (e) {
+              // Context is no longer valid, ignore
+            }
+          });
+        } else if (state is DeleteBinRecordFailure) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            try {
+              CustomToast.error(context, state.message);
+            } catch (e) {
+              // Context is no longer valid, ignore
+            }
+          });
+        }
+      },
+      child: BlocBuilder<BinTransferReportBloc, BinTransferReportState>(
+        builder: (context, state) {
+          final isLoading = state is DeleteBinRecordLoading;
+
+          return Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: AppPalette.greyColor.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(2.r),
+                  color: AppPalette.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20.r),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Drag handle
+                      Center(
+                        child: Container(
+                          width: 40.w,
+                          height: 4.h,
+                          margin: EdgeInsets.only(bottom: 16.h),
+                          decoration: BoxDecoration(
+                            color: AppPalette.greyColor.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(2.r),
+                          ),
+                        ),
+                      ),
+                      // Title
+                      CustomText(
+                        text: 'Transaction Details',
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppPalette.darkGreyColor,
+                      ),
+                      16.verticalSpace,
+                      // Divider
+                      Divider(color: AppPalette.lightGreyColor, thickness: 1),
+                      16.verticalSpace,
+                      _plantAndWarehouseWidget(),
+                      16.verticalSpace,
+                      _sourceAndDestinationBinWidget(),
+                      16.verticalSpace,
+                      _totalMaterialsAndTotaCount(),
+                      20.verticalSpace,
+                      _header(),
+                      4.verticalSpace,
+                      if (report.materials.isEmpty)
+                        _noMaterialsFound()
+                      else
+                        ...report.materials.map(
+                          (material) => _buildMaterialItem(material),
+                        ),
+                      16.verticalSpace,
+                      _editButton(context),
+                      20.verticalSpace,
+                      _deleteButton(context),
+                      SafeArea(child: SizedBox(height: 8.h)),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // Title
-            CustomText(
-              text: 'Transaction Details',
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              color: AppPalette.darkGreyColor,
-            ),
-            16.verticalSpace,
-            // Divider
-            Divider(color: AppPalette.lightGreyColor, thickness: 1),
-            16.verticalSpace,
-            _plantAndWarehouseWidget(),
-            16.verticalSpace,
-            _sourceAndDestinationBinWidget(),
-            16.verticalSpace,
-            _totalMaterialsAndTotaCount(),
-            20.verticalSpace,
-            _header(),
-            4.verticalSpace,
-            if (report.materials.isEmpty)
-              _noMaterialsFound()
-            else
-              ...report.materials.map(
-                (material) => _buildMaterialItem(material),
-              ),
-            16.verticalSpace,
-            _editButton(context),
-            20.verticalSpace,
-            _deleteButton(context),
-            SafeArea(child: SizedBox(height: 8.h)),
-          ],
-        ),
+              if (isLoading)
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.1),
+                      child: const Center(
+                        child: CustomCircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -86,23 +155,43 @@ class BinTransferTransactionDetailsBottomSheet extends StatelessWidget {
     );
   }
 
-  GestureDetector _deleteButton(BuildContext context) {
+  Widget _deleteButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context, 'delete');
+        if (report.docNum == null) {
+          CustomToast.error(context, 'Document number not available');
+          return;
+        }
+
+        AnimatedStatusDialog.show(
+          context: context,
+          isSuccess: false,
+          title: AppTexts.deleteBinTransfer,
+          message: AppTexts.deleteBinTransferMessage,
+          primaryButtonText: AppTexts.delete,
+          secondaryButtonText: AppTexts.cancel,
+          onPrimaryTap: () {
+            context.read<BinTransferReportBloc>().add(
+              DeleteBinRecordEvent(docNum: report.docNum!),
+            );
+          },
+        );
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.delete_outline, color: Colors.red, size: 20.sp),
-          8.horizontalSpace,
-          CustomText(
-            text: 'Delete Transfer',
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.red,
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.delete_outline, color: Colors.red, size: 20.sp),
+            8.horizontalSpace,
+            CustomText(
+              text: 'Delete Transfer',
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.red,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -379,5 +468,3 @@ class BinTransferTransactionDetailsBottomSheet extends StatelessWidget {
     );
   }
 }
-
-

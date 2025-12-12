@@ -24,6 +24,10 @@ abstract class ReservationRepository {
   Future<Either<Failure, ApiResponse<bool>>> createPickingAgainstReservation(
     CreatePickingRequestModel request,
   );
+
+  Future<Either<Failure, ApiResponse<bool>>> deleteReservation({
+    required int docNum,
+  });
 }
 
 

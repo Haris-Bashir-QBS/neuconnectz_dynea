@@ -143,6 +143,9 @@ void _registerGrnListDependencies() {
   sl.registerLazySingleton(
     () => CreatePutAwayAgainstPurchaseOrderGrnUseCase(sl()),
   );
+  sl.registerLazySingleton(
+    () => DeletePutAwayOfPurchaseOrderGrnUseCase(sl()),
+  );
   sl.registerLazySingleton(() => GetBinsUseCase(sl()));
   // Blocs
   sl.registerFactory(
@@ -150,6 +153,7 @@ void _registerGrnListDependencies() {
       getGrnListUseCase: sl(),
       getGrnItemsUseCase: sl(),
       getCompletedGrnItemsUseCase: sl(),
+      deletePutAwayOfPurchaseOrderGrnUseCase: sl(),
     ),
   );
   sl.registerFactory(
@@ -170,8 +174,13 @@ void _registerInboundDeliveryDependencies() {
   sl.registerLazySingleton<InboundDeliveryRepository>(
     () => InboundDeliveryRepositoryImpl(remoteDataSource: sl()),
   );
+  // Use case
+  sl.registerLazySingleton(() => DeletePutawayAgainstInboundDeliveryStoUseCase(sl()));
   // Blocs
-  sl.registerFactory(() => InboundDeliveryBloc(repository: sl()));
+  sl.registerFactory(() => InboundDeliveryBloc(
+    repository: sl(),
+    deletePutawayAgainstInboundDeliveryStoUseCase: sl(),
+  ));
   sl.registerFactory(() => InboundDeliveryPutAwayBloc(repository: sl()));
 }
 
@@ -187,8 +196,15 @@ void _registerProductionReceiptDependencies() {
   sl.registerLazySingleton<ProductionReceiptRepository>(
     () => ProductionReceiptRepositoryImpl(remoteDataSource: sl()),
   );
+  // Use case
+  sl.registerLazySingleton<DeletePutawayAgainstProductionReceiptUseCase>(
+    () => DeletePutawayAgainstProductionReceiptUseCase(sl()),
+  );
   // Bloc
-  sl.registerFactory(() => ProductionReceiptBloc(repository: sl()));
+  sl.registerFactory(() => ProductionReceiptBloc(
+    repository: sl(),
+    deletePutawayAgainstProductionReceiptUseCase: sl(),
+  ));
 }
 
 /// ------------------------
@@ -226,7 +242,8 @@ void _registerReservationDependencies() {
     ..registerLazySingleton(() => GetCompletedReservationItemsUseCase(sl()))
     ..registerLazySingleton(() => GetMovementTypesUseCase(sl()))
     ..registerLazySingleton(() => GetWarehouseBinsByMaterialUseCase(sl()))
-    ..registerLazySingleton(() => CreatePickingAgainstReservationUseCase(sl()));
+    ..registerLazySingleton(() => CreatePickingAgainstReservationUseCase(sl()))
+    ..registerLazySingleton(() => DeleteReservationUseCase(sl()));
 
   // Blocs
   sl.registerFactory(() => MovementTypeBloc(getMovementTypesUseCase: sl()));
@@ -235,6 +252,7 @@ void _registerReservationDependencies() {
       getReservationListUseCase: sl(),
       getReservationItemsUseCase: sl(),
       getCompletedReservationItemsUseCase: sl(),
+      deleteReservationUseCase: sl(),
     ),
   );
   sl.registerFactory(
@@ -296,6 +314,7 @@ void _registerOutboundDeliveryStoItemsDependencies() {
     ..registerLazySingleton(() => GetStockDocItemFromSAPUseCase(sl()))
     ..registerLazySingleton(() => GetCompletedStoItemsUseCase(sl()))
     ..registerLazySingleton(() => GetAndUpdateStocksUseCase(sl()))
+    ..registerLazySingleton(() => DeletePickingAgainstOutboundDeliveryStoUseCase(sl()))
     // Stocks by Storage Bin dependencies
     ..registerLazySingleton<StocksByStorageBinRemoteDataSource>(
       () => StocksByStorageBinRemoteDataSourceImpl(client: sl()),
@@ -309,6 +328,7 @@ void _registerOutboundDeliveryStoItemsDependencies() {
     () => OutboundDeliveryStoItemBloc(
       getStockDocItemFromSAPUseCase: sl(),
       getCompletedStoItemsUseCase: sl(),
+      deletePickingAgainstOutboundDeliveryStoUseCase: sl(),
     ),
   );
 
@@ -328,7 +348,8 @@ void _registerOutboundDeliverySalesDependencies() {
     ..registerLazySingleton(
       () => GetCompletedOutboundDeliverySalesItemsUseCase(sl()),
     )
-    ..registerLazySingleton(() => CreateSalesOrderUseCase(sl()));
+    ..registerLazySingleton(() => CreateSalesOrderUseCase(sl()))
+    ..registerLazySingleton(() => DeletePickingAgainstOutboundDeliverySalesUseCase(sl()));
 
   sl.registerFactory(
     () => OutboundDeliverySalesBloc(
@@ -337,6 +358,7 @@ void _registerOutboundDeliverySalesDependencies() {
       getCompletedOutboundDeliverySalesItemsUseCase: sl(),
       createSalesOrderUseCase: sl(),
       getAndUpdateStocksUseCase: sl(),
+      deletePickingAgainstOutboundDeliverySalesUseCase: sl(),
     ),
   );
 }
@@ -372,8 +394,12 @@ void _registerBinToBinDependencies() {
   );
   // Use cases
   sl.registerLazySingleton(() => GetBinTransferReportUseCase(repository: sl()));
+  sl.registerLazySingleton(() => DeleteBinRecordUseCase(sl()));
   // BLoC
   sl.registerFactory(
-    () => BinTransferReportBloc(getBinTransferReportUseCase: sl()),
+    () => BinTransferReportBloc(
+      getBinTransferReportUseCase: sl(),
+      deleteBinRecordUseCase: sl(),
+    ),
   );
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
@@ -13,7 +15,7 @@ import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentati
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
-import 'package:go_router/go_router.dart';
+import 'package:neuconnectz_dynea/src/widgets/status_dialog.dart';
 
 import '../../../../../core/constants/app_texts.dart';
 import '../../../../../core/router/app_routes.dart';
@@ -161,6 +163,34 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
     }
   }
 
+  void _showDeleteConfirmation(
+    BuildContext context,
+    PurchaseOrderGrnItemEntity item,
+  ) {
+    if (item.docNum == null) {
+      CustomToast.error(context, 'Document number not available');
+      return;
+    }
+
+    AnimatedStatusDialog.show(
+      context: context,
+      isSuccess: false,
+      title: AppTexts.deletePutawayRequest,
+      message: AppTexts.deletePutawayRequestMessage,
+      primaryButtonText: AppTexts.delete,
+      secondaryButtonText: AppTexts.cancel,
+      onPrimaryTap: () {
+        _deletePutAwayOfPurchaseOrderGrn(context, item.docNum!);
+      },
+    );
+  }
+
+  void _deletePutAwayOfPurchaseOrderGrn(BuildContext context, int docNum) {
+    context.read<PurchaseOrderGrnBloc>().add(
+      DeletePutAwayOfPurchaseOrderGrnEvent(docNum: docNum),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<PurchaseOrderGrnBloc, PurchaseOrderGrnState>(
@@ -171,15 +201,41 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
         final completedChanged =
             previous.completedSection.errorMessage !=
             current.completedSection.errorMessage;
-        return pendingChanged || completedChanged;
+        final deleteChanged =
+            previous is! DeletePutAwayOfPurchaseOrderGrnSuccess &&
+            current is DeletePutAwayOfPurchaseOrderGrnSuccess;
+        final deleteErrorChanged =
+            previous is! DeletePutAwayOfPurchaseOrderGrnFailure &&
+            current is DeletePutAwayOfPurchaseOrderGrnFailure;
+        final deleteLoadingToFailure =
+            previous is DeletePutAwayOfPurchaseOrderGrnLoading &&
+            current is DeletePutAwayOfPurchaseOrderGrnFailure;
+        return pendingChanged ||
+            completedChanged ||
+            deleteChanged ||
+            deleteErrorChanged ||
+            deleteLoadingToFailure;
       },
       listener: (context, state) {
+        if (!mounted) return;
+
         final pendingError = state.pendingSection.errorMessage;
         final completedError = state.completedSection.errorMessage;
         if (pendingError != null && pendingError.isNotEmpty) {
           CustomToast.error(context, pendingError);
         } else if (completedError != null && completedError.isNotEmpty) {
           CustomToast.error(context, completedError);
+        } else if (state is DeletePutAwayOfPurchaseOrderGrnSuccess) {
+          if (!mounted) return;
+          final message =
+              state.apiResponse?.message.isNotEmpty == true
+                  ? state.apiResponse!.message
+                  : 'Putaway request deleted successfully';
+          CustomToast.success(context, message);
+          _loadPendingData();
+          _loadCompletedData();
+        } else if (state is DeletePutAwayOfPurchaseOrderGrnFailure) {
+          CustomToast.error(context, state.message);
         }
       },
       child: BlocBuilder<PurchaseOrderGrnBloc, PurchaseOrderGrnState>(
@@ -337,11 +393,41 @@ class _GrnItemsViewState extends State<_GrnItemsView> {
             );
           }
           final item = completedState.items[index];
-          return GrnItemWidget(
-            item: item,
-            onTap: () {
-              context.pushNamed(AppRoutes.completedGrnItemDetail, extra: item);
-            },
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Slidable(
+              key: ValueKey(item.docNum),
+              endActionPane: ActionPane(
+                motion: const StretchMotion(),
+                extentRatio: 0.25,
+                children: [
+                  SlidableAction(
+                    onPressed: (_) => _showDeleteConfirmation(context, item),
+                    backgroundColor: AppPalette.redColor,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'Delete',
+                    flex: 1,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(8.r),
+                      bottomRight: Radius.circular(8.r),
+                    ),
+                    autoClose: false,
+                    spacing: 0,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+              child: GrnItemWidget(
+                item: item,
+                onTap: () {
+                  context.pushNamed(
+                    AppRoutes.completedGrnItemDetail,
+                    extra: item,
+                  );
+                },
+              ),
+            ),
           );
         },
       ),

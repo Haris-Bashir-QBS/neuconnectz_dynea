@@ -46,6 +46,15 @@ class LoadCompletedReservationItemsEvent extends ReservationEvent {
   List<Object?> get props => [params, refresh];
 }
 
+class DeleteReservationEvent extends ReservationEvent {
+  final int docNum;
+
+  const DeleteReservationEvent({required this.docNum});
+
+  @override
+  List<Object?> get props => [docNum];
+}
+
 
 
 

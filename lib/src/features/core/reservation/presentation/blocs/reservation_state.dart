@@ -25,6 +25,11 @@ class ReservationState extends Equatable {
   final int completedSkipRecords;
   final String? completedError;
 
+  // Delete reservation state
+  final bool isDeleting;
+  final String? deleteError;
+  final ApiResponse<bool>? deleteResponse;
+
   const ReservationState({
     this.listLoading = false,
     this.listIsLoadingMore = false,
@@ -44,6 +49,9 @@ class ReservationState extends Equatable {
     this.completedTotalRows = 0,
     this.completedSkipRecords = 0,
     this.completedError,
+    this.isDeleting = false,
+    this.deleteError,
+    this.deleteResponse,
   });
 
   bool get listHasMore => listItems.length < listTotalRows;
@@ -72,6 +80,10 @@ class ReservationState extends Equatable {
     int? completedSkipRecords,
     String? completedError,
     bool clearCompletedError = false,
+    bool? isDeleting,
+    String? deleteError,
+    bool clearDeleteError = false,
+    ApiResponse<bool>? deleteResponse,
   }) {
     return ReservationState(
       listLoading: listLoading ?? this.listLoading,
@@ -96,6 +108,9 @@ class ReservationState extends Equatable {
           completedSkipRecords ?? this.completedSkipRecords,
       completedError:
           clearCompletedError ? null : (completedError ?? this.completedError),
+      isDeleting: isDeleting ?? this.isDeleting,
+      deleteError: clearDeleteError ? null : (deleteError ?? this.deleteError),
+      deleteResponse: deleteResponse ?? this.deleteResponse,
     );
   }
 
@@ -119,6 +134,9 @@ class ReservationState extends Equatable {
         completedTotalRows,
         completedSkipRecords,
         completedError,
+        isDeleting,
+        deleteError,
+        deleteResponse,
       ];
 }
 

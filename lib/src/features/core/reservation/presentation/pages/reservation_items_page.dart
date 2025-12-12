@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
@@ -14,8 +15,10 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/wid
 import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
+import 'package:neuconnectz_dynea/src/widgets/status_dialog.dart';
 
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../widgets/custom_toast.dart';
 
 class ReservationItemsPage extends StatelessWidget {
   final ReservationItemParams params;
@@ -134,27 +137,47 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: AppTexts.pickingAgainstReservation),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(child: _buildTab(0, AppTexts.pending)),
-              Expanded(child: _buildTab(1, AppTexts.completed)),
-            ],
-          ),
-          10.verticalSpace,
-          ItemListingHeader(
-            leftHeading: AppTexts.materialName,
-            rightHeading: AppTexts.quantity,
-          ),
-          SizedBox(height: 8.h),
-          Expanded(
-            child:
-                _selectedTab == 0 ? _buildPendingList() : _buildCompletedList(),
-          ),
-        ],
+    return BlocListener<ReservationBloc, ReservationState>(
+      listenWhen: (previous, current) {
+        return previous.deleteError != current.deleteError ||
+            previous.deleteResponse != current.deleteResponse;
+      },
+      listener: (context, state) {
+        if (!mounted) return;
+
+        if (state.deleteError != null && state.deleteError!.isNotEmpty) {
+          CustomToast.error(context, state.deleteError!);
+        } else if (state.deleteResponse != null) {
+          final message = state.deleteResponse!.message.isNotEmpty == true
+              ? state.deleteResponse!.message
+              : 'Reservation deleted successfully';
+          CustomToast.success(context, message);
+          _loadPending(refresh: true);
+          _loadCompleted(refresh: true);
+        }
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(title: AppTexts.pickingAgainstReservation),
+        body: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(child: _buildTab(0, AppTexts.pending)),
+                Expanded(child: _buildTab(1, AppTexts.completed)),
+              ],
+            ),
+            10.verticalSpace,
+            ItemListingHeader(
+              leftHeading: AppTexts.materialName,
+              rightHeading: AppTexts.quantity,
+            ),
+            SizedBox(height: 8.h),
+            Expanded(
+              child:
+                  _selectedTab == 0 ? _buildPendingList() : _buildCompletedList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -284,11 +307,38 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
                 return _buildLoadMoreIndicator();
               }
               final item = state.completedItems[index];
-              return ReservationItemCard(
-                item: item,
-                quantity: item.quantity,
-                ctaText: 'View Details',
-                onTap: () => _showCompletedDetails(item),
+              return Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: Slidable(
+                  key: ValueKey(item.docNum),
+                  endActionPane: ActionPane(
+                    motion: const StretchMotion(),
+                    extentRatio: 0.25,
+                    children: [
+                      SlidableAction(
+                        onPressed: (_) => _showDeleteConfirmation(context, item),
+                        backgroundColor: AppPalette.redColor,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: AppTexts.delete,
+                        flex: 1,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(8.r),
+                          bottomRight: Radius.circular(8.r),
+                        ),
+                        autoClose: false,
+                        spacing: 0,
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                  child: ReservationItemCard(
+                    item: item,
+                    quantity: item.quantity,
+                    ctaText: 'View Details',
+                    onTap: () => _showCompletedDetails(item),
+                  ),
+                ),
               );
             },
           ),
@@ -336,6 +386,34 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    ReservationItemEntity item,
+  ) {
+    if (item.docNum == null) {
+      CustomToast.error(context, 'Document number not available');
+      return;
+    }
+
+    AnimatedStatusDialog.show(
+      context: context,
+      isSuccess: false,
+      title: AppTexts.deletePutawayRequest,
+      message: AppTexts.deletePutawayRequestMessage,
+      primaryButtonText: AppTexts.delete,
+      secondaryButtonText: AppTexts.cancel,
+      onPrimaryTap: () {
+        _deleteReservation(context, item.docNum!);
+      },
+    );
+  }
+
+  void _deleteReservation(BuildContext context, int docNum) {
+    context.read<ReservationBloc>().add(
+      DeleteReservationEvent(docNum: docNum),
     );
   }
 }

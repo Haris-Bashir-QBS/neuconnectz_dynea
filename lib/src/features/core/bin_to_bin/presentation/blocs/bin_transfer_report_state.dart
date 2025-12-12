@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/domain/entities/bin_transfer_report_entity.dart';
 
 abstract class BinTransferReportState extends Equatable {
@@ -30,4 +31,23 @@ class BinTransferReportFailure extends BinTransferReportState {
   List<Object?> get props => [message];
 }
 
+class DeleteBinRecordLoading extends BinTransferReportState {}
+
+class DeleteBinRecordSuccess extends BinTransferReportState {
+  final ApiResponse<bool>? apiResponse;
+
+  const DeleteBinRecordSuccess({this.apiResponse});
+
+  @override
+  List<Object?> get props => [apiResponse];
+}
+
+class DeleteBinRecordFailure extends BinTransferReportState {
+  final String message;
+
+  const DeleteBinRecordFailure({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
 

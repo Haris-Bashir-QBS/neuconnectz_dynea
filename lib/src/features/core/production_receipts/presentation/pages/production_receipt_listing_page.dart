@@ -107,9 +107,7 @@ class __ProductionReceiptListingViewState
       final state = context.read<ProductionReceiptBloc>().state;
 
       if (state is ProductionReceiptHeaderListFetched) {
-        if (!state.isHeadersLoading &&
-            !state.isLoadingMore &&
-            state.hasMore) {
+        if (!state.isHeadersLoading && !state.isLoadingMore && state.hasMore) {
           final params = ProductionReceiptListParams(
             plant: widget.params.plant.code,
             warehouseNumber: widget.params.warehouse.code,
@@ -130,7 +128,7 @@ class __ProductionReceiptListingViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Production Receipts"),
+      appBar: CustomAppBar(title: "Putaway Against Production Receipts"),
       body: Column(
         children: [
           CustomSearchField(controller: _searchController),
@@ -161,45 +159,50 @@ class __ProductionReceiptListingViewState
                 child: ListView.builder(
                   itemCount: 6,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  itemBuilder: (context, index) => Container(
-                    margin: EdgeInsets.only(bottom: 12.h),
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60.w,
-                          height: 60.w,
-                          decoration: BoxDecoration(
-                            color: AppPalette.greyColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                  itemBuilder:
+                      (context, index) => Container(
+                        margin: EdgeInsets.only(bottom: 12.h),
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                        12.horizontalSpace,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 12.h,
-                                width: 180.w,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 60.w,
+                              height: 60.w,
+                              decoration: BoxDecoration(
                                 color: AppPalette.greyColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              8.verticalSpace,
-                              Container(
-                                height: 12.h,
-                                width: 140.w,
-                                color: AppPalette.greyColor.withOpacity(0.2),
+                            ),
+                            12.horizontalSpace,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 12.h,
+                                    width: 180.w,
+                                    color: AppPalette.greyColor.withOpacity(
+                                      0.2,
+                                    ),
+                                  ),
+                                  8.verticalSpace,
+                                  Container(
+                                    height: 12.h,
+                                    width: 140.w,
+                                    color: AppPalette.greyColor.withOpacity(
+                                      0.2,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
                 ),
               ),
             ],
@@ -237,8 +240,9 @@ class __ProductionReceiptListingViewState
           );
         }
 
-        if (state.isHeadersLoading && 
-            !(state is ProductionReceiptHeaderListFetched && state.isLoadingMore)) {
+        if (state.isHeadersLoading &&
+            !(state is ProductionReceiptHeaderListFetched &&
+                state.isLoadingMore)) {
           // Show shimmer when refreshing (not loading more)
           return Column(
             children: [
@@ -248,45 +252,50 @@ class __ProductionReceiptListingViewState
                 child: ListView.builder(
                   itemCount: 6,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  itemBuilder: (context, index) => Container(
-                    margin: EdgeInsets.only(bottom: 12.h),
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60.w,
-                          height: 60.w,
-                          decoration: BoxDecoration(
-                            color: AppPalette.greyColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                  itemBuilder:
+                      (context, index) => Container(
+                        margin: EdgeInsets.only(bottom: 12.h),
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                        12.horizontalSpace,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 12.h,
-                                width: 180.w,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 60.w,
+                              height: 60.w,
+                              decoration: BoxDecoration(
                                 color: AppPalette.greyColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              8.verticalSpace,
-                              Container(
-                                height: 12.h,
-                                width: 140.w,
-                                color: AppPalette.greyColor.withOpacity(0.2),
+                            ),
+                            12.horizontalSpace,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 12.h,
+                                    width: 180.w,
+                                    color: AppPalette.greyColor.withOpacity(
+                                      0.2,
+                                    ),
+                                  ),
+                                  8.verticalSpace,
+                                  Container(
+                                    height: 12.h,
+                                    width: 140.w,
+                                    color: AppPalette.greyColor.withOpacity(
+                                      0.2,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
                 ),
               ),
             ],
@@ -310,8 +319,11 @@ class __ProductionReceiptListingViewState
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: 15.w),
                   itemCount:
-                      state.headers.length + 
-                      (state is ProductionReceiptHeaderListFetched && state.isLoadingMore ? 1 : 0),
+                      state.headers.length +
+                      (state is ProductionReceiptHeaderListFetched &&
+                              state.isLoadingMore
+                          ? 1
+                          : 0),
                   itemBuilder: (context, index) {
                     if (index == state.headers.length) {
                       return Padding(
@@ -356,7 +368,9 @@ class __ProductionReceiptListingViewState
           ),
         )
         .then((value) {
+          //if (value == true) {
           _loadInitialData();
+          // }
         });
   }
 }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/operation_state.dart';
+import 'package:neuconnectz_dynea/src/widgets/custom_toast.dart';
+import 'package:neuconnectz_dynea/src/widgets/status_dialog.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
@@ -144,27 +148,64 @@ class _OutboundDeliverySalesItemsViewState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: AppTexts.outboundDeliverySales),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(child: _buildTab(0, AppTexts.pending)),
-              Expanded(child: _buildTab(1, AppTexts.completed)),
-            ],
-          ),
-          10.verticalSpace,
-          ItemListingHeader(
-            leftHeading: AppTexts.materialName,
-            rightHeading: AppTexts.quantity,
-          ),
-          SizedBox(height: 8.h),
-          Expanded(
-            child:
-                _selectedTab == 0 ? _buildPendingList() : _buildCompletedList(),
-          ),
-        ],
+    return BlocListener<OutboundDeliverySalesBloc, OutboundDeliverySalesState>(
+      listenWhen: (previous, current) {
+        return previous.deletePickingAgainstOutboundDeliverySales !=
+            current.deletePickingAgainstOutboundDeliverySales;
+      },
+      listener: (context, state) {
+        if (!mounted) return;
+
+        if (state.deletePickingAgainstOutboundDeliverySales.status ==
+            OperationStatus.error) {
+          CustomToast.error(
+            context,
+            state.deletePickingAgainstOutboundDeliverySales.error ??
+                'Failed to delete picking against outbound delivery sales',
+          );
+        } else if (state.deletePickingAgainstOutboundDeliverySales.status ==
+            OperationStatus.success) {
+          final message =
+              state
+                          .deletePickingAgainstOutboundDeliverySales
+                          .data
+                          ?.message
+                          .isNotEmpty ==
+                      true
+                  ? state
+                      .deletePickingAgainstOutboundDeliverySales
+                      .data!
+                      .message
+                  : 'Picking against outbound delivery sales deleted successfully';
+          CustomToast.success(context, message);
+          _loadPending(refresh: true);
+          _loadCompleted(refresh: true);
+        }
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(title: AppTexts.outboundDeliverySales),
+        body: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(child: _buildTab(0, AppTexts.pending)),
+                Expanded(child: _buildTab(1, AppTexts.completed)),
+              ],
+            ),
+            10.verticalSpace,
+            ItemListingHeader(
+              leftHeading: AppTexts.materialName,
+              rightHeading: AppTexts.quantity,
+            ),
+            SizedBox(height: 8.h),
+            Expanded(
+              child:
+                  _selectedTab == 0
+                      ? _buildPendingList()
+                      : _buildCompletedList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -311,10 +352,38 @@ class _OutboundDeliverySalesItemsViewState
                 return _buildLoadMoreIndicator();
               }
               final item = state.completedItems[index];
-              return OutboundDeliverySalesItemCard(
-                item: item,
-                ctaText: 'View Details',
-                onTap: () => _showCompletedDetails(item),
+              return Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: Slidable(
+                  key: ValueKey(item.docNum),
+                  endActionPane: ActionPane(
+                    motion: const StretchMotion(),
+                    extentRatio: 0.25,
+                    children: [
+                      SlidableAction(
+                        onPressed:
+                            (_) => _showDeleteConfirmation(context, item),
+                        backgroundColor: AppPalette.redColor,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: AppTexts.delete,
+                        flex: 1,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(8.r),
+                          bottomRight: Radius.circular(8.r),
+                        ),
+                        autoClose: false,
+                        spacing: 0,
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                  child: OutboundDeliverySalesItemCard(
+                    item: item,
+                    ctaText: 'View Details',
+                    onTap: () => _showCompletedDetails(item),
+                  ),
+                ),
               );
             },
           ),
@@ -362,6 +431,37 @@ class _OutboundDeliverySalesItemsViewState
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    OutboundDeliverySalesItemEntity item,
+  ) {
+    if (item.docNum == null) {
+      CustomToast.error(context, 'Document number not available');
+      return;
+    }
+
+    AnimatedStatusDialog.show(
+      context: context,
+      isSuccess: false,
+      title: AppTexts.deletePutawayRequest,
+      message: AppTexts.deletePutawayRequestMessage,
+      primaryButtonText: AppTexts.delete,
+      secondaryButtonText: AppTexts.cancel,
+      onPrimaryTap: () {
+        _deletePickingAgainstOutboundDeliverySales(context, item.docNum!);
+      },
+    );
+  }
+
+  void _deletePickingAgainstOutboundDeliverySales(
+    BuildContext context,
+    int docNum,
+  ) {
+    context.read<OutboundDeliverySalesBloc>().add(
+      DeletePickingAgainstOutboundDeliverySalesEvent(docNum: docNum),
     );
   }
 }

@@ -11,6 +11,7 @@ class InboundDeliveryItemEntity extends Equatable {
   final String? materialDescription;
   final String? uom;
   final List<InboundDeliveryItemBinDetailEntity> binDetails;
+  final int? docNum;
 
   const InboundDeliveryItemEntity({
     required this.stoNo,
@@ -23,6 +24,7 @@ class InboundDeliveryItemEntity extends Equatable {
     this.materialNo,
     this.materialDescription,
     this.binDetails = const [],
+    this.docNum,
   });
 
   @override
@@ -37,6 +39,7 @@ class InboundDeliveryItemEntity extends Equatable {
     materialDescription,
     binDetails,
     uom,
+    docNum,
   ];
 }
 

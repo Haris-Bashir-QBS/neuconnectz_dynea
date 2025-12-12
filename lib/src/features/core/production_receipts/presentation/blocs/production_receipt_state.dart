@@ -58,6 +58,9 @@ abstract class ProductionReceiptState extends Equatable {
   final bool isCreating;
   final String? createError;
   final ApiResponse<bool>? createResponse;
+  final bool isDeleting;
+  final String? deleteError;
+  final ApiResponse<bool>? deleteResponse;
 
   const ProductionReceiptState({
     required this.isHeadersLoading,
@@ -69,6 +72,9 @@ abstract class ProductionReceiptState extends Equatable {
     this.isCreating = false,
     this.createError,
     this.createResponse,
+    this.isDeleting = false,
+    this.deleteError,
+    this.deleteResponse,
   });
 
   List<Object?> get baseProps => [
@@ -81,6 +87,9 @@ abstract class ProductionReceiptState extends Equatable {
         isCreating,
         createError,
         createResponse,
+        isDeleting,
+        deleteError,
+        deleteResponse,
       ];
 
   @override
@@ -98,6 +107,9 @@ class ProductionReceiptInitial extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -108,6 +120,9 @@ class ProductionReceiptHeaderListLoading extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   }) : super(
           isHeadersLoading: true,
           headers: const [],
@@ -129,6 +144,9 @@ class ProductionReceiptHeaderListFetched extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   }) : super(isHeadersLoading: false);
 
   bool get hasMore => headers.length < headersTotalRows;
@@ -151,6 +169,9 @@ class ProductionReceiptHeaderListFetchFailure extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   }) : super(
           isHeadersLoading: false,
           headers: const [],
@@ -172,6 +193,9 @@ class ProductionReceiptItemsLoading extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -185,6 +209,9 @@ class ProductionReceiptItemsSuccess extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -201,6 +228,9 @@ class ProductionReceiptItemsFailure extends ProductionReceiptState {
     super.isCreating = false,
     super.createError,
     super.createResponse,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 
   @override

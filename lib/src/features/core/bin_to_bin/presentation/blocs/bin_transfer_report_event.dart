@@ -17,4 +17,12 @@ class LoadBinTransferReportEvent extends BinTransferReportEvent {
   List<Object?> get props => [params];
 }
 
+class DeleteBinRecordEvent extends BinTransferReportEvent {
+  final int docNum;
+
+  const DeleteBinRecordEvent({required this.docNum});
+
+  @override
+  List<Object?> get props => [docNum];
+}
 

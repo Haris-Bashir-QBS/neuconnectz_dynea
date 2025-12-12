@@ -112,6 +112,18 @@ class InboundDeliveryRepositoryImpl implements InboundDeliveryRepository {
       return left(failure);
     }
   }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> deletePutawayAgainstInboundDeliverySto({
+    required int docNum,
+  }) async {
+    try {
+      final response = await remoteDataSource.deletePutawayAgainstInboundDeliverySto(docNum: docNum);
+      return right(response);
+    } on Failure catch (error) {
+      return left(error);
+    }
+  }
 }
 
 

@@ -147,6 +147,11 @@ final class AppTexts {
   static const String search = "Search";
   static const String putAwayAgainstGrn = "Put Away Against Purchase Receipts";
   static const String putAway = "Putaway";
+  static const String deletePutawayRequest = "Delete Putaway Request";
+  static const String deletePutawayRequestMessage = "Are you sure you want to delete this putaway request?";
+  static const String deleteBinTransfer = "Delete Bin Transfer";
+  static const String deleteBinTransferMessage = "Are you sure you want to delete this bin transfer?";
+  static const String delete = "Delete";
   static const String proceed = "Proceed";
   static const String apply = "Apply";
   static const String selectPlantAndWarehouse = 'Select Plant & Warehouse';

@@ -15,6 +15,10 @@ abstract class OutboundDeliveryStoItemRepository {
   Future<Either<Failure, ApiResponse<bool>>> getAndUpdateStocksFromSap(
     GetAndUpdateStocksRequestModel request,
   );
+
+  Future<Either<Failure, ApiResponse<bool>>> deletePickingAgainstOutboundDeliverySto({
+    required int docNum,
+  });
 }
 
 

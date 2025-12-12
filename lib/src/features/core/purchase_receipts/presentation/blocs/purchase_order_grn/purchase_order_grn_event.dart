@@ -40,3 +40,12 @@ class LoadCompletedPurchaseOrderGrnItemsEvent extends PurchaseOrderGrnEvent {
   @override
   List<Object?> get props => [params, refresh];
 }
+
+class DeletePutAwayOfPurchaseOrderGrnEvent extends PurchaseOrderGrnEvent {
+  final int docNum;
+
+  DeletePutAwayOfPurchaseOrderGrnEvent({required this.docNum});
+
+  @override
+  List<Object?> get props => [docNum];
+}

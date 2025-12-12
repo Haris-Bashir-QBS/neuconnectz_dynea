@@ -27,6 +27,7 @@ class OutboundDeliverySalesState extends Equatable {
 
   final OperationState<ApiResponse<bool>> createSalesOrder;
   final OperationState<ApiResponse<bool>> syncStocks;
+  final OperationState<ApiResponse<bool>> deletePickingAgainstOutboundDeliverySales;
 
   const OutboundDeliverySalesState({
     this.listLoading = false,
@@ -49,6 +50,7 @@ class OutboundDeliverySalesState extends Equatable {
     this.completedError,
     this.createSalesOrder = const OperationState(),
     this.syncStocks = const OperationState(),
+    this.deletePickingAgainstOutboundDeliverySales = const OperationState(),
   });
 
   bool get listHasMore => listItems.length < listTotalRows;
@@ -79,6 +81,7 @@ class OutboundDeliverySalesState extends Equatable {
     bool clearCompletedError = false,
     OperationState<ApiResponse<bool>>? createSalesOrder,
     OperationState<ApiResponse<bool>>? syncStocks,
+    OperationState<ApiResponse<bool>>? deletePickingAgainstOutboundDeliverySales,
   }) {
     return OutboundDeliverySalesState(
       listLoading: listLoading ?? this.listLoading,
@@ -104,6 +107,7 @@ class OutboundDeliverySalesState extends Equatable {
           clearCompletedError ? null : (completedError ?? this.completedError),
       createSalesOrder: createSalesOrder ?? this.createSalesOrder,
       syncStocks: syncStocks ?? this.syncStocks,
+      deletePickingAgainstOutboundDeliverySales: deletePickingAgainstOutboundDeliverySales ?? this.deletePickingAgainstOutboundDeliverySales,
     );
   }
 
@@ -129,6 +133,7 @@ class OutboundDeliverySalesState extends Equatable {
     completedError,
     createSalesOrder,
     syncStocks,
+    deletePickingAgainstOutboundDeliverySales,
   ];
 }
 

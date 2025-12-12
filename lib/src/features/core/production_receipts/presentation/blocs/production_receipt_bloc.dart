@@ -9,6 +9,7 @@ import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/e
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/params/production_receipt_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/params/production_receipt_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/repositories/production_receipt_repository.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/usecases/delete_putaway_against_production_receipt_usecase.dart';
 
 part 'production_receipt_event.dart';
 part 'production_receipt_state.dart';
@@ -16,13 +17,20 @@ part 'production_receipt_state.dart';
 class ProductionReceiptBloc
     extends Bloc<ProductionReceiptEvent, ProductionReceiptState> {
   final ProductionReceiptRepository repository;
+  final DeletePutawayAgainstProductionReceiptUseCase
+  deletePutawayAgainstProductionReceiptUseCase;
 
-  ProductionReceiptBloc({required this.repository})
-      : super(const ProductionReceiptInitial()) {
+  ProductionReceiptBloc({
+    required this.repository,
+    required this.deletePutawayAgainstProductionReceiptUseCase,
+  }) : super(const ProductionReceiptInitial()) {
     on<LoadProductionReceiptsEvent>(_onLoadHeaders);
     on<LoadProductionReceiptItemsEvent>(_onLoadItems);
     on<LoadCompletedProductionReceiptItemsEvent>(_onLoadCompletedItems);
     on<CreateProductionReceiptEvent>(_onCreateProductionReceipt);
+    on<DeletePutawayAgainstProductionReceiptEvent>(
+      _onDeletePutawayAgainstProductionReceipt,
+    );
   }
 
   Future<void> _onLoadHeaders(
@@ -292,8 +300,9 @@ class ProductionReceiptBloc
         skipRecords: 0,
       );
 
-      final result =
-          await repository.listCompletedProductionReceiptItems(params);
+      final result = await repository.listCompletedProductionReceiptItems(
+        params,
+      );
 
       result.fold(
         (failure) {
@@ -357,8 +366,9 @@ class ProductionReceiptBloc
         skipRecords: completedState.skipRecords,
       );
 
-      final result =
-          await repository.listCompletedProductionReceiptItems(params);
+      final result = await repository.listCompletedProductionReceiptItems(
+        params,
+      );
 
       result.fold(
         (failure) {
@@ -445,5 +455,56 @@ class ProductionReceiptBloc
       },
     );
   }
-}
 
+  Future<void> _onDeletePutawayAgainstProductionReceipt(
+    DeletePutawayAgainstProductionReceiptEvent event,
+    Emitter<ProductionReceiptState> emit,
+  ) async {
+    emit(
+      ProductionReceiptItemsSuccess(
+        pendingSection: state.pendingSection,
+        completedSection: state.completedSection,
+        isHeadersLoading: state.isHeadersLoading,
+        headers: state.headers,
+        headersTotalRows: state.headersTotalRows,
+        isDeleting: true,
+        deleteError: null,
+      ),
+    );
+
+    final result = await deletePutawayAgainstProductionReceiptUseCase(
+      docNum: event.docNum,
+    );
+
+    result.fold(
+      (failure) {
+        emit(
+          ProductionReceiptItemsFailure(
+            message: failure.message,
+            pendingSection: state.pendingSection,
+            completedSection: state.completedSection,
+            isHeadersLoading: state.isHeadersLoading,
+            headers: state.headers,
+            headersTotalRows: state.headersTotalRows,
+            isDeleting: false,
+            deleteError: failure.message,
+          ),
+        );
+      },
+      (success) {
+        emit(
+          ProductionReceiptItemsSuccess(
+            pendingSection: state.pendingSection,
+            completedSection: state.completedSection,
+            isHeadersLoading: state.isHeadersLoading,
+            headers: state.headers,
+            headersTotalRows: state.headersTotalRows,
+            isDeleting: false,
+            deleteResponse: success,
+            deleteError: null,
+          ),
+        );
+      },
+    );
+  }
+}

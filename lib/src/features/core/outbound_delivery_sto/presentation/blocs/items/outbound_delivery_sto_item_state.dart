@@ -51,24 +51,43 @@ class StoItemsSectionState extends Equatable {
 class OutboundDeliveryStoItemState extends Equatable {
   final StoItemsSectionState pendingSection;
   final StoItemsSectionState completedSection;
+  final bool isDeleting;
+  final String? deleteError;
+  final ApiResponse<bool>? deleteResponse;
 
   const OutboundDeliveryStoItemState({
     this.pendingSection = const StoItemsSectionState(),
     this.completedSection = const StoItemsSectionState(),
+    this.isDeleting = false,
+    this.deleteError,
+    this.deleteResponse,
   });
 
   OutboundDeliveryStoItemState copyWith({
     StoItemsSectionState? pendingSection,
     StoItemsSectionState? completedSection,
+    bool? isDeleting,
+    String? deleteError,
+    bool clearDeleteError = false,
+    ApiResponse<bool>? deleteResponse,
   }) {
     return OutboundDeliveryStoItemState(
       pendingSection: pendingSection ?? this.pendingSection,
       completedSection: completedSection ?? this.completedSection,
+      isDeleting: isDeleting ?? this.isDeleting,
+      deleteError: clearDeleteError ? null : (deleteError ?? this.deleteError),
+      deleteResponse: deleteResponse ?? this.deleteResponse,
     );
   }
 
   @override
-  List<Object?> get props => [pendingSection, completedSection];
+  List<Object?> get props => [
+        pendingSection,
+        completedSection,
+        isDeleting,
+        deleteError,
+        deleteResponse,
+      ];
 }
 
 

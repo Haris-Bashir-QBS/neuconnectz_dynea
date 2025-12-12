@@ -68,6 +68,20 @@ class ReservationRepositoryImpl implements ReservationRepository {
       return Left(error);
     }
   }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> deleteReservation({
+    required int docNum,
+  }) async {
+    try {
+      final response = await remoteDataSource.deleteReservation(
+        docNum: docNum,
+      );
+      return Right(response);
+    } on Failure catch (error) {
+      return Left(error);
+    }
+  }
 }
 
 

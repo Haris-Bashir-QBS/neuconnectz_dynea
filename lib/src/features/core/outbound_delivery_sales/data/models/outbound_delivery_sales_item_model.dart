@@ -16,7 +16,6 @@ class OutboundDeliverySalesItemResponseModel
   factory OutboundDeliverySalesItemResponseModel.fromJson(
     Map<String, dynamic> json,
   ) {
-    // Handle both old format (with data.data) and new format (with data array directly)
     List<dynamic>? dataList;
     int totalRows = 0;
 
@@ -32,7 +31,8 @@ class OutboundDeliverySalesItemResponseModel
     }
 
     return OutboundDeliverySalesItemResponseModel(
-      data: dataList
+      data:
+          dataList
               ?.map((e) => OutboundDeliverySalesItemModel.fromJson(e))
               .map((model) => model.toEntity())
               .toList() ??
@@ -74,6 +74,7 @@ class OutboundDeliverySalesItemModel {
   final String itemMovementSts;
   final List<OutboundDeliverySalesItemBinDetailModel> binDetails;
   final List<CompletedSalesItemBinDetailModel>? completedBinDetails;
+  final int? docNum;
 
   OutboundDeliverySalesItemModel({
     required this.delivery,
@@ -96,10 +97,11 @@ class OutboundDeliverySalesItemModel {
     required this.itemMovementSts,
     required this.binDetails,
     this.completedBinDetails,
+    this.docNum,
   });
 
   factory OutboundDeliverySalesItemModel.fromJson(Map<String, dynamic> json) {
-    double _toDouble(dynamic value) {
+    double toDouble(dynamic value) {
       if (value == null) return 0;
       if (value is num) return value.toDouble();
       return double.tryParse(value.toString()) ?? 0;
@@ -116,11 +118,11 @@ class OutboundDeliverySalesItemModel {
     final rawBinDetails =
         (json['additionalBinDetails'] ??
                 json['binDetails'] ??
-                json['salesOrderBinDetails']) as List<dynamic>? ??
-            const [];
+                json['salesOrderBinDetails'])
+            as List<dynamic>? ??
+        const [];
 
-    final rawCompletedBinDetails =
-        json['binDetails'] as List<dynamic>?;
+    final rawCompletedBinDetails = json['binDetails'] as List<dynamic>?;
 
     return OutboundDeliverySalesItemModel(
       delivery: json['delivery']?.toString() ?? '',
@@ -132,7 +134,7 @@ class OutboundDeliverySalesItemModel {
       plant: json['plant']?.toString() ?? '',
       storageLocation: json['storageLocation']?.toString() ?? '',
       warehouseNo: json['warehouseNo']?.toString(),
-      deliveryQuantity: _toDouble(json['deliveryQuantity']),
+      deliveryQuantity: toDouble(json['deliveryQuantity']),
       baseUom: json['baseUom']?.toString() ?? '',
       salesUnit: json['salesUnit']?.toString() ?? '',
       referenceDocument: json['referenceDocument']?.toString() ?? '',
@@ -141,49 +143,50 @@ class OutboundDeliverySalesItemModel {
       precedingDocCateg: json['precedingDocCateg']?.toString() ?? '',
       itemOverallStatus: json['itemOverallStatus']?.toString() ?? '',
       itemMovementSts: json['itemMovementSts']?.toString() ?? '',
-      binDetails: rawBinDetails
-          .map(
-            (e) => OutboundDeliverySalesItemBinDetailModel.fromJson(
-              e as Map<String, dynamic>,
-            ),
-          )
-          .toList(),
-      completedBinDetails: rawCompletedBinDetails != null
-          ? rawCompletedBinDetails
+      binDetails:
+          rawBinDetails
               .map(
+                (e) => OutboundDeliverySalesItemBinDetailModel.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      completedBinDetails:
+          rawCompletedBinDetails
+              ?.map(
                 (e) => CompletedSalesItemBinDetailModel.fromJson(
                   e as Map<String, dynamic>,
                 ),
               )
-              .toList()
-          : null,
+              .toList(),
+      docNum: json['docNum'],
     );
   }
 
   OutboundDeliverySalesItemEntity toEntity() => OutboundDeliverySalesItemEntity(
-        delivery: delivery,
-        item: item,
-        material: material,
-        itemDescription: itemDescription,
-        itemCategory: itemCategory,
-        batch: batch,
-        plant: plant,
-        storageLocation: storageLocation,
-        warehouseNo: warehouseNo,
-        deliveryQuantity: deliveryQuantity,
-        baseUom: baseUom,
-        salesUnit: salesUnit,
-        referenceDocument: referenceDocument,
-        movementType: movementType,
-        materialType: materialType,
-        precedingDocCateg: precedingDocCateg,
-        itemOverallStatus: itemOverallStatus,
-        itemMovementSts: itemMovementSts,
-        binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
-        completedBinDetails: completedBinDetails
-            ?.map((bin) => bin.toEntity())
-            .toList(),
-      );
+    delivery: delivery,
+    item: item,
+    material: material,
+    itemDescription: itemDescription,
+    itemCategory: itemCategory,
+    batch: batch,
+    plant: plant,
+    storageLocation: storageLocation,
+    warehouseNo: warehouseNo,
+    deliveryQuantity: deliveryQuantity,
+    baseUom: baseUom,
+    salesUnit: salesUnit,
+    referenceDocument: referenceDocument,
+    movementType: movementType,
+    materialType: materialType,
+    precedingDocCateg: precedingDocCateg,
+    itemOverallStatus: itemOverallStatus,
+    itemMovementSts: itemMovementSts,
+    binDetails: binDetails.map((bin) => bin.toEntity()).toList(),
+    completedBinDetails:
+        completedBinDetails?.map((bin) => bin.toEntity()).toList(),
+    docNum: docNum,
+  );
 }
 
 class OutboundDeliverySalesItemBinDetailModel {
@@ -242,29 +245,28 @@ class CompletedSalesItemBinDetailModel {
     required this.batches,
   });
 
-  factory CompletedSalesItemBinDetailModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory CompletedSalesItemBinDetailModel.fromJson(Map<String, dynamic> json) {
     return CompletedSalesItemBinDetailModel(
       sourceStorageBin: json['sourceStorageBin']?.toString() ?? '',
       sourceStorageType: json['sourceStorageType']?.toString() ?? '',
       sourceStorageSection: json['sourceStorageSection']?.toString() ?? '',
-      batches: (json['batches'] as List<dynamic>? ?? [])
-          .map(
-            (e) => CompletedSalesItemBatchDetailModel.fromJson(
-              e as Map<String, dynamic>,
-            ),
-          )
-          .toList(),
+      batches:
+          (json['batches'] as List<dynamic>? ?? [])
+              .map(
+                (e) => CompletedSalesItemBatchDetailModel.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
   CompletedSalesItemBinDetail toEntity() => CompletedSalesItemBinDetail(
-        sourceStorageBin: sourceStorageBin,
-        sourceStorageType: sourceStorageType,
-        sourceStorageSection: sourceStorageSection,
-        batches: batches.map((batch) => batch.toEntity()).toList(),
-      );
+    sourceStorageBin: sourceStorageBin,
+    sourceStorageType: sourceStorageType,
+    sourceStorageSection: sourceStorageSection,
+    batches: batches.map((batch) => batch.toEntity()).toList(),
+  );
 }
 
 class CompletedSalesItemBatchDetailModel {
@@ -291,11 +293,6 @@ class CompletedSalesItemBatchDetailModel {
     );
   }
 
-  CompletedSalesItemBatchDetail toEntity() => CompletedSalesItemBatchDetail(
-        batchName: batchName,
-        quantity: quantity,
-      );
+  CompletedSalesItemBatchDetail toEntity() =>
+      CompletedSalesItemBatchDetail(batchName: batchName, quantity: quantity);
 }
-
-
-

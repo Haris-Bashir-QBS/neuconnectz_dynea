@@ -22,5 +22,9 @@ abstract class ProductionReceiptRepository {
   Future<Either<Failure, ApiResponse<bool>>> createProductionReceipt(
     CreateProductionReceiptRequestModel request,
   );
+
+  Future<Either<Failure, ApiResponse<bool>>> deletePutawayAgainstProductionReceipt({
+    required int docNum,
+  });
 }
 

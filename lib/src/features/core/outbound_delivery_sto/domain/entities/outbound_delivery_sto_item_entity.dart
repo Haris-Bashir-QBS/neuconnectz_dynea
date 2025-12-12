@@ -17,6 +17,7 @@ class OutboundDeliveryStoItemEntity extends Equatable {
   final String itemOverallStatus;
   final String itemGoodsMovementSts;
   final List<BinDetail>? binDetails; // For completed items
+  final int? docNum;
 
   const OutboundDeliveryStoItemEntity({
     required this.delivery,
@@ -35,6 +36,7 @@ class OutboundDeliveryStoItemEntity extends Equatable {
     required this.itemOverallStatus,
     required this.itemGoodsMovementSts,
     this.binDetails,
+    this.docNum,
   });
 
   @override
@@ -55,6 +57,7 @@ class OutboundDeliveryStoItemEntity extends Equatable {
         itemOverallStatus,
         itemGoodsMovementSts,
         binDetails,
+        docNum,
       ];
 }
 

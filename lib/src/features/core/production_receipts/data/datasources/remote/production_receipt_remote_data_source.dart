@@ -21,5 +21,9 @@ abstract class ProductionReceiptRemoteDataSource {
   Future<ApiResponse<bool>> createProductionReceipt(
     CreateProductionReceiptRequestModel request,
   );
+
+  Future<ApiResponse<bool>> deletePutawayAgainstProductionReceipt({
+    required int docNum,
+  });
 }
 

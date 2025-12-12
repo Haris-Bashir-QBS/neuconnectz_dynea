@@ -14,6 +14,7 @@ class PurchaseOrderGrnItemEntity extends Equatable {
   final double quantity;
   final String baseUOM;
   final List<PurchaseOrderGrnItemBinDetailEntity> binDetails;
+  final int? docNum;
 
   const PurchaseOrderGrnItemEntity({
     required this.materialDocument,
@@ -29,6 +30,7 @@ class PurchaseOrderGrnItemEntity extends Equatable {
     required this.quantity,
     required this.baseUOM,
     this.binDetails = const [],
+    this.docNum,
   });
 
   @override
@@ -46,6 +48,7 @@ class PurchaseOrderGrnItemEntity extends Equatable {
     quantity,
     baseUOM,
     binDetails,
+    docNum,
   ];
 }
 

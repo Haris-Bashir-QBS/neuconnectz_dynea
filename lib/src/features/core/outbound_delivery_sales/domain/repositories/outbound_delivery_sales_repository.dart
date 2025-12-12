@@ -26,6 +26,10 @@ abstract class OutboundDeliverySalesRepository {
   Future<Either<Failure, ApiResponse<bool>>> createSalesOrder({
     required CreateSalesOrderRequestModel request,
   });
+
+  Future<Either<Failure, ApiResponse<bool>>> deletePickingAgainstOutboundDeliverySales({
+    required int docNum,
+  });
 }
 
 

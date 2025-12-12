@@ -7,4 +7,8 @@ abstract class PurchaseOrderGrnPutAwayRepository {
   Future<Either<Failure, ApiResponse<bool>>> createPutAwayAgainstGr(
     CreatePurchaseOrderGrnPutAwayRequestModel request,
   );
+
+  Future<Either<Failure, ApiResponse<bool>>> deletePutAwayOfPurchaseOrderGrn({
+    required int docNum,
+  });
 }

@@ -21,6 +21,10 @@ abstract class InboundDeliveryRemoteDataSource {
   Future<ApiResponse<bool>> createPutAwayAgainstInboundDelivery({
     required CreatePutAwayInboundStoRequestModel request,
   });
+
+  Future<ApiResponse<bool>> deletePutawayAgainstInboundDeliverySto({
+    required int docNum,
+  });
 }
 
 

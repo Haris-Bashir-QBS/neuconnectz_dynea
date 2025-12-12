@@ -21,6 +21,10 @@ abstract class ReservationRemoteDataSource {
   Future<ApiResponse<bool>> createPickingAgainstReservation({
     required CreatePickingRequestModel request,
   });
+
+  Future<ApiResponse<bool>> deleteReservation({
+    required int docNum,
+  });
 }
 
 

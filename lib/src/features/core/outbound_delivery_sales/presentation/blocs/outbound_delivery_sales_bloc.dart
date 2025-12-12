@@ -7,6 +7,7 @@ import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/doma
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/create_sales_order_usecase.dart';
+import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/delete_picking_against_outbound_delivery_sales_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_completed_outbound_delivery_sales_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_outbound_delivery_sales_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/usecases/get_outbound_delivery_sales_list_usecase.dart';
@@ -26,6 +27,7 @@ class OutboundDeliverySalesBloc
   getCompletedOutboundDeliverySalesItemsUseCase;
   final CreateSalesOrderUseCase createSalesOrderUseCase;
   final GetAndUpdateStocksUseCase getAndUpdateStocksUseCase;
+  final DeletePickingAgainstOutboundDeliverySalesUseCase deletePickingAgainstOutboundDeliverySalesUseCase;
 
   OutboundDeliverySalesBloc({
     required this.getOutboundDeliverySalesListUseCase,
@@ -33,6 +35,7 @@ class OutboundDeliverySalesBloc
     required this.getCompletedOutboundDeliverySalesItemsUseCase,
     required this.createSalesOrderUseCase,
     required this.getAndUpdateStocksUseCase,
+    required this.deletePickingAgainstOutboundDeliverySalesUseCase,
   }) : super(const OutboundDeliverySalesState()) {
     on<LoadOutboundDeliverySalesListEvent>(_onLoadOutboundDeliverySalesList);
     on<LoadOutboundDeliverySalesItemsEvent>(_onLoadOutboundDeliverySalesItems);
@@ -41,6 +44,7 @@ class OutboundDeliverySalesBloc
     );
     on<CreateSalesOrderEvent>(_onCreateSalesOrder);
     on<GetAndUpdateStocksFromSapEvent>(_onGetAndUpdateStocksFromSap);
+    on<DeletePickingAgainstOutboundDeliverySalesEvent>(_onDeletePickingAgainstOutboundDeliverySales);
   }
 
   Future<void> _onLoadOutboundDeliverySalesList(
@@ -263,6 +267,40 @@ class OutboundDeliverySalesBloc
       (response) => emit(
         state.copyWith(
           syncStocks: OperationState<ApiResponse<bool>>(
+            status: OperationStatus.success,
+            data: response,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onDeletePickingAgainstOutboundDeliverySales(
+    DeletePickingAgainstOutboundDeliverySalesEvent event,
+    Emitter<OutboundDeliverySalesState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        deletePickingAgainstOutboundDeliverySales: const OperationState<ApiResponse<bool>>(
+          status: OperationStatus.loading,
+        ),
+      ),
+    );
+
+    final result = await deletePickingAgainstOutboundDeliverySalesUseCase(docNum: event.docNum);
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          deletePickingAgainstOutboundDeliverySales: OperationState<ApiResponse<bool>>(
+            status: OperationStatus.error,
+            error: failure.message,
+          ),
+        ),
+      ),
+      (response) => emit(
+        state.copyWith(
+          deletePickingAgainstOutboundDeliverySales: OperationState<ApiResponse<bool>>(
             status: OperationStatus.success,
             data: response,
           ),

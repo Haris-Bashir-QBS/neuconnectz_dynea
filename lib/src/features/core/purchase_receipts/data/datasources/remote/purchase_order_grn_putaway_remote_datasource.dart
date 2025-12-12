@@ -5,4 +5,8 @@ abstract class PurchaseOrderGrnPutAwayRemoteDataSource {
   Future<ApiResponse<bool>> createPutAwayAgainstGr({
     required CreatePurchaseOrderGrnPutAwayRequestModel request,
   });
+
+  Future<ApiResponse<bool>> deletePutAwayOfPurchaseOrderGrn({
+    required int docNum,
+  });
 }

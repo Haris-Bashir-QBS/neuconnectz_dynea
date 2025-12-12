@@ -109,5 +109,17 @@ class ProductionReceiptRepositoryImpl implements ProductionReceiptRepository {
       return left(failure);
     }
   }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> deletePutawayAgainstProductionReceipt({
+    required int docNum,
+  }) async {
+    try {
+      final response = await remoteDataSource.deletePutawayAgainstProductionReceipt(docNum: docNum);
+      return right(response);
+    } on Failure catch (error) {
+      return left(error);
+    }
+  }
 }
 

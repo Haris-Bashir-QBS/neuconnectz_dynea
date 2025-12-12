@@ -24,4 +24,18 @@ class PurchaseOrderGrnPutAwayRepositoryImpl
       return left(failure);
     }
   }
+
+  @override
+  Future<Either<Failure, ApiResponse<bool>>> deletePutAwayOfPurchaseOrderGrn({
+    required int docNum,
+  }) async {
+    try {
+      final success = await remoteDataSource.deletePutAwayOfPurchaseOrderGrn(
+        docNum: docNum,
+      );
+      return right(success);
+    } on Failure catch (failure) {
+      return left(failure);
+    }
+  }
 }

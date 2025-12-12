@@ -18,9 +18,11 @@ class OutboundDeliverySalesItemEntity extends Equatable {
   final String materialType;
   final String precedingDocCateg;
   final String itemOverallStatus;
+  final int? docNum;
   final String itemMovementSts;
   final List<OutboundDeliverySalesItemBinDetailEntity> binDetails;
-  final List<CompletedSalesItemBinDetail>? completedBinDetails; // For completed items
+  final List<CompletedSalesItemBinDetail>?
+  completedBinDetails; // For completed items
 
   const OutboundDeliverySalesItemEntity({
     required this.delivery,
@@ -43,31 +45,33 @@ class OutboundDeliverySalesItemEntity extends Equatable {
     required this.itemMovementSts,
     this.binDetails = const [],
     this.completedBinDetails,
+    this.docNum,
   });
 
   @override
   List<Object?> get props => [
-        delivery,
-        item,
-        material,
-        itemDescription,
-        itemCategory,
-        batch,
-        plant,
-        storageLocation,
-        warehouseNo,
-        deliveryQuantity,
-        baseUom,
-        salesUnit,
-        referenceDocument,
-        movementType,
-        materialType,
-        precedingDocCateg,
-        itemOverallStatus,
-        itemMovementSts,
-        binDetails,
-        completedBinDetails,
-      ];
+    delivery,
+    item,
+    material,
+    itemDescription,
+    itemCategory,
+    batch,
+    plant,
+    storageLocation,
+    warehouseNo,
+    deliveryQuantity,
+    baseUom,
+    salesUnit,
+    referenceDocument,
+    movementType,
+    materialType,
+    precedingDocCateg,
+    itemOverallStatus,
+    itemMovementSts,
+    binDetails,
+    completedBinDetails,
+    docNum,
+  ];
 }
 
 class OutboundDeliverySalesItemBinDetailEntity extends Equatable {
@@ -87,12 +91,12 @@ class OutboundDeliverySalesItemBinDetailEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        binCode,
-        storageType,
-        storageSection,
-        proposedQuantity,
-        actualQuantity,
-      ];
+    binCode,
+    storageType,
+    storageSection,
+    proposedQuantity,
+    actualQuantity,
+  ];
 }
 
 class CompletedSalesItemBinDetail extends Equatable {
@@ -110,11 +114,11 @@ class CompletedSalesItemBinDetail extends Equatable {
 
   @override
   List<Object?> get props => [
-        sourceStorageBin,
-        sourceStorageType,
-        sourceStorageSection,
-        batches,
-      ];
+    sourceStorageBin,
+    sourceStorageType,
+    sourceStorageSection,
+    batches,
+  ];
 }
 
 class CompletedSalesItemBatchDetail extends Equatable {
@@ -129,6 +133,3 @@ class CompletedSalesItemBatchDetail extends Equatable {
   @override
   List<Object?> get props => [batchName, quantity];
 }
-
-
-

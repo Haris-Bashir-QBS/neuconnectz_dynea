@@ -26,6 +26,10 @@ abstract class InboundDeliveryRepository {
   Future<Either<Failure, ApiResponse<bool>>> createPutAwayAgainstInboundDelivery(
     CreatePutAwayInboundStoRequestModel request,
   );
+
+  Future<Either<Failure, ApiResponse<bool>>> deletePutawayAgainstInboundDeliverySto({
+    required int docNum,
+  });
 }
 
 

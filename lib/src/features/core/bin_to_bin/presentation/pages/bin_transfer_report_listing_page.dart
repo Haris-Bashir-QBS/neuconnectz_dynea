@@ -20,6 +20,7 @@ import 'package:neuconnectz_dynea/src/widgets/custom_appbar.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text_formfield.dart';
+import 'package:neuconnectz_dynea/src/widgets/custom_toast.dart';
 
 import '../../../../../core/router/app_router.dart';
 
@@ -282,81 +283,98 @@ class _BinTransferReportListingViewState
   }
 
   Widget _buildReportList() {
-    return BlocBuilder<BinTransferReportBloc, BinTransferReportState>(
-      builder: (context, state) {
-        if (state is BinTransferReportLoading) {
-          return const Center(child: CircularProgressIndicator());
+    return BlocListener<BinTransferReportBloc, BinTransferReportState>(
+      listenWhen: (previous, current) {
+        return previous is! DeleteBinRecordFailure && current is DeleteBinRecordFailure;
+      },
+      listener: (context, state) {
+        if (state is DeleteBinRecordFailure) {
+          CustomToast.error(context, state.message);
         }
+      },
+      child: BlocBuilder<BinTransferReportBloc, BinTransferReportState>(
+        builder: (context, state) {
+          // Show loading for both normal loading and delete loading states
+          if (state is BinTransferReportLoading || state is DeleteBinRecordLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (state is BinTransferReportFailure) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomText(
-                  text: state.message,
-                  fontSize: 14.sp,
-                  color: AppPalette.greyColor,
-                ),
-                12.verticalSpace,
-                ElevatedButton(
-                  onPressed: _loadReport,
-                  child: Text(AppTexts.retry),
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (state is BinTransferReportSuccess) {
-          if (state.reports.isEmpty) {
+          if (state is BinTransferReportFailure) {
             return Center(
-              child: CustomText(
-                text: 'No bin transfers found',
-                fontSize: 14.sp,
-                color: AppPalette.greyColor,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomText(
+                    text: state.message,
+                    fontSize: 14.sp,
+                    color: AppPalette.greyColor,
+                  ),
+                  12.verticalSpace,
+                  ElevatedButton(
+                    onPressed: _loadReport,
+                    child: Text(AppTexts.retry),
+                  ),
+                ],
               ),
             );
           }
 
-          // Group reports by date
-          final grouped = _groupReportsByDate(state.reports);
+          if (state is BinTransferReportSuccess) {
+            if (state.reports.isEmpty) {
+              return Center(
+                child: CustomText(
+                  text: 'No bin transfers found',
+                  fontSize: 14.sp,
+                  color: AppPalette.greyColor,
+                ),
+              );
+            }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              _loadReport();
-              // Wait a bit to allow the refresh indicator to show
-              await Future.delayed(const Duration(milliseconds: 500));
-            },
-            child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              itemCount: grouped.length,
-              itemBuilder: (context, index) {
-                final dateKey = grouped.keys.elementAt(index);
-                final reports = grouped[dateKey]!;
+            // Group reports by date
+            final grouped = _groupReportsByDate(state.reports);
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDateHeader(dateKey),
-                    4.verticalSpace,
-                    ...reports.map(
-                      (report) => BinTransferReportItemCard(
-                        report: report,
-                        onTap: () => _showTransactionDetails(context, report),
-                      ),
-                    ),
-                    16.verticalSpace,
-                  ],
-                );
+            return RefreshIndicator(
+              onRefresh: () async {
+                _loadReport();
+                // Wait a bit to allow the refresh indicator to show
+                await Future.delayed(const Duration(milliseconds: 500));
               },
-            ),
-          );
-        }
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                itemCount: grouped.length,
+                itemBuilder: (context, index) {
+                  final dateKey = grouped.keys.elementAt(index);
+                  final reports = grouped[dateKey]!;
 
-        return const SizedBox.shrink();
-      },
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDateHeader(dateKey),
+                      4.verticalSpace,
+                      ...reports.map(
+                        (report) => BinTransferReportItemCard(
+                          report: report,
+                          onTap: () => _showTransactionDetails(context, report),
+                        ),
+                      ),
+                      16.verticalSpace,
+                    ],
+                  );
+                },
+              ),
+            );
+          }
+
+          // Handle delete success state - show loading while reloading
+          if (state is DeleteBinRecordSuccess) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // Default: show loading
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
 
@@ -392,19 +410,28 @@ class _BinTransferReportListingViewState
     BuildContext context,
     BinTransferReportEntity report,
   ) {
+    final bloc = context.read<BinTransferReportBloc>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (context) => BinTransferTransactionDetailsBottomSheet(report: report),
+      builder: (context) => BlocProvider.value(
+        value: bloc,
+        child: BinTransferTransactionDetailsBottomSheet(report: report),
+      ),
     ).then((result) {
-      if (result == 'edit') {
+      if (!mounted) return;
+      if (result == true) {
+        // Refresh the listing after successful delete
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          context.read<BinTransferReportBloc>().add(
+            const LoadBinTransferReportEvent(params: GetBinTransferReportParams()),
+          );
+        });
+      } else if (result == 'edit') {
         // Handle edit action
         // TODO: Navigate to edit screen or show edit dialog
-      } else if (result == 'delete') {
-        // Handle delete action
-        // TODO: Show confirmation and delete transfer
       }
     });
   }

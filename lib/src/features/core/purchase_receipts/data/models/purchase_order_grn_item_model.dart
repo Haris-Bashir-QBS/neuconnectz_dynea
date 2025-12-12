@@ -88,6 +88,7 @@ class GrnItemModel {
   final double quantity;
   final String baseUOM;
   final List<GrnItemBinDetailModel> binDetails;
+  final int? docNum;
 
   GrnItemModel({
     required this.materialDocument,
@@ -103,6 +104,7 @@ class GrnItemModel {
     required this.quantity,
     required this.baseUOM,
     this.binDetails = const [],
+    this.docNum,
   });
 
   factory GrnItemModel.fromJson(Map<String, dynamic> json) {
@@ -127,6 +129,7 @@ class GrnItemModel {
               )
               .toList() ??
           const [],
+      docNum: json['docNum'],
     );
   }
 
@@ -144,6 +147,7 @@ class GrnItemModel {
     quantity: quantity,
     baseUOM: baseUOM,
     binDetails: binDetails.map((e) => e.toEntity()).toList(),
+    docNum: docNum,
   );
 
   Map<String, dynamic> toJson() => {
@@ -160,6 +164,7 @@ class GrnItemModel {
     'quantity': quantity,
     'baseUOM': baseUOM,
     'binDetails': binDetails.map((e) => e.toJson()).toList(),
+    'docNum': docNum,
   };
 }
 

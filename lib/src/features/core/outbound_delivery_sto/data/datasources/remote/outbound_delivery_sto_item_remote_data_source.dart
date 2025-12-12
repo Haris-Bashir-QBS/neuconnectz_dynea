@@ -15,6 +15,10 @@ abstract class OutboundDeliveryStoItemRemoteDataSource {
   Future<ApiResponse<bool>> getAndUpdateStocksFromSap({
     required GetAndUpdateStocksRequestModel request,
   });
+
+  Future<ApiResponse<bool>> deletePickingAgainstOutboundDeliverySto({
+    required int docNum,
+  });
 }
 
 

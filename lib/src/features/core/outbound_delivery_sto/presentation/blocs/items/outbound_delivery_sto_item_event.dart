@@ -33,4 +33,13 @@ class LoadCompletedStoItemsEvent extends OutboundDeliveryStoItemEvent {
   List<Object> get props => [params, refresh];
 }
 
+class DeletePickingAgainstOutboundDeliveryStoEvent extends OutboundDeliveryStoItemEvent {
+  final int docNum;
+
+  const DeletePickingAgainstOutboundDeliveryStoEvent({required this.docNum});
+
+  @override
+  List<Object> get props => [docNum];
+}
+
 

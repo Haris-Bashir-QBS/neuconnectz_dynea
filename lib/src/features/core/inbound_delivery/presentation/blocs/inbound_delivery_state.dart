@@ -51,13 +51,25 @@ class InboundDeliveryItemsSectionState extends Equatable {
 abstract class InboundDeliveryState extends Equatable {
   final InboundDeliveryItemsSectionState pendingSection;
   final InboundDeliveryItemsSectionState completedSection;
+  final bool isDeleting;
+  final String? deleteError;
+  final ApiResponse<bool>? deleteResponse;
 
   const InboundDeliveryState({
     this.pendingSection = const InboundDeliveryItemsSectionState(),
     this.completedSection = const InboundDeliveryItemsSectionState(),
+    this.isDeleting = false,
+    this.deleteError,
+    this.deleteResponse,
   });
 
-  List<Object?> get baseProps => [pendingSection, completedSection];
+  List<Object?> get baseProps => [
+        pendingSection,
+        completedSection,
+        isDeleting,
+        deleteError,
+        deleteResponse,
+      ];
 
   @override
   List<Object?> get props => baseProps;
@@ -67,6 +79,9 @@ class InboundDeliveryInitial extends InboundDeliveryState {
   const InboundDeliveryInitial({
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -74,6 +89,9 @@ class InboundDeliveryHeaderListLoading extends InboundDeliveryState {
   const InboundDeliveryHeaderListLoading({
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -90,6 +108,9 @@ class InboundDeliveryHeaderListFetched extends InboundDeliveryState {
     this.isLoadingMore = false,
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 
   bool get hasMore => items.length < totalRows;
@@ -111,6 +132,9 @@ class InboundDeliveryHeaderListFetchFailure extends InboundDeliveryState {
     required this.message,
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 
   @override
@@ -121,6 +145,9 @@ class InboundDeliveryItemsLoading extends InboundDeliveryState {
   const InboundDeliveryItemsLoading({
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -128,6 +155,9 @@ class InboundDeliveryItemsSuccess extends InboundDeliveryState {
   const InboundDeliveryItemsSuccess({
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -138,6 +168,9 @@ class InboundDeliveryItemsFailure extends InboundDeliveryState {
     required this.message,
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 
   @override
@@ -148,6 +181,9 @@ class CompletedInboundDeliveryItemsLoading extends InboundDeliveryState {
   const CompletedInboundDeliveryItemsLoading({
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -155,6 +191,9 @@ class CompletedInboundDeliveryItemsSuccess extends InboundDeliveryState {
   const CompletedInboundDeliveryItemsSuccess({
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 }
 
@@ -165,6 +204,9 @@ class CompletedInboundDeliveryItemsFailure extends InboundDeliveryState {
     required this.message,
     super.pendingSection,
     super.completedSection,
+    super.isDeleting = false,
+    super.deleteError,
+    super.deleteResponse,
   });
 
   @override

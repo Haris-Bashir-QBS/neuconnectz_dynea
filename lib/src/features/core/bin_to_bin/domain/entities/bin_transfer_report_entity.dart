@@ -29,6 +29,7 @@ class BinTransferReportEntity extends Equatable {
   final int totalQuantity;
   final List<BinTransferReportMaterialEntity> materials;
   final DateTime? transferDate; // Will be extracted from response if available
+  final int? docNum;
 
   const BinTransferReportEntity({
     required this.plant,
@@ -44,6 +45,7 @@ class BinTransferReportEntity extends Equatable {
     required this.totalQuantity,
     required this.materials,
     this.transferDate,
+    this.docNum,
   });
 
   @override
@@ -61,6 +63,7 @@ class BinTransferReportEntity extends Equatable {
         totalQuantity,
         materials,
         transferDate,
+        docNum,
       ];
 }
 

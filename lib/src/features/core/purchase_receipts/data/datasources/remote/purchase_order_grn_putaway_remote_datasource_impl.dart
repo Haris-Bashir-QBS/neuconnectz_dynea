@@ -35,4 +35,35 @@ class PurchaseOrderGrnPutAwayRemoteDataSourceImpl
       );
     });
   }
+
+  @override
+  Future<ApiResponse<bool>> deletePutAwayOfPurchaseOrderGrn({
+    required int docNum,
+  }) async {
+    return ApiErrorHandler.executeGuarded(() async {
+      final response = await dio.put(
+        endpoint: ApiEndpoints.deletePutAwayOfPurchaseOrderGrn.value,
+        queryParams: {'docNum': docNum},
+      );
+
+      // Always parse the ApiResponse to get the actual success/error status
+      final apiResponse = ApiResponse<bool>.fromJson(
+        response.data ?? {},
+        fromJsonT: (data) => data as bool? ?? false,
+      );
+
+      // Check if the API request was successful
+      if (apiResponse.isRequestSuccess && (response.statusCode == 200 || response.statusCode == 201)) {
+        return apiResponse;
+      }
+
+      // If not successful, throw exception with the message from API response
+      throw ServerException(
+        statusCode: apiResponse.statusCode,
+        message: apiResponse.message.isNotEmpty
+            ? apiResponse.message
+            : 'Failed to delete put away request.',
+      );
+    });
+  }
 }

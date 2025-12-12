@@ -21,6 +21,10 @@ abstract class OutboundDeliverySalesRemoteDataSource {
   Future<ApiResponse<bool>> createSalesOrder({
     required CreateSalesOrderRequestModel request,
   });
+
+  Future<ApiResponse<bool>> deletePickingAgainstOutboundDeliverySales({
+    required int docNum,
+  });
 }
 
 

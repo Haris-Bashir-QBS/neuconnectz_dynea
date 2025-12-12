@@ -4,6 +4,8 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
+import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/delete_reservation_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_reservation_list_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_reservation_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/usecases/get_completed_reservation_items_usecase.dart';
@@ -16,15 +18,18 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
   final GetReservationItemsUseCase getReservationItemsUseCase;
   final GetCompletedReservationItemsUseCase
       getCompletedReservationItemsUseCase;
+  final DeleteReservationUseCase deleteReservationUseCase;
 
   ReservationBloc({
     required this.getReservationListUseCase,
     required this.getReservationItemsUseCase,
     required this.getCompletedReservationItemsUseCase,
+    required this.deleteReservationUseCase,
   }) : super(const ReservationState()) {
     on<LoadReservationListEvent>(_onLoadReservationList);
     on<LoadReservationItemsEvent>(_onLoadReservationItems);
     on<LoadCompletedReservationItemsEvent>(_onLoadCompletedReservationItems);
+    on<DeleteReservationEvent>(_onDeleteReservation);
   }
 
   Future<void> _onLoadReservationList(
@@ -199,6 +204,42 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
             completedItems: newItems,
             completedTotalRows: data.totalCount,
             completedSkipRecords: newItems.length,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onDeleteReservation(
+    DeleteReservationEvent event,
+    Emitter<ReservationState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        isDeleting: true,
+        deleteError: null,
+        deleteResponse: null,
+      ),
+    );
+
+    final result = await deleteReservationUseCase(docNum: event.docNum);
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            isDeleting: false,
+            deleteError: failure.message,
+            deleteResponse: null,
+          ),
+        );
+      },
+      (success) {
+        emit(
+          state.copyWith(
+            isDeleting: false,
+            deleteError: null,
+            deleteResponse: success,
           ),
         );
       },

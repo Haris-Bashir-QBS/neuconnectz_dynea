@@ -65,5 +65,14 @@ class GetAndUpdateStocksFromSapEvent extends OutboundDeliverySalesEvent {
   List<Object?> get props => [request];
 }
 
+class DeletePickingAgainstOutboundDeliverySalesEvent extends OutboundDeliverySalesEvent {
+  final int docNum;
+
+  const DeletePickingAgainstOutboundDeliverySalesEvent({required this.docNum});
+
+  @override
+  List<Object?> get props => [docNum];
+}
+
 
 

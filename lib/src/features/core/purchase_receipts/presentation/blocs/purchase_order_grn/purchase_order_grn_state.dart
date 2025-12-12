@@ -167,3 +167,36 @@ class PurchaseOrderCompletedGrnItemsFailure extends PurchaseOrderGrnState {
   @override
   List<Object?> get props => [...baseProps, message];
 }
+
+class DeletePutAwayOfPurchaseOrderGrnLoading extends PurchaseOrderGrnState {
+  const DeletePutAwayOfPurchaseOrderGrnLoading({
+    super.pendingSection,
+    super.completedSection,
+  });
+}
+
+class DeletePutAwayOfPurchaseOrderGrnSuccess extends PurchaseOrderGrnState {
+  final ApiResponse<bool>? apiResponse;
+
+  const DeletePutAwayOfPurchaseOrderGrnSuccess({
+    this.apiResponse,
+    super.pendingSection,
+    super.completedSection,
+  });
+
+  @override
+  List<Object?> get props => [...baseProps, apiResponse];
+}
+
+class DeletePutAwayOfPurchaseOrderGrnFailure extends PurchaseOrderGrnState {
+  final String message;
+
+  const DeletePutAwayOfPurchaseOrderGrnFailure({
+    required this.message,
+    super.pendingSection,
+    super.completedSection,
+  });
+
+  @override
+  List<Object?> get props => [...baseProps, message];
+}

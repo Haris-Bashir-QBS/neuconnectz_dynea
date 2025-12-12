@@ -90,6 +90,7 @@ class ProductionReceiptItemModel {
   final String alternativeUOM;
   final String storageLocation;
   final List<ProductionReceiptItemBinDetailModel> binQuantities;
+  final int? docNum;
 
   ProductionReceiptItemModel({
     required this.warehouseNumber,
@@ -103,6 +104,7 @@ class ProductionReceiptItemModel {
     required this.alternativeUOM,
     required this.storageLocation,
     this.binQuantities = const [],
+    this.docNum,
   });
 
   factory ProductionReceiptItemModel.fromJson(Map<String, dynamic> json) {
@@ -117,6 +119,7 @@ class ProductionReceiptItemModel {
       trQuantity: (json['trQuantity'] ?? 0).toDouble(),
       alternativeUOM: json['alternativeUOM'] ?? '',
       storageLocation: json['storageLocation'] ?? '',
+      docNum: json['docNum'],
     );
   }
 
@@ -137,6 +140,7 @@ class ProductionReceiptItemModel {
       alternativeUOM: json['uom'] ?? '', // Completed API uses 'uom'
       storageLocation: json['storageLocation'] ?? '',
       binQuantities: binQuantities,
+      docNum: json['docNum'],
     );
   }
 
@@ -153,6 +157,7 @@ class ProductionReceiptItemModel {
       alternativeUOM: alternativeUOM,
       storageLocation: storageLocation,
       binDetails: binQuantities.map((bin) => bin.toEntity()).toList(),
+      docNum: docNum,
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:logger/logger.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
+import 'package:neuconnectz_dynea/src/widgets/status_dialog.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/entities/inbound_delivery_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/params/inbound_delivery_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/blocs/inbound_delivery_bloc.dart';
@@ -179,16 +181,44 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
         final completedChanged =
             previous.completedSection.errorMessage !=
             current.completedSection.errorMessage;
-        return pendingChanged || completedChanged;
+        final deleteErrorChanged =
+            previous.deleteError != current.deleteError;
+        final deleteResponseChanged =
+            previous.deleteResponse != current.deleteResponse;
+        final deleteLoadingToFailure =
+            previous.isDeleting && !current.isDeleting && current.deleteError != null;
+        final deleteLoadingToSuccess =
+            previous.isDeleting && !current.isDeleting && current.deleteResponse != null;
+        return pendingChanged ||
+            completedChanged ||
+            deleteErrorChanged ||
+            deleteResponseChanged ||
+            deleteLoadingToFailure ||
+            deleteLoadingToSuccess;
       },
       listener: (context, state) {
-        final pendingError = state.pendingSection.errorMessage;
-        final completedError = state.completedSection.errorMessage;
-        if (pendingError != null && pendingError.isNotEmpty) {
-          CustomToast.error(context, pendingError);
-        } else if (completedError != null && completedError.isNotEmpty) {
-          CustomToast.error(context, completedError);
-        }
+        if (!mounted) return;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+
+          final pendingError = state.pendingSection.errorMessage;
+          final completedError = state.completedSection.errorMessage;
+          if (pendingError != null && pendingError.isNotEmpty) {
+            CustomToast.error(context, pendingError);
+          } else if (completedError != null && completedError.isNotEmpty) {
+            CustomToast.error(context, completedError);
+          } else if (state.deleteError != null && state.deleteError!.isNotEmpty) {
+            CustomToast.error(context, state.deleteError!);
+          } else if (state.deleteResponse != null) {
+            final message = state.deleteResponse!.message.isNotEmpty == true
+                ? state.deleteResponse!.message
+                : 'Putaway against inbound delivery STO deleted successfully';
+            CustomToast.success(context, message);
+            _loadPendingData();
+            _loadCompletedData();
+          }
+        });
       },
       child: BlocBuilder<InboundDeliveryBloc, InboundDeliveryState>(
         builder: (context, state) {
@@ -345,14 +375,42 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
             );
           }
           final item = completedState.items[index];
-          return InboundDeliveryItemWidget(
-            item: item,
-            onTap: () {
-              context.pushNamed(
-                AppRoutes.completedInboundDeliveryItemDetail,
-                extra: item,
-              );
-            },
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Slidable(
+              key: ValueKey('completed_${item.stoNo}_${item.stoItemNo}_${item.outboundDeliveryNo}_$index'),
+              groupTag: 'completed_items',
+              endActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                extentRatio: 0.25,
+                children: [
+                  SlidableAction(
+                    onPressed: (_) => _showDeleteConfirmation(context, item),
+                    backgroundColor: AppPalette.redColor,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: AppTexts.delete,
+                    flex: 1,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(8.r),
+                      bottomRight: Radius.circular(8.r),
+                    ),
+                    autoClose: false,
+                    spacing: 0,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+              child: InboundDeliveryItemWidget(
+                item: item,
+                onTap: () {
+                  context.pushNamed(
+                    AppRoutes.completedInboundDeliveryItemDetail,
+                    extra: item,
+                  );
+                },
+              ),
+            ),
           );
         },
       ),
@@ -413,6 +471,34 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    InboundDeliveryItemEntity item,
+  ) {
+    if (item.docNum == null) {
+      CustomToast.error(context, 'Document number not available');
+      return;
+    }
+
+    AnimatedStatusDialog.show(
+      context: context,
+      isSuccess: false,
+      title: AppTexts.deletePutawayRequest,
+      message: AppTexts.deletePutawayRequestMessage,
+      primaryButtonText: AppTexts.delete,
+      secondaryButtonText: AppTexts.cancel,
+      onPrimaryTap: () {
+        _deletePutawayAgainstInboundDeliverySto(context, item.docNum!);
+      },
+    );
+  }
+
+  void _deletePutawayAgainstInboundDeliverySto(BuildContext context, int docNum) {
+    context.read<InboundDeliveryBloc>().add(
+      DeletePutawayAgainstInboundDeliveryStoEvent(docNum: docNum),
     );
   }
 }

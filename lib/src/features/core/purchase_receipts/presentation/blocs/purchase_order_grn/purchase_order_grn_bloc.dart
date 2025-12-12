@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:neuconnectz_dynea/src/core/network/models/api_generic_response.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/params/purchase_order_grn_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/params/purchase_order_grn_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/entities/purchase_order_grn_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/entities/purchase_order_grn_list_item_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/usecases/delete_putaway_of_purchase_order_grn_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/usecases/get_completed_purchase_order_grn_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/usecases/get_purchase_order_grn_items_usecase.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/usecases/get_purchase_order_grn_list_usecase.dart';
@@ -16,15 +18,18 @@ class PurchaseOrderGrnBloc
   final GetPurchaseOrderGrnListUseCase getGrnListUseCase;
   final GetPurchaseOrderGrnItemsUseCase getGrnItemsUseCase;
   final GetCompletedPurchaseOrderGrnItemsUseCase getCompletedGrnItemsUseCase;
+  final DeletePutAwayOfPurchaseOrderGrnUseCase deletePutAwayOfPurchaseOrderGrnUseCase;
 
   PurchaseOrderGrnBloc({
     required this.getGrnListUseCase,
     required this.getGrnItemsUseCase,
     required this.getCompletedGrnItemsUseCase,
+    required this.deletePutAwayOfPurchaseOrderGrnUseCase,
   }) : super(PurchaseOrderGrnInitial()) {
     on<LoadPendingPurchaseOrderGrnEvent>(_onLoadPendingGrn);
     on<LoadPurchaseOrderGrnItemsEvent>(_onLoadGrnItems);
     on<LoadCompletedPurchaseOrderGrnItemsEvent>(_onLoadCompletedGrnItems);
+    on<DeletePutAwayOfPurchaseOrderGrnEvent>(_onDeletePutAwayOfPurchaseOrderGrn);
   }
 
   Future<void> _onLoadPendingGrn(
@@ -367,5 +372,40 @@ class PurchaseOrderGrnBloc
         },
       );
     }
+  }
+
+  Future<void> _onDeletePutAwayOfPurchaseOrderGrn(
+    DeletePutAwayOfPurchaseOrderGrnEvent event,
+    Emitter<PurchaseOrderGrnState> emit,
+  ) async {
+    emit(
+      DeletePutAwayOfPurchaseOrderGrnLoading(
+        pendingSection: state.pendingSection,
+        completedSection: state.completedSection,
+      ),
+    );
+
+    final result = await deletePutAwayOfPurchaseOrderGrnUseCase(docNum: event.docNum);
+
+    result.fold(
+      (failure) {
+        emit(
+          DeletePutAwayOfPurchaseOrderGrnFailure(
+            message: failure.message,
+            pendingSection: state.pendingSection,
+            completedSection: state.completedSection,
+          ),
+        );
+      },
+      (success) {
+        emit(
+          DeletePutAwayOfPurchaseOrderGrnSuccess(
+            apiResponse: success,
+            pendingSection: state.pendingSection,
+            completedSection: state.completedSection,
+          ),
+        );
+      },
+    );
   }
 }

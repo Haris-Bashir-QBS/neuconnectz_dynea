@@ -74,6 +74,34 @@ class OutboundDeliveryStoItemRemoteDataSourceImpl
       );
     });
   }
+
+  @override
+  Future<ApiResponse<bool>> deletePickingAgainstOutboundDeliverySto({
+    required int docNum,
+  }) async {
+    return ApiErrorHandler.executeGuarded(() async {
+      final response = await dioClient.put(
+        endpoint: ApiEndpoints.deleteSto.value,
+        queryParams: {'docNum': docNum},
+      );
+
+      final apiResponse = ApiResponse<bool>.fromJson(
+        response.data ?? {},
+        fromJsonT: (data) => data as bool? ?? false,
+      );
+
+      if (apiResponse.isRequestSuccess && (response.statusCode == 200 || response.statusCode == 201)) {
+        return apiResponse;
+      }
+
+      throw ServerException(
+        statusCode: apiResponse.statusCode,
+        message: apiResponse.message.isNotEmpty
+            ? apiResponse.message
+            : 'Failed to delete STO.',
+      );
+    });
+  }
 }
 
 

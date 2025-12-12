@@ -8,3 +8,5 @@ class LoadStocksByStorageBinEvent extends StocksByStorageBinEvent {
 
 abstract class StocksByStorageBinEvent {}
 
+
+

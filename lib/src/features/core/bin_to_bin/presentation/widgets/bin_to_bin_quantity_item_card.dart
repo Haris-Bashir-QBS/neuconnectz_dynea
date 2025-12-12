@@ -177,3 +177,5 @@ class BinToBinQuantityItemCard extends StatelessWidget {
     );
   }
 }
+
+

@@ -16,3 +16,5 @@ class LoadBinTransferReportEvent extends BinTransferReportEvent {
   @override
   List<Object?> get props => [params];
 }
+
+

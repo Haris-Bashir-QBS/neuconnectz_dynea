@@ -6,3 +6,5 @@ class ForgetPasswordRequestModel {
 
   Map<String, dynamic> toJson() => {'email': email, 'deviceId': deviceId};
 }
+
+

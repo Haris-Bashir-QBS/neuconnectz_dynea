@@ -19,3 +19,5 @@ class FetchSecretKeyUsecase
     return await authRepository.getSecretKey();
   }
 }
+
+

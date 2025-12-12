@@ -13,6 +13,8 @@ var _stocks = "$_rootApi/IStocksFeature";
 var _stockTransferOrder = "$_rootApi/IStockTransferOrderFeature";
 var _salesOrder = "$_rootApi/ISalesOrderFeature";
 var _sapDataSync = "$_rootApi/ISAPDataSyncFeature";
+var _inboundDelivery = "$_rootApi/IInboundDeliveryStoFeature";
+var _productionReceipt = "$_rootApi/IProductionReceiptFeature";
 
 enum ApiEndpoints {
   /// ================= Auth =======================
@@ -78,7 +80,17 @@ enum ApiEndpoints {
 
   /// ===================== Bin to Bin Transfer =====================
   processBinToBinTransfer,
-  getBinTransferReport;
+  getBinTransferReport,
+
+  /// ===================== Inbound Delivery =====================
+  listAllInboundDeliveryFromSAP,
+  listAllInboundDeliveryItemsFromSAP,
+  completedInboundDeliveryItems,
+  createPutAwayAgainstInboundDelivery,
+
+  /// ===================== Production Receipts =====================
+  listProductionReceiptsFromSAP,
+  listProductionReceiptItemsFromSAP;
 
   String get value {
     switch (this) {
@@ -188,6 +200,24 @@ enum ApiEndpoints {
         return "$_binManagement/ProcessBinToBinTransfer";
       case ApiEndpoints.getBinTransferReport:
         return "$_binManagement/GetBinTransferReport";
+
+      /// ===================== Inbound Delivery =====================
+      case ApiEndpoints.listAllInboundDeliveryFromSAP:
+        return "$_inboundDelivery/GetInboundDeliveryStoFromSap";
+      case ApiEndpoints.listAllInboundDeliveryItemsFromSAP:
+        return "$_inboundDelivery/GetInboundDeliveryStoItemFromSap";
+      case ApiEndpoints.completedInboundDeliveryItems:
+        return "$_inboundDelivery/GetCompletedInboundDeliveryItemWithBins";
+      case ApiEndpoints.createPutAwayAgainstInboundDelivery:
+        return "$_inboundDelivery/CreatePutAwayAgainstInboundDeliverySto";
+
+      /// ===================== Production Receipts =====================
+      case ApiEndpoints.listProductionReceiptsFromSAP:
+        return "$_productionReceipt/GetProductionReceiptsFromSap";
+      case ApiEndpoints.listProductionReceiptItemsFromSAP:
+        return "$_productionReceipt/GetProductionReceiptItemFromSap";
     }
   }
 }
+
+

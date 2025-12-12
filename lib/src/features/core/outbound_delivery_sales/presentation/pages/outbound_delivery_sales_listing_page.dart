@@ -7,10 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_shimmer.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/item_listing_header_shimmer.dart';
+import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/item_listing_header_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_entity.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_items_page_params.dart';
@@ -150,7 +149,7 @@ class _OutboundDeliverySalesListingViewState
                 child: ListView.builder(
                   itemCount: 6,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  itemBuilder: (context, index) => const GrnListItemShimmer(),
+                  itemBuilder: (context, index) => const CardShimmer(),
                 ),
               ),
             ],
@@ -209,9 +208,7 @@ class _OutboundDeliverySalesListingViewState
                     if (index == state.listItems.length) {
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: const Center(child: CircularProgressIndicator()),
                       );
                     }
 
@@ -239,11 +236,10 @@ class _OutboundDeliverySalesListingViewState
       warehouse: widget.params.warehouse,
     );
 
-    await context.pushNamed(AppRoutes.outboundDeliverySalesItems, extra: params).then((
-      value,
-    ) {
-      _loadInitialData();
-    });
+    await context
+        .pushNamed(AppRoutes.outboundDeliverySalesItems, extra: params)
+        .then((value) {
+          _loadInitialData();
+        });
   }
 }
-

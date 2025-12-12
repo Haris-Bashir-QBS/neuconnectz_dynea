@@ -18,3 +18,5 @@ class ProcessBinToBinTransferUseCase
     return repository.processBinToBinTransfer(params);
   }
 }
+
+

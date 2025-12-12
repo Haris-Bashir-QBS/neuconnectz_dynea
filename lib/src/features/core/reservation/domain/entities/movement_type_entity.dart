@@ -15,3 +15,5 @@ class MovementTypeEntity extends Equatable {
   List<Object?> get props => [id, movementType, description];
 }
 
+
+

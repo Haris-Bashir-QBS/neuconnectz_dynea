@@ -15,3 +15,5 @@ class StockResultEntity extends Equatable {
   List<Object?> get props => [items, totalCount];
 }
 
+
+

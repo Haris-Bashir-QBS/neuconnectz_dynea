@@ -55,3 +55,5 @@ class StockRemoteDataSourceImpl implements StockRemoteDataSource {
     return StockResponseModel.fromJson(response.data ?? {});
   }
 }
+
+

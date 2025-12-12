@@ -1,1 +1,3 @@
 enum FieldScanType { barcode, binCode }
+
+

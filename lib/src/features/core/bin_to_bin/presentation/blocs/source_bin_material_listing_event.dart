@@ -68,3 +68,4 @@ class LoadMoreSourceBinMaterialsEvent extends SourceBinMaterialListingEvent {
         searchQuery,
       ];
 }
+

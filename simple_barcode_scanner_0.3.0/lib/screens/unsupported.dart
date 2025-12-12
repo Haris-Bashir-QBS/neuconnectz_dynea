@@ -74,3 +74,5 @@ class BarcodeScannerView extends StatelessWidget {
     throw 'Platform not supported';
   }
 }
+
+

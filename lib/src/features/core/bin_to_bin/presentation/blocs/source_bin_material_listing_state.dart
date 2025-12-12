@@ -63,3 +63,5 @@ class SourceBinMaterialListingFailure extends SourceBinMaterialListingState {
   @override
   List<Object?> get props => [message];
 }
+
+

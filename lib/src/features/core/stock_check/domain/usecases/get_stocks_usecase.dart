@@ -17,3 +17,5 @@ class GetStocksUseCase extends UseCase<StockResultEntity, StockQueryParams> {
     return repository.getStocks(params);
   }
 }
+
+

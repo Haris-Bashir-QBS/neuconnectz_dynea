@@ -121,3 +121,5 @@ class StockBloc extends Bloc<StockEvent, StockState> {
   }
 }
 
+
+

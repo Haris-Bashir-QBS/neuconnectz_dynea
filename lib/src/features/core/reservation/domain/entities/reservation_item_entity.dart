@@ -91,3 +91,5 @@ class ReservationItemBinDetailEntity extends Equatable {
     actualQuantity,
   ];
 }
+
+

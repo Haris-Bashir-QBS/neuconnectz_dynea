@@ -8,3 +8,5 @@ abstract class BinTransferReportRepository {
     GetBinTransferReportParams params,
   );
 }
+
+

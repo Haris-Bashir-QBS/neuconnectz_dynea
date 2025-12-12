@@ -90,3 +90,5 @@ class MovementTypeBloc extends Bloc<MovementTypeEvent, MovementTypeState> {
     );
   }
 }
+
+

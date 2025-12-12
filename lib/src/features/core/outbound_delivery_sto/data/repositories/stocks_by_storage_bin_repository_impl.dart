@@ -22,3 +22,5 @@ class StocksByStorageBinRepositoryImpl implements StocksByStorageBinRepository {
     }
   }
 }
+
+

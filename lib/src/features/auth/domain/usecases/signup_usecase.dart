@@ -17,3 +17,5 @@ class SignupUseCase extends UseCase<UserEntity, SignupRequestModel> {
     return await authRepository.signUp(params: params);
   }
 }
+
+

@@ -79,3 +79,5 @@ class SessionManager {
     await AppPreferences().clearAll();
   }
 }
+
+

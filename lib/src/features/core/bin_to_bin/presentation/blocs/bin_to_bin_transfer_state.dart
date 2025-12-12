@@ -28,3 +28,5 @@ class BinToBinTransferFailure extends BinToBinTransferState {
   @override
   List<Object?> get props => [message];
 }
+
+

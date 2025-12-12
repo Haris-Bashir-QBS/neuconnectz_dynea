@@ -103,3 +103,5 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
     );
   }
 }
+
+

@@ -11,3 +11,5 @@ extension GoRouterExtension on GoRouter {
     return location;
   }
 }
+
+

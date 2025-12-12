@@ -55,3 +55,5 @@ class ModalProgressHUD extends StatelessWidget {
     );
   }
 }
+
+

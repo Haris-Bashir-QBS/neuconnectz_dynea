@@ -246,3 +246,5 @@ class _DetailRowData {
 
   _DetailRowData(this.label, this.value);
 }
+
+

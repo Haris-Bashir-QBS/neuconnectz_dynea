@@ -18,3 +18,5 @@ class GetOutboundDeliveryStoListUseCase
     return repository.listAllStockDocFromSAP(params: params);
   }
 }
+
+

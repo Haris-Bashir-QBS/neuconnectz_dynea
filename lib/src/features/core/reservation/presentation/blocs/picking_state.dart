@@ -29,3 +29,5 @@ class CreatePickingFailure extends PickingState {
   List<Object?> get props => [message];
 }
 
+
+

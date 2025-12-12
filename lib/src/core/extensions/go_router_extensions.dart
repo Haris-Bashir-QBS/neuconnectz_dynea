@@ -8,3 +8,4 @@ extension GoRouterExtension on GoRouter{
     pushReplacementNamed(location);
   }
 }
+

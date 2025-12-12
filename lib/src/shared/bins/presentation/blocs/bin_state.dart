@@ -29,3 +29,5 @@ class BinFailure extends BinState {
   List<Object?> get props => [message];
 }
 
+
+

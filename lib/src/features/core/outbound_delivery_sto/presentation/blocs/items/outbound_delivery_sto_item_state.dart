@@ -70,3 +70,5 @@ class OutboundDeliveryStoItemState extends Equatable {
   @override
   List<Object?> get props => [pendingSection, completedSection];
 }
+
+

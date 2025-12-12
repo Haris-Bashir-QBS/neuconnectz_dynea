@@ -15,7 +15,7 @@ import 'package:neuconnectz_dynea/src/core/enums/scan_type.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/utils/app_static_data.dart';
 import 'package:neuconnectz_dynea/src/core/utils/utils.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/scan_button.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/scan_button.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/data/models/create_stock_transfer_order_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/data/models/get_and_update_stocks_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/stocks_by_storage_bin_params.dart';
@@ -1227,3 +1227,5 @@ class _OutboundDeliveryStoQuantityViewState
     );
   }
 }
+
+

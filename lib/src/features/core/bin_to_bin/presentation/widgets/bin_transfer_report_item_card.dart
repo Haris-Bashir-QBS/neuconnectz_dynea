@@ -95,3 +95,5 @@ class BinTransferReportItemCard extends StatelessWidget {
     );
   }
 }
+
+

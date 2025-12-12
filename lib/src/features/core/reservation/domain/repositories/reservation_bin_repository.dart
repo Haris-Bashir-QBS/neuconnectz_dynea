@@ -15,3 +15,5 @@ abstract class ReservationBinRepository {
     required String material,
   });
 }
+
+

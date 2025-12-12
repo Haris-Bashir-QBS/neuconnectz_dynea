@@ -36,3 +36,5 @@ final class AppPalette {
   static const Color d8Color = Color(0xFFD5A5FF);
   static const Color d9Color = Color(0xFFFFA261);
 }
+
+

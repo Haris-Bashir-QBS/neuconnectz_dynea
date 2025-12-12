@@ -15,3 +15,5 @@ class DestinationBinSelectionPageParams {
     required this.sourceBin,
   });
 }
+
+

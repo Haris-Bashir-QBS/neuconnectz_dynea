@@ -186,3 +186,5 @@ class LastIntegrationDates {
     'lastGrnIntegrationDate': lastGrnIntegrationDate,
   };
 }
+
+

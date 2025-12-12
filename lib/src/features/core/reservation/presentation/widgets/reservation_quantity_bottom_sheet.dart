@@ -18,7 +18,7 @@ import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blo
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bin_bloc.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/entities/bin_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/scan_button.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/scan_button.dart';
 import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse_entity.dart';
 import 'package:neuconnectz_dynea/src/widgets/bottom_sheet_handle.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_button.dart';
@@ -917,3 +917,5 @@ class _ReservationQuantityBottomSheetState
     super.dispose();
   }
 }
+
+

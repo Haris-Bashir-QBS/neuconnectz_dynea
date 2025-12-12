@@ -78,3 +78,5 @@ class StockCardShimmer extends StatelessWidget {
     );
   }
 }
+
+

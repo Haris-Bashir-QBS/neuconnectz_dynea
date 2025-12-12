@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_shimmer.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/item_listing_header_shimmer.dart';
+import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/item_listing_header_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/entities/outbound_delivery_sto_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/outbound_delivery_sto_bloc.dart';
@@ -152,7 +152,7 @@ class _OutboundDeliveryStoListingViewState
                 child: ListView.builder(
                   itemCount: 6,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  itemBuilder: (context, index) => const GrnListItemShimmer(),
+                  itemBuilder: (context, index) => const CardShimmer(),
                 ),
               ),
             ],

@@ -18,3 +18,5 @@ class LoginUseCase extends UseCase<UserEntity, LoginRequestModel> {
     return await authRepository.login(params: params);
   }
 }
+
+

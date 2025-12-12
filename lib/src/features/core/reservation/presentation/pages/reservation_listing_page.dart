@@ -5,11 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:neuconnectz_dynea/src/core/barrels/auth_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_list_shimmer.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/item_listing_header_shimmer.dart';
+import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/item_listing_header_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_list_params.dart';
@@ -20,7 +19,9 @@ import 'package:neuconnectz_dynea/src/widgets/custom_search_field.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
 
+import '../../../../../core/constants/app_texts.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../widgets/custom_appbar.dart';
 
 class ReservationListingPage extends StatelessWidget {
   final ReservationListingPageParams params;
@@ -99,7 +100,6 @@ class _ReservationListingViewState extends State<_ReservationListingView> {
   }
 
   void _onScroll() {
-    print("sAsasasaSA");
     if (!_scrollController.hasClients) return;
 
     final position = _scrollController.position;
@@ -161,7 +161,7 @@ class _ReservationListingViewState extends State<_ReservationListingView> {
                 child: ListView.builder(
                   itemCount: 6,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  itemBuilder: (context, index) => const GrnListItemShimmer(),
+                  itemBuilder: (context, index) => const CardShimmer(),
                 ),
               ),
             ],

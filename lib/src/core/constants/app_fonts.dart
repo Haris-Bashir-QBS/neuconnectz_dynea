@@ -9,3 +9,5 @@ final class AppFonts {
     'Pacifico',
   ];
 }
+
+

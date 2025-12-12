@@ -14,7 +14,7 @@ import 'package:neuconnectz_dynea/src/core/enums/scan_type.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/utils/app_static_data.dart';
 import 'package:neuconnectz_dynea/src/core/utils/utils.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/scan_button.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/scan_button.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/data/models/create_picking_request_model.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/picking_bloc.dart';
@@ -880,3 +880,5 @@ class _ReservationQuantityViewState extends State<_ReservationQuantityView> {
     super.dispose();
   }
 }
+
+

@@ -36,3 +36,5 @@ class OutboundDeliveryStoEntity extends Equatable {
         storageLocation,
       ];
 }
+
+

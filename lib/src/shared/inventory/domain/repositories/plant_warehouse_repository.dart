@@ -12,3 +12,5 @@ abstract class PlantWarehouseRepository {
     WarehouseQueryParams params,
   );
 }
+
+

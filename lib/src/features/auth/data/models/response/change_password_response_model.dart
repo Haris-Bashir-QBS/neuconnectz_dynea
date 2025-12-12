@@ -15,3 +15,4 @@ class ChangePasswordDataModel {
     'message': message,
   };
 } 
+

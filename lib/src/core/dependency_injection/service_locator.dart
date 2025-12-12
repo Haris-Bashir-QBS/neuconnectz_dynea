@@ -30,6 +30,8 @@ Future<void> _initAuthDependencies() async {
   _registerAuthBloc();
   _registerInventoryDependencies();
   _registerGrnListDependencies();
+  _registerInboundDeliveryDependencies();
+  _registerProductionReceiptDependencies();
   _registerReservationDependencies();
   _registerStockDependencies();
   _registerOutboundDeliveryStoDependencies();
@@ -113,41 +115,80 @@ void _registerInventoryDependencies() {
 /// ------------------------
 void _registerGrnListDependencies() {
   // Data sources
-  sl.registerLazySingleton<GrnRemoteDataSource>(
-    () => GrnRemoteDataSourceImpl(dio: sl()),
+  sl.registerLazySingleton<PurchaseOrderGrnRemoteDataSource>(
+    () => PurchaseOrderGrnRemoteDataSourceImpl(dio: sl()),
   );
-  sl.registerLazySingleton<PutAwayRemoteDataSource>(
-    () => PutAwayRemoteDataSourceImpl(dio: sl()),
+  sl.registerLazySingleton<PurchaseOrderGrnPutAwayRemoteDataSource>(
+    () => PurchaseOrderGrnPutAwayRemoteDataSourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<BinRemoteDataSource>(
     () => BinRemoteDataSourceImpl(dio: sl()),
   );
   // Repositories
-  sl.registerLazySingleton<GrnRepository>(
-    () => GrnRepositoryImpl(remoteDataSource: sl()),
+  sl.registerLazySingleton<PurchaseOrderGrnRepository>(
+    () => PurchaseOrderGrnRepositoryImpl(remoteDataSource: sl()),
   );
-  sl.registerLazySingleton<PutAwayRepository>(
-    () => PutAwayRepositoryImpl(remoteDataSource: sl()),
+  sl.registerLazySingleton<PurchaseOrderGrnPutAwayRepository>(
+    () => PurchaseOrderGrnPutAwayRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<BinRepository>(
     () => BinRepositoryImpl(remoteDataSource: sl()),
   );
   // Use cases
-  sl.registerLazySingleton(() => GetGrnListUseCase(sl()));
-  sl.registerLazySingleton(() => GetGrnItemsUseCase(sl()));
-  sl.registerLazySingleton(() => GetCompletedGrnItemsUseCase(sl()));
-  sl.registerLazySingleton(() => CreatePutAwayAgainstGrUseCase(sl()));
+  sl.registerLazySingleton(() => GetPurchaseOrderGrnListUseCase(sl()));
+  sl.registerLazySingleton(() => GetPurchaseOrderGrnItemsUseCase(sl()));
+  sl.registerLazySingleton(
+    () => GetCompletedPurchaseOrderGrnItemsUseCase(sl()),
+  );
+  sl.registerLazySingleton(
+    () => CreatePutAwayAgainstPurchaseOrderGrnUseCase(sl()),
+  );
   sl.registerLazySingleton(() => GetBinsUseCase(sl()));
   // Blocs
   sl.registerFactory(
-    () => GrnBloc(
+    () => PurchaseOrderGrnBloc(
       getGrnListUseCase: sl(),
       getGrnItemsUseCase: sl(),
       getCompletedGrnItemsUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => PutAwayBloc(createPutAwayUseCase: sl()));
+  sl.registerFactory(
+    () => PurchaseOrderGrnPutAwayBloc(createPutAwayUseCase: sl()),
+  );
   sl.registerFactory(() => BinBloc(getBinsUseCase: sl()));
+}
+
+/// ------------------------
+/// INBOUND DELIVERY DEPENDENCIES
+/// ------------------------
+void _registerInboundDeliveryDependencies() {
+  // Data source (merged - all methods in one)
+  sl.registerLazySingleton<InboundDeliveryRemoteDataSource>(
+    () => InboundDeliveryRemoteDataSourceImpl(dio: sl()),
+  );
+  // Repository
+  sl.registerLazySingleton<InboundDeliveryRepository>(
+    () => InboundDeliveryRepositoryImpl(remoteDataSource: sl()),
+  );
+  // Blocs
+  sl.registerFactory(() => InboundDeliveryBloc(repository: sl()));
+  sl.registerFactory(() => InboundDeliveryPutAwayBloc(repository: sl()));
+}
+
+/// ------------------------
+/// PRODUCTION RECEIPT DEPENDENCIES
+/// ------------------------
+void _registerProductionReceiptDependencies() {
+  // Data source
+  sl.registerLazySingleton<ProductionReceiptRemoteDataSource>(
+    () => ProductionReceiptRemoteDataSourceImpl(dio: sl()),
+  );
+  // Repository
+  sl.registerLazySingleton<ProductionReceiptRepository>(
+    () => ProductionReceiptRepositoryImpl(remoteDataSource: sl()),
+  );
+  // Bloc
+  sl.registerFactory(() => ProductionReceiptBloc(repository: sl()));
 }
 
 /// ------------------------

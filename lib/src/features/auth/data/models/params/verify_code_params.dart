@@ -8,3 +8,5 @@ class VerifyCodeParams {
 
   VerifyCodeParams({required this.type, this.user, this.email});
 }
+
+

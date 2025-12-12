@@ -12,3 +12,5 @@ class ClientLogo extends StatelessWidget {
     return Image.asset(AppAssets.clientLogo, height: 100.h, width: 240.w);
   }
 }
+
+

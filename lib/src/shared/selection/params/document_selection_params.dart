@@ -1,6 +1,6 @@
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/params/grn_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/params/purchase_order_grn_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/params/reservation_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/stock_check/presentation/params/stock_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/movement_type_entity.dart';
@@ -9,6 +9,9 @@ import 'package:neuconnectz_dynea/src/shared/inventory/domain/entities/warehouse
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_list_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/bin_to_bin/presentation/params/bin_selection_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/params/inbound_delivery_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/params/production_receipt_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/params/production_receipt_listing_page_params.dart';
 
 class DocumentSelectionParams<T extends Object> {
   final String title;
@@ -40,7 +43,7 @@ class SelectionDestination<T extends Object> {
 }
 
 class DocumentSelectionConfigs {
-  static DocumentSelectionParams<GrnListingPageParams> grn({
+  static DocumentSelectionParams<PurchaseOrderGrnListingPageParams> grn({
     bool isScaffold = true,
   }) {
     return DocumentSelectionParams(
@@ -53,7 +56,10 @@ class DocumentSelectionConfigs {
               required PlantEntity plant,
               required WarehouseEntity warehouse,
               MovementTypeEntity? movementType,
-            }) => GrnListingPageParams(plant: plant, warehouse: warehouse),
+            }) => PurchaseOrderGrnListingPageParams(
+              plant: plant,
+              warehouse: warehouse,
+            ),
       ),
     );
   }
@@ -164,7 +170,48 @@ class DocumentSelectionConfigs {
           required WarehouseEntity warehouse,
           MovementTypeEntity? movementType,
         }) {
-          return BinSelectionPageParams(
+          return BinSelectionPageParams(plant: plant, warehouse: warehouse);
+        },
+      ),
+    );
+  }
+
+  static DocumentSelectionParams<InboundDeliveryListingPageParams>
+  inboundDelivery({bool isScaffold = true}) {
+    return DocumentSelectionParams(
+      title: AppTexts.inboundDelivery,
+      requiresMovementType: false,
+      isScaffold: isScaffold,
+      destination: SelectionDestination(
+        routeName: AppRoutes.inboundDeliveryListing,
+        buildArgs: ({
+          required PlantEntity plant,
+          required WarehouseEntity warehouse,
+          MovementTypeEntity? movementType,
+        }) {
+          return InboundDeliveryListingPageParams(
+            plant: plant,
+            warehouse: warehouse,
+          );
+        },
+      ),
+    );
+  }
+
+  static DocumentSelectionParams<ProductionReceiptListingPageParams>
+      productionReceipts({bool isScaffold = true}) {
+    return DocumentSelectionParams(
+      title: "Production Receipts",
+      requiresMovementType: false,
+      isScaffold: isScaffold,
+      destination: SelectionDestination(
+        routeName: AppRoutes.productionReceiptListing,
+        buildArgs: ({
+          required PlantEntity plant,
+          required WarehouseEntity warehouse,
+          MovementTypeEntity? movementType,
+        }) {
+          return ProductionReceiptListingPageParams(
             plant: plant,
             warehouse: warehouse,
           );

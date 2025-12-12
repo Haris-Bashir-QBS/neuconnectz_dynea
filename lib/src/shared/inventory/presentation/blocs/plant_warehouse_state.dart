@@ -32,3 +32,5 @@ class WarehouseAndPlantState extends Equatable {
   @override
   List<Object?> get props => [plants, warehouses, isLoading, errorMessage];
 }
+
+

@@ -145,7 +145,7 @@ final class AppTexts {
   static const String selectWarehouse = "Select Warehouse";
   static const String items = "Items";
   static const String search = "Search";
-  static const String putAwayAgainstGrn = "Put Away Against GRN";
+  static const String putAwayAgainstGrn = "Put Away Against Purchase Receipts";
   static const String putAway = "Putaway";
   static const String proceed = "Proceed";
   static const String apply = "Apply";
@@ -164,7 +164,7 @@ final class AppTexts {
   static const String scanAndType = "Scan/Type";
   static const String typeHere = "Type Here";
   static const String binCode = "Bin Code";
-  static const String goodReceiptNote = "Good Receipt Note";
+  static const String goodReceiptNote = "Purchase Receipts";
   static const String itemName = "Item Name";
   static const String itemCode = "Item Code";
   static const String supplierName = "Supplier Name";
@@ -220,3 +220,5 @@ final class AppTexts {
   static const String proceedAll = "Proceed All";
   static const String changeBin = "Change Bin";
 }
+
+

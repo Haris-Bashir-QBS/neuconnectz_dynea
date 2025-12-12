@@ -5,11 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
+import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/entities/outbound_delivery_sales_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/domain/params/outbound_delivery_sales_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/blocs/outbound_delivery_sales_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/pages/completed_outbound_delivery_sales_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/params/outbound_delivery_sales_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sales/presentation/widgets/outbound_delivery_sales_item_card.dart';
@@ -75,7 +74,13 @@ class _OutboundDeliverySalesItemsViewState
           warehouse: widget.params.warehouse,
           warehouseCode: widget.params.warehouseCode,
           lastCount: 10,
-          skipRecords: refresh ? 0 : context.read<OutboundDeliverySalesBloc>().state.pendingSkipRecords,
+          skipRecords:
+              refresh
+                  ? 0
+                  : context
+                      .read<OutboundDeliverySalesBloc>()
+                      .state
+                      .pendingSkipRecords,
         ),
         refresh: refresh,
       ),
@@ -92,7 +97,13 @@ class _OutboundDeliverySalesItemsViewState
           warehouse: widget.params.warehouse,
           warehouseCode: widget.params.warehouseCode,
           lastCount: 10,
-          skipRecords: refresh ? 0 : context.read<OutboundDeliverySalesBloc>().state.completedSkipRecords,
+          skipRecords:
+              refresh
+                  ? 0
+                  : context
+                      .read<OutboundDeliverySalesBloc>()
+                      .state
+                      .completedSkipRecords,
         ),
         refresh: refresh,
       ),
@@ -185,8 +196,10 @@ class _OutboundDeliverySalesItemsViewState
           ),
         ),
         child: Center(
-          child: BlocBuilder<OutboundDeliverySalesBloc,
-              OutboundDeliverySalesState>(
+          child: BlocBuilder<
+            OutboundDeliverySalesBloc,
+            OutboundDeliverySalesState
+          >(
             builder: (context, state) {
               final count =
                   index == 0
@@ -313,7 +326,7 @@ class _OutboundDeliverySalesItemsViewState
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       itemCount: 6,
-      itemBuilder: (_, __) => const GrnItemShimmer(),
+      itemBuilder: (_, __) => const CardShimmer(),
     );
   }
 
@@ -351,4 +364,3 @@ class _OutboundDeliverySalesItemsViewState
     );
   }
 }
-

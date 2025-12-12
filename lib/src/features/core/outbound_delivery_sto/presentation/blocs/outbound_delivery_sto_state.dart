@@ -62,3 +62,5 @@ class OutboundDeliveryStoState extends Equatable {
         syncStocks,
       ];
 }
+
+

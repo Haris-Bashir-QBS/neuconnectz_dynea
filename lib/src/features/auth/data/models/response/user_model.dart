@@ -46,3 +46,5 @@ class UserModel extends UserEntity {
     'isTotp': isTotp,
   };
 }
+
+

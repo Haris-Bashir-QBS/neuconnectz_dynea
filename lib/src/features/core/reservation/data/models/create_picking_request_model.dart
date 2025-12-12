@@ -82,3 +82,5 @@ class BinQuantityModel {
   Map<String, dynamic> toJson() => {"id": id, "quantity": quantity};
 }
 
+
+

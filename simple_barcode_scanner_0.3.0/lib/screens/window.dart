@@ -193,3 +193,5 @@ class WindowBarcodeScanner extends StatelessWidget {
     );
   }
 }
+
+

@@ -35,3 +35,5 @@ class ConnectivityService {
   Stream<(ConnectivityResult, bool)> get connectionStatusStream =>
       _connectionStatusController.stream;
 }
+
+

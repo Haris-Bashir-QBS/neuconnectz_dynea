@@ -22,3 +22,5 @@ class MovementTypeRepositoryImpl implements MovementTypeRepository {
     }
   }
 }
+
+

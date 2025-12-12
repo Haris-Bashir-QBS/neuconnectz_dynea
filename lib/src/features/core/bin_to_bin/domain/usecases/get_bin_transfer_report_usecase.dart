@@ -15,3 +15,5 @@ class GetBinTransferReportUseCase {
     return await repository.getBinTransferReport(params);
   }
 }
+
+

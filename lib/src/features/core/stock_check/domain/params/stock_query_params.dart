@@ -63,3 +63,5 @@ class StockQueryParams extends Equatable {
       ];
 }
 
+
+

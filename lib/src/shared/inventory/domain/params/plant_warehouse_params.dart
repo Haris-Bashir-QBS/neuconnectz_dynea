@@ -29,3 +29,5 @@ class WarehouseQueryParams extends Equatable {
   @override
   List<Object?> get props => [userId, plantCode];
 }
+
+

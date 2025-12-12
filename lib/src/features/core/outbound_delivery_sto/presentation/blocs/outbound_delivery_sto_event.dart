@@ -40,3 +40,5 @@ class GetAndUpdateStocksFromSapEvent extends OutboundDeliveryStoEvent {
   @override
   List<Object> get props => [request];
 }
+
+

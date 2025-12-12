@@ -23,3 +23,5 @@ class GetBinTransferReportParams extends Equatable {
   @override
   List<Object?> get props => [fromDate, toDate];
 }
+
+

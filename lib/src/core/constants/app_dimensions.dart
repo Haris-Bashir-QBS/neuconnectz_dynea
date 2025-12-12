@@ -5,3 +5,5 @@ class AppDimensions {
   static const double dialogTitleFontSize = 14;
   static const double dialogContentFontSize = 12;
 }
+
+

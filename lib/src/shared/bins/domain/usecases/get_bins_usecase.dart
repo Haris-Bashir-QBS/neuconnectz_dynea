@@ -16,3 +16,5 @@ class GetBinsUseCase extends UseCase<List<BinEntity>, BinParams> {
   }
 }
 
+
+

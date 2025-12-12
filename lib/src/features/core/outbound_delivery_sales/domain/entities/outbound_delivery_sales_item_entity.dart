@@ -130,3 +130,5 @@ class CompletedSalesItemBatchDetail extends Equatable {
   List<Object?> get props => [batchName, quantity];
 }
 
+
+

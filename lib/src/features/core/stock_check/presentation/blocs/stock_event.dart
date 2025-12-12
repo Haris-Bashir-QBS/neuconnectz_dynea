@@ -42,3 +42,5 @@ class SearchStockEvent extends StockEvent {
   List<Object?> get props => [query];
 }
 
+
+

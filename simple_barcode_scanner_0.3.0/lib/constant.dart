@@ -7,3 +7,5 @@ class PackageConstant {
 
 String kScanPageTitle = 'Scan barcode/qrcode';
 String kCancelValue = '-2';
+
+

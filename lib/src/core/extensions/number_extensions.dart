@@ -20,3 +20,5 @@ extension QuantityFormatter on double {
     return this % 1 == 0 ? toInt().toString() : toStringAsFixed(8);
   }
 }
+
+

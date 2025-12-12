@@ -64,3 +64,5 @@ mixin PaginationMixin<T extends StatefulWidget> on State<T> {
     onSearchCleared();
   }
 }
+
+

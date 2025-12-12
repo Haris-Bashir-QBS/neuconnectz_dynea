@@ -4,3 +4,5 @@ import 'package:rxdart/rxdart.dart';
 EventTransformer<Event> debounceTransformer<Event>(Duration duration) {
   return (events, mapper) => events.debounceTime(duration);
 }
+
+

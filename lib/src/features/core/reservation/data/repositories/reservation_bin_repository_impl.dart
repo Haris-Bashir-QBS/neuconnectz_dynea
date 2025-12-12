@@ -48,3 +48,5 @@ class ReservationBinRepositoryImpl implements ReservationBinRepository {
     }
   }
 }
+
+

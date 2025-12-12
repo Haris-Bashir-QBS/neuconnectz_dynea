@@ -384,3 +384,5 @@ class _BinSelectionViewState extends State<_BinSelectionView> {
     context.pushNamed(AppRoutes.sourceBinMaterialListing, extra: args);
   }
 }
+
+

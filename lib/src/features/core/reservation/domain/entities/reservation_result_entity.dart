@@ -14,3 +14,5 @@ class ReservationResultEntity extends Equatable {
   List<Object?> get props => [totalCount, data];
 }
 
+
+

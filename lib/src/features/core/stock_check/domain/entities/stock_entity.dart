@@ -45,3 +45,5 @@ class StockEntity extends Equatable {
     availableStock,
   ];
 }
+
+

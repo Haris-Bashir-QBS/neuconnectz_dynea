@@ -93,3 +93,5 @@ class ThemeCubit extends Cubit<ThemeData> {
     emit(_buildTheme(_selectedColor, _brightness, _fontFamily));
   }
 }
+
+

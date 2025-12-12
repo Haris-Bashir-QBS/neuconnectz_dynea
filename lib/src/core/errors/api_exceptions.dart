@@ -150,3 +150,5 @@ class ParsingException extends Failure {
         type: DioExceptionType.unknown,
       );
 }
+
+

@@ -92,12 +92,17 @@ final class AppStaticData {
       subItems: [
         SubModuleItem(
           title: AppTexts.goodReceiptNote,
-          subtitle: "Manage & create putaway against good receipt note",
+          subtitle: "Manage & create putaway against purchase receipts",
           iconPath: AppAssets.menuItIcon,
         ),
         SubModuleItem(
-          title: "Inbound Delivery",
+          title: AppTexts.inboundDelivery,
           subtitle: "Manage & create putaway against inbound delivery",
+          iconPath: AppAssets.menuItIcon,
+        ),
+        SubModuleItem(
+          title: "Production Receipts",
+          subtitle: "Manage & create putaway against production receipts",
           iconPath: AppAssets.menuItIcon,
         ),
       ],
@@ -107,6 +112,16 @@ final class AppStaticData {
           context.pushNamed(
             AppRoutes.documentSelection,
             extra: DocumentSelectionConfigs.grn(),
+          );
+        } else if (item == AppTexts.inboundDelivery) {
+          context.pushNamed(
+            AppRoutes.documentSelection,
+            extra: DocumentSelectionConfigs.inboundDelivery(),
+          );
+        } else if (item == "Production Receipts") {
+          context.pushNamed(
+            AppRoutes.documentSelection,
+            extra: DocumentSelectionConfigs.productionReceipts(),
           );
         }
       },
@@ -442,3 +457,5 @@ class ModuleItem {
 //     );
 //   }
 // }
+
+

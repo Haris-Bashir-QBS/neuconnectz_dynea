@@ -29,3 +29,5 @@ class GetWarehouseBinsByMaterialParams {
     required this.material,
   });
 }
+
+

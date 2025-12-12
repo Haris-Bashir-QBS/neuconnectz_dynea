@@ -29,3 +29,5 @@ class BinTransferReportFailure extends BinTransferReportState {
   @override
   List<Object?> get props => [message];
 }
+
+

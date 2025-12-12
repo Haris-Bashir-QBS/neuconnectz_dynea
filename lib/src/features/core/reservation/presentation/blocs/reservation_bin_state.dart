@@ -33,3 +33,5 @@ class ReservationBinFailure extends ReservationBinState {
   List<Object?> get props => [message];
 }
 
+
+

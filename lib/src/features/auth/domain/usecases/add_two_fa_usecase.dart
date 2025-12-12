@@ -20,3 +20,5 @@ class Add2FAUseCase
     return await authRepository.add2FA(params);
   }
 }
+
+

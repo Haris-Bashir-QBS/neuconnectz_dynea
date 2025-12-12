@@ -19,3 +19,5 @@ class OtpVerificationStatus {
   String toString() =>
       'OtpVerificationStatus(timeMatched: $timeMatched, isVerified: $isVerified)';
 }
+
+

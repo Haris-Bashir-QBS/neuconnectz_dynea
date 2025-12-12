@@ -20,3 +20,5 @@ class LoadWarehouseBinsByMaterialEvent extends ReservationBinEvent {
   List<Object?> get props => [warehouseCode, material];
 }
 
+
+

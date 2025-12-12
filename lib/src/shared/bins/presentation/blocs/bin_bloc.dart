@@ -34,3 +34,5 @@ class BinBloc extends Bloc<BinEvent, BinState> {
     );
   }
 }
+
+

@@ -99,3 +99,5 @@ class OutboundDeliverySalesCard extends StatelessWidget {
     color: AppPalette.greyColor,
   );
 }
+
+

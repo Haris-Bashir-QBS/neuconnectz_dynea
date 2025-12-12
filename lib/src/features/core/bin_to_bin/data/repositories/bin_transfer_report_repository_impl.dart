@@ -27,3 +27,5 @@ class BinTransferReportRepositoryImpl implements BinTransferReportRepository {
     }
   }
 }
+
+

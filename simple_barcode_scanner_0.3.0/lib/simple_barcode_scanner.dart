@@ -311,3 +311,5 @@ class SimpleBarcodeScanner extends StatelessWidget {
     );
   }
 }
+
+

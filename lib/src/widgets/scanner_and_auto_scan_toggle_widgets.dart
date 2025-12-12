@@ -41,3 +41,5 @@ class ScannerAndAutoScanToggleWidget extends StatelessWidget {
     );
   }
 }
+
+

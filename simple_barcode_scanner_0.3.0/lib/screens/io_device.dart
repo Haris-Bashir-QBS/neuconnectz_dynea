@@ -197,3 +197,5 @@ class BarcodeScannerView extends StatelessWidget {
     onBarcodeViewCreated(controller);
   }
 }
+
+

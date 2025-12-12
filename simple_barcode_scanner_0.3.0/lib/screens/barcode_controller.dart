@@ -48,3 +48,5 @@ class BarcodeViewController {
     return _channel.invokeMethod('resumeScanning');
   }
 }
+
+

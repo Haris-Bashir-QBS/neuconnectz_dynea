@@ -6,7 +6,7 @@ import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/core/router/app_routes.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
+import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/domain/params/outbound_delivery_sto_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/blocs/items/outbound_delivery_sto_item_bloc.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
@@ -188,7 +188,7 @@ class _OutboundDeliveryStoItemsViewState
       return ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: 6,
-        itemBuilder: (_, __) => const GrnItemShimmer(),
+        itemBuilder: (_, __) => const CardShimmer(),
       );
     }
 
@@ -266,7 +266,7 @@ class _OutboundDeliveryStoItemsViewState
       return ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: 6,
-        itemBuilder: (_, __) => const GrnItemShimmer(),
+        itemBuilder: (_, __) => const CardShimmer(),
       );
     }
 

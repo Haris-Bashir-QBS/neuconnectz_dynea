@@ -21,3 +21,5 @@ class OutboundDeliveryStoItemsPageParams extends Equatable {
     //  movementType
   ];
 }
+
+

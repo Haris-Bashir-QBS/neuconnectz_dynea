@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_texts.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
-import 'package:neuconnectz_dynea/src/features/core/good_receipt_note/presentation/widgets/grn_row_shimmer.dart';
+import 'package:neuconnectz_dynea/src/core/shimmers/card_shimmer.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/entities/reservation_item_entity.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/domain/params/reservation_item_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/reservation/presentation/blocs/reservation_bloc.dart';
@@ -301,7 +301,7 @@ class _ReservationItemsViewState extends State<_ReservationItemsView> {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       itemCount: 6,
-      itemBuilder: (_, __) => const GrnItemShimmer(),
+      itemBuilder: (_, __) => const CardShimmer(),
     );
   }
 

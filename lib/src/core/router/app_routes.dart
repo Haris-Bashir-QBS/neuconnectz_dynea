@@ -19,6 +19,11 @@ class AppRoutes {
   static const grnItems = 'grn_items';
   static const grnQuantity = 'grn_quantity';
   static const completedGrnItemDetail = "completed_grn_item_detail";
+  // =========================== Inbound Delivery ============================
+  static const inboundDeliveryListing = 'inbound_delivery_listing';
+  static const inboundDeliveryItems = 'inbound_delivery_items';
+  static const inboundDeliveryQuantity = 'inbound_delivery_quantity';
+  static const completedInboundDeliveryItemDetail = "completed_inbound_delivery_item_detail";
   // ============================ Reservation ============================
   static const reservationListing = 'reservation_listing';
   static const reservationItems = 'reservation_items';
@@ -46,4 +51,10 @@ class AppRoutes {
   static const String sourceBinMaterialListing = 'source_bin_material_listing';
   static const String binToBinQuantity = 'bin_to_bin_quantity';
   static const String destinationBinSelection = 'destination_bin_selection';
+
+  // ============================ Production Receipts ============================
+  static const String productionReceiptListing = 'production_receipt_listing';
+  static const String productionReceiptItems = 'production_receipt_items';
 }
+
+

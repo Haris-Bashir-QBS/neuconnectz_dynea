@@ -10,3 +10,5 @@ class UserCubit extends Cubit<UserEntity?> {
 
   void clearUser() => emit(null);
 }
+
+

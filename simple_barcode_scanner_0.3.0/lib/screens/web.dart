@@ -152,3 +152,5 @@ class BarcodeScannerView extends StatelessWidget {
     return const Center(child: Text('Platform not supported'));
   }
 }
+
+

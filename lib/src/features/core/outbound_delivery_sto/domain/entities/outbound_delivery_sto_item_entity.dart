@@ -89,3 +89,5 @@ class BatchDetail extends Equatable {
   @override
   List<Object?> get props => [batchName, quantity];
 }
+
+

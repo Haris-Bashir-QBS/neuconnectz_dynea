@@ -7,3 +7,5 @@ abstract class OutboundDeliveryStoRepository {
   Future<Either<Failure, List<OutboundDeliveryStoEntity>>>
   listAllStockDocFromSAP({required OutboundDeliveryStoListParams params});
 }
+
+

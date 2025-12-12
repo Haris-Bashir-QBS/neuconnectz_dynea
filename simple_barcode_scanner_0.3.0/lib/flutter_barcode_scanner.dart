@@ -97,3 +97,5 @@ class FlutterBarcodeScanner {
     return _onBarcodeReceiver;
   }
 }
+
+

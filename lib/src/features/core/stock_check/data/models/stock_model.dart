@@ -108,3 +108,5 @@ class StockItemModel {
     availableStock: availableStock,
   );
 }
+
+

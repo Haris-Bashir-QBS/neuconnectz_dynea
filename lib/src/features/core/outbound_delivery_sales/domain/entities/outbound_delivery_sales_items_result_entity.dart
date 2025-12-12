@@ -14,3 +14,5 @@ class OutboundDeliverySalesItemsResultEntity extends Equatable {
   List<Object?> get props => [totalCount, data];
 }
 
+
+

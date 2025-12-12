@@ -37,3 +37,5 @@ class OperationState<T> extends Equatable {
   List<Object?> get props => [status, data, error];
 }
 
+
+

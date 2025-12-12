@@ -22,3 +22,5 @@ class StocksByStorageBinFailure extends StocksByStorageBinState {
   StocksByStorageBinFailure(this.message);
 }
 
+
+

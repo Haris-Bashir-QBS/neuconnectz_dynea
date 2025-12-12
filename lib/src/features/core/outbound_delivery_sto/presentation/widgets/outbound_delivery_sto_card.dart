@@ -92,3 +92,5 @@ class OutboundDeliveryStoCard extends StatelessWidget {
     color: AppPalette.greyColor,
   );
 }
+
+

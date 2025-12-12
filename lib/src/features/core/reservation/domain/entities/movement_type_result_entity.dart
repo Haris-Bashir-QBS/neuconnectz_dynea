@@ -14,3 +14,5 @@ class MovementTypeResultEntity extends Equatable {
   List<Object?> get props => [totalCount, items];
 }
 
+
+

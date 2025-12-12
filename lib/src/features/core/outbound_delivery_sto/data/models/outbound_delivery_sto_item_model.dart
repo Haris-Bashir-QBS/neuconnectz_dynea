@@ -133,3 +133,5 @@ class BatchDetailModel extends BatchDetail {
     );
   }
 }
+
+

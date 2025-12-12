@@ -312,3 +312,5 @@ class CompletedOutboundDeliveryStoDetailPage extends StatelessWidget {
     );
   }
 }
+
+

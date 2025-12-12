@@ -15,3 +15,5 @@ class LogoutUseCase extends UseCase<bool, NoParams> {
     return await _authRepository.logout();
   }
 }
+
+

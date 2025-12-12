@@ -29,3 +29,5 @@ class AppBlocObserver extends BlocObserver {
     log("❌ Error in ${bloc.runtimeType}: $error\n$stackTrace");
   }
 }
+
+

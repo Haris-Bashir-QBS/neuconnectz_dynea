@@ -57,3 +57,5 @@ class MovementTypeState extends Equatable {
         keyword,
       ];
 }
+
+

@@ -78,3 +78,5 @@ class BinDetailsSection extends StatelessWidget {
     );
   }
 }
+
+

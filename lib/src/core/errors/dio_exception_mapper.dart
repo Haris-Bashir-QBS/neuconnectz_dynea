@@ -44,3 +44,5 @@ String _extractErrorMessage(DioException error) {
   }
   return "${error.response?.statusMessage ?? error.error}";
 }
+
+

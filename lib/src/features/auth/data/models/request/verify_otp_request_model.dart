@@ -6,3 +6,5 @@ class VerifyOtpRequestModel {
 
   Map<String, dynamic> toJson() => {'otp': otp, 'email': email};
 }
+
+

@@ -32,6 +32,12 @@ class PutawaySection extends StatelessWidget {
           iconBackgroundColor: AppPalette.d3Color,
           iconColor: AppPalette.yellowColor,
           iconPath: AppAssets.pendingIcon,
+          onTap: () {
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.productionReceipts(),
+            );
+          },
         ),
         HomeActionCardData(
           title: "${AppTexts.inboundDelivery} (STO)",
@@ -39,8 +45,16 @@ class PutawaySection extends StatelessWidget {
           iconColor: AppPalette.yellowColor,
           iconPath: AppAssets.pendingIcon,
           spanFullWidth: true,
+          onTap: () {
+            context.pushNamed(
+              AppRoutes.documentSelection,
+              extra: DocumentSelectionConfigs.inboundDelivery(),
+            );
+          },
         ),
       ],
     );
   }
 }
+
+

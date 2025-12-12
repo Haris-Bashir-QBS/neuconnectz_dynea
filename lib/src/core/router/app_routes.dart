@@ -55,6 +55,8 @@ class AppRoutes {
   // ============================ Production Receipts ============================
   static const String productionReceiptListing = 'production_receipt_listing';
   static const String productionReceiptItems = 'production_receipt_items';
+  static const String productionReceiptQuantity = 'production_receipt_quantity';
+  static const String completedProductionReceiptItemDetail = 'completed_production_receipt_item_detail';
 }
 
 

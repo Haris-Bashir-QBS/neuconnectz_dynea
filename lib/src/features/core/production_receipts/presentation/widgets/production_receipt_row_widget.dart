@@ -9,11 +9,7 @@ class ProductionReceiptRowWidget extends StatelessWidget {
   final ProductionReceiptItemEntity item;
   final VoidCallback? onTap;
 
-  const ProductionReceiptRowWidget({
-    super.key,
-    required this.item,
-    this.onTap,
-  });
+  const ProductionReceiptRowWidget({super.key, required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +28,13 @@ class ProductionReceiptRowWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Material & Quantity
+                  // Material Description & Quantity
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: CustomText(
-                          text: item.material,
+                          text: item.materialDescription ?? 'N/A',
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
                         ),
@@ -107,4 +103,3 @@ class ProductionReceiptRowWidget extends StatelessWidget {
     );
   }
 }
-

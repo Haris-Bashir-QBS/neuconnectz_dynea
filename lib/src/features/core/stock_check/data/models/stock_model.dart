@@ -55,6 +55,7 @@ class StockItemModel {
   final String material;
   final String description;
   final String storageType;
+  final String storageSection;
   final String storageBin;
   final String stockCategory;
   final String batch;
@@ -69,6 +70,7 @@ class StockItemModel {
     required this.material,
     required this.description,
     required this.storageType,
+    required this.storageSection,
     required this.storageBin,
     required this.stockCategory,
     required this.batch,
@@ -85,6 +87,7 @@ class StockItemModel {
       material: json['material'] as String? ?? '',
       description: json['description'] as String? ?? '',
       storageType: json['storageType'] as String? ?? '',
+      storageSection: json['storageSection'] as String? ?? '',
       storageBin: json['storageBin'] as String? ?? '',
       stockCategory: json['stockCategory'] as String? ?? '',
       batch: json['batch'] as String? ?? '',
@@ -101,6 +104,7 @@ class StockItemModel {
     material: material,
     description: description,
     storageType: storageType,
+    storageSection: storageSection,
     storageBin: storageBin,
     stockCategory: stockCategory,
     batch: batch,
@@ -108,5 +112,3 @@ class StockItemModel {
     availableStock: availableStock,
   );
 }
-
-

@@ -70,9 +70,10 @@ class InboundDeliveryRemoteDataSourceImpl
     return ApiErrorHandler.executeGuarded(() async {
       final queryParams = {
         'plant': params.plant,
+        'warehouseNumber': params.warehouseNumber ?? '',
         'storageLocation': params.storageLocation,
-        'outboundDeliveryNo': params.outboundDeliveryNo,
         'stoNo': params.stoNo,
+        'outboundDeliveryNo': params.outboundDeliveryNo,
         'lastCount': params.lastCount,
         'skipRecords': params.skipRecords,
       };

@@ -179,7 +179,7 @@ class DocumentSelectionConfigs {
   static DocumentSelectionParams<InboundDeliveryListingPageParams>
   inboundDelivery({bool isScaffold = true}) {
     return DocumentSelectionParams(
-      title: AppTexts.inboundDelivery,
+      title: AppTexts.stoInboundReceipts,
       requiresMovementType: false,
       isScaffold: isScaffold,
       destination: SelectionDestination(
@@ -199,7 +199,7 @@ class DocumentSelectionConfigs {
   }
 
   static DocumentSelectionParams<ProductionReceiptListingPageParams>
-      productionReceipts({bool isScaffold = true}) {
+  productionReceipts({bool isScaffold = true}) {
     return DocumentSelectionParams(
       title: "Production Receipts",
       requiresMovementType: false,

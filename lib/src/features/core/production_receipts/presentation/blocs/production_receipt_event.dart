@@ -22,14 +22,36 @@ class LoadProductionReceiptsEvent extends ProductionReceiptEvent {
 
 class LoadProductionReceiptItemsEvent extends ProductionReceiptEvent {
   final ProductionReceiptItemQueryParams params;
-  final bool reset;
+  final bool refresh;
 
   const LoadProductionReceiptItemsEvent({
     required this.params,
-    this.reset = false,
+    this.refresh = false,
   });
 
   @override
-  List<Object?> get props => [params, reset];
+  List<Object?> get props => [params, refresh];
+}
+
+class LoadCompletedProductionReceiptItemsEvent extends ProductionReceiptEvent {
+  final ProductionReceiptItemQueryParams params;
+  final bool refresh;
+
+  const LoadCompletedProductionReceiptItemsEvent({
+    required this.params,
+    this.refresh = false,
+  });
+
+  @override
+  List<Object?> get props => [params, refresh];
+}
+
+class CreateProductionReceiptEvent extends ProductionReceiptEvent {
+  final CreateProductionReceiptRequestModel request;
+
+  const CreateProductionReceiptEvent({required this.request});
+
+  @override
+  List<Object?> get props => [request];
 }
 

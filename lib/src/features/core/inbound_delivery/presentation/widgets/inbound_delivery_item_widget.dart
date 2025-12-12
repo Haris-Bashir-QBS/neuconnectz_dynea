@@ -80,12 +80,12 @@ class InboundDeliveryItemWidget extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // CustomText(
-                  //   text: 'UOM: ${item. ?? "N/A"}',
-                  //   fontSize: 12.sp,
-                  //   fontWeight: FontWeight.w400,
-                  //   color: AppPalette.whiteColor,
-                  // ),
+                  CustomText(
+                    text: 'UOM: ${item.uom ?? "N/A"}',
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: AppPalette.whiteColor,
+                  ),
                   Spacer(),
                   CustomText(
                     text: 'Tap to Process',

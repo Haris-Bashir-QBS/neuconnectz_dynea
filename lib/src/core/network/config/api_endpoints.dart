@@ -90,7 +90,9 @@ enum ApiEndpoints {
 
   /// ===================== Production Receipts =====================
   listProductionReceiptsFromSAP,
-  listProductionReceiptItemsFromSAP;
+  listProductionReceiptItemsFromSAP,
+  listCompletedProductionReceiptItems,
+  createProductionReceipt;
 
   String get value {
     switch (this) {
@@ -207,15 +209,19 @@ enum ApiEndpoints {
       case ApiEndpoints.listAllInboundDeliveryItemsFromSAP:
         return "$_inboundDelivery/GetInboundDeliveryStoItemFromSap";
       case ApiEndpoints.completedInboundDeliveryItems:
-        return "$_inboundDelivery/GetCompletedInboundDeliveryItemWithBins";
+        return "$_inboundDelivery/GetCompletedInBoundStoItemsWithBins";
       case ApiEndpoints.createPutAwayAgainstInboundDelivery:
-        return "$_inboundDelivery/CreatePutAwayAgainstInboundDeliverySto";
+        return "$_inboundDelivery/CreateInboundSto";
 
       /// ===================== Production Receipts =====================
       case ApiEndpoints.listProductionReceiptsFromSAP:
         return "$_productionReceipt/GetProductionReceiptsFromSap";
       case ApiEndpoints.listProductionReceiptItemsFromSAP:
         return "$_productionReceipt/GetProductionReceiptItemFromSap";
+      case ApiEndpoints.listCompletedProductionReceiptItems:
+        return "$_productionReceipt/GetCompletedProductionReceiptItemsWithBins";
+      case ApiEndpoints.createProductionReceipt:
+        return "$_productionReceipt/CreateProductionReceipt";
     }
   }
 }

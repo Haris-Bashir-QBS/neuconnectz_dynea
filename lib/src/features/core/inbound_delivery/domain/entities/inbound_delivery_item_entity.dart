@@ -9,6 +9,7 @@ class InboundDeliveryItemEntity extends Equatable {
   final double quantity;
   final String? materialNo;
   final String? materialDescription;
+  final String? uom;
   final List<InboundDeliveryItemBinDetailEntity> binDetails;
 
   const InboundDeliveryItemEntity({
@@ -16,6 +17,7 @@ class InboundDeliveryItemEntity extends Equatable {
     required this.stoItemNo,
     required this.outboundDeliveryNo,
     required this.deliveryItemNo,
+    this.uom,
     required this.batchNo,
     required this.quantity,
     this.materialNo,
@@ -25,16 +27,17 @@ class InboundDeliveryItemEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        stoNo,
-        stoItemNo,
-        outboundDeliveryNo,
-        deliveryItemNo,
-        batchNo,
-        quantity,
-        materialNo,
-        materialDescription,
-        binDetails,
-      ];
+    stoNo,
+    stoItemNo,
+    outboundDeliveryNo,
+    deliveryItemNo,
+    batchNo,
+    quantity,
+    materialNo,
+    materialDescription,
+    binDetails,
+    uom,
+  ];
 }
 
 class InboundDeliveryItemBinDetailEntity extends Equatable {
@@ -53,6 +56,3 @@ class InboundDeliveryItemBinDetailEntity extends Equatable {
   @override
   List<Object?> get props => [binCode, storageType, storageSection, quantity];
 }
-
-
-

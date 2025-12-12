@@ -178,23 +178,23 @@ class _ExpandableListTileState extends State<ExpandableListTile>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      if (item.iconPath != null &&
-                                          item.iconPath!.isNotEmpty)
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: AppPalette.lightGreyColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          padding: const EdgeInsets.all(10),
-                                          child: Image.asset(
-                                            item.iconPath!,
-                                            width: 16.w,
-                                            height: 16.w,
-                                          ),
-                                        ),
-                                      if (item.iconPath != null &&
-                                          item.iconPath!.isNotEmpty)
-                                        SizedBox(width: 12.w),
+                                      // if (item.iconPath != null &&
+                                      //     item.iconPath!.isNotEmpty)
+                                      //   Container(
+                                      //     decoration: BoxDecoration(
+                                      //       color: AppPalette.lightGreyColor,
+                                      //       shape: BoxShape.circle,
+                                      //     ),
+                                      //     padding: const EdgeInsets.all(10),
+                                      //     child: Image.asset(
+                                      //       item.iconPath!,
+                                      //       width: 16.w,
+                                      //       height: 16.w,
+                                      //     ),
+                                      //   ),
+                                      // if (item.iconPath != null &&
+                                      //     item.iconPath!.isNotEmpty)
+                                      //   SizedBox(width: 12.w),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -212,8 +212,10 @@ class _ExpandableListTileState extends State<ExpandableListTile>
                                                 ),
                                                 child: CustomText(
                                                   text: item.subtitle,
-                                                  fontSize: 15.sp,
+                                                  fontSize: 14.sp,
                                                   color: AppPalette.greyColor,
+                                                  maxLines: 2,
+                                                  textAlign: TextAlign.start,
                                                 ),
                                               ),
                                           ],
@@ -376,5 +378,3 @@ class _ExpandableListTileState extends State<ExpandableListTile>
     );
   }
 }
-
-

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:logger/logger.dart';
 import 'package:neuconnectz_dynea/src/core/constants/app_palette.dart';
 import 'package:neuconnectz_dynea/src/core/dependency_injection/di_barrel.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/domain/entities/inbound_delivery_item_entity.dart';
@@ -39,7 +40,8 @@ class _InboundDeliveryItemsView extends StatefulWidget {
   const _InboundDeliveryItemsView({required this.params});
 
   @override
-  State<_InboundDeliveryItemsView> createState() => _InboundDeliveryItemsViewState();
+  State<_InboundDeliveryItemsView> createState() =>
+      _InboundDeliveryItemsViewState();
 }
 
 class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
@@ -50,6 +52,10 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
   @override
   void initState() {
     super.initState();
+
+    Logger().i(
+      "InboundDeliveryItemsPage opened with params of whc: ${widget.params.warehouseCode}",
+    );
     _pendingScrollController.addListener(_onPendingScroll);
     _completedScrollController.addListener(_onCompletedScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -91,6 +97,7 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
           storageLocation: widget.params.location,
           outboundDeliveryNo: widget.params.inboundDelivery.outboundDeliveryNo,
           stoNo: widget.params.inboundDelivery.stoNo,
+          warehouseNumber: widget.params.warehouseCode,
           lastCount: 10,
           skipRecords: state.pendingSection.skipRecords,
         );
@@ -105,6 +112,7 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
     final params = InboundDeliveryItemQueryParams(
       plant: widget.params.plant,
       storageLocation: widget.params.location,
+      warehouseNumber: widget.params.warehouseCode,
       outboundDeliveryNo: widget.params.inboundDelivery.outboundDeliveryNo,
       stoNo: widget.params.inboundDelivery.stoNo,
       lastCount: 10,
@@ -125,13 +133,17 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
         final params = InboundDeliveryItemQueryParams(
           plant: widget.params.plant,
           storageLocation: widget.params.location,
+          warehouseNumber: widget.params.warehouseCode,
           outboundDeliveryNo: widget.params.inboundDelivery.outboundDeliveryNo,
           stoNo: widget.params.inboundDelivery.stoNo,
           lastCount: 10,
           skipRecords: state.completedSection.skipRecords,
         );
         context.read<InboundDeliveryBloc>().add(
-          LoadCompletedInboundDeliveryItemsEvent(params: params, refresh: false),
+          LoadCompletedInboundDeliveryItemsEvent(
+            params: params,
+            refresh: false,
+          ),
         );
       }
     }
@@ -144,6 +156,8 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
         inboundDelivery: widget.params.inboundDelivery,
         item: item,
         warehouseCode: widget.params.warehouseCode,
+        plant: widget.params.plant,
+        storageLocation: widget.params.location,
       ),
     );
 
@@ -334,7 +348,10 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
           return InboundDeliveryItemWidget(
             item: item,
             onTap: () {
-              context.pushNamed(AppRoutes.completedInboundDeliveryItemDetail, extra: item);
+              context.pushNamed(
+                AppRoutes.completedInboundDeliveryItemDetail,
+                extra: item,
+              );
             },
           );
         },
@@ -399,6 +416,3 @@ class _InboundDeliveryItemsViewState extends State<_InboundDeliveryItemsView> {
     );
   }
 }
-
-
-

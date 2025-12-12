@@ -51,6 +51,7 @@ class _OutboundDeliverySalesItemsViewState
   @override
   void initState() {
     super.initState();
+    print("params in items page: ${widget.params.warehouseCode}");
     _loadPending(refresh: true);
     _loadCompleted(refresh: true);
     _pendingScrollController.addListener(_onPendingScroll);

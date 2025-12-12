@@ -91,34 +91,37 @@ final class AppStaticData {
       iconPath: AppAssets.purchaseOrderIcon,
       subItems: [
         SubModuleItem(
-          title: AppTexts.goodReceiptNote,
-          subtitle: "Manage & create putaway against purchase receipts",
+          title: AppTexts.purchaseReceipts,
+          subtitle:
+              "${AppTexts.manageAndCreatePuttingAway} ${AppTexts.purchaseReceipts.toLowerCase()}",
           iconPath: AppAssets.menuItIcon,
         ),
         SubModuleItem(
-          title: AppTexts.inboundDelivery,
-          subtitle: "Manage & create putaway against inbound delivery",
+          title: AppTexts.stoInboundReceipts,
+          subtitle:
+              "${AppTexts.manageAndCreatePuttingAway} ${AppTexts.stoInboundReceipts.toLowerCase()}",
           iconPath: AppAssets.menuItIcon,
         ),
         SubModuleItem(
-          title: "Production Receipts",
-          subtitle: "Manage & create putaway against production receipts",
+          title: AppTexts.productionReceipts,
+          subtitle:
+              "${AppTexts.manageAndCreatePuttingAway} ${AppTexts.productionReceipts.toLowerCase()}",
           iconPath: AppAssets.menuItIcon,
         ),
       ],
       onTap: null,
       onItemTap: (context, item) {
-        if (item == AppTexts.goodReceiptNote) {
+        if (item == AppTexts.purchaseReceipts) {
           context.pushNamed(
             AppRoutes.documentSelection,
             extra: DocumentSelectionConfigs.grn(),
           );
-        } else if (item == AppTexts.inboundDelivery) {
+        } else if (item == AppTexts.stoInboundReceipts) {
           context.pushNamed(
             AppRoutes.documentSelection,
             extra: DocumentSelectionConfigs.inboundDelivery(),
           );
-        } else if (item == "Production Receipts") {
+        } else if (item == AppTexts.productionReceipts) {
           context.pushNamed(
             AppRoutes.documentSelection,
             extra: DocumentSelectionConfigs.productionReceipts(),
@@ -457,5 +460,3 @@ class ModuleItem {
 //     );
 //   }
 // }
-
-

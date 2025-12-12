@@ -12,9 +12,9 @@ import 'package:neuconnectz_dynea/src/core/enums/scan_type.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/context_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/extensions/number_extensions.dart';
 import 'package:neuconnectz_dynea/src/core/utils/utils.dart';
-import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/data/models/create_putaway_inbound_sto_request_model.dart';
-import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/blocs/putaway_bloc.dart';
-import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/params/inbound_delivery_quantity_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/data/models/create_production_receipt_request_model.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/blocs/production_receipt_bloc.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/params/production_receipt_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/presentation/widgets/scan_button.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/domain/entities/bin_entity.dart';
 import 'package:neuconnectz_dynea/src/shared/bins/presentation/blocs/bin_bloc.dart';
@@ -26,35 +26,35 @@ import 'package:neuconnectz_dynea/src/widgets/custom_text_formfield.dart';
 import 'package:neuconnectz_dynea/src/widgets/custom_toast.dart';
 import 'package:neuconnectz_dynea/src/widgets/generic_selection_dialog.dart';
 
-class InboundDeliveryQuantityPage extends StatelessWidget {
-  final InboundDeliveryQuantityPageParams params;
+class ProductionReceiptQuantityPage extends StatelessWidget {
+  final ProductionReceiptQuantityPageParams params;
 
-  const InboundDeliveryQuantityPage({super.key, required this.params});
+  const ProductionReceiptQuantityPage({super.key, required this.params});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<InboundDeliveryPutAwayBloc>()),
+        BlocProvider(create: (_) => sl<ProductionReceiptBloc>()),
         BlocProvider(create: (_) => sl<BinBloc>()),
       ],
-      child: _InboundDeliveryQuantityView(params: params),
+      child: _ProductionReceiptQuantityView(params: params),
     );
   }
 }
 
-class _InboundDeliveryQuantityView extends StatefulWidget {
-  final InboundDeliveryQuantityPageParams params;
+class _ProductionReceiptQuantityView extends StatefulWidget {
+  final ProductionReceiptQuantityPageParams params;
 
-  const _InboundDeliveryQuantityView({required this.params});
+  const _ProductionReceiptQuantityView({required this.params});
 
   @override
-  State<_InboundDeliveryQuantityView> createState() =>
-      _InboundDeliveryQuantityViewState();
+  State<_ProductionReceiptQuantityView> createState() =>
+      _ProductionReceiptQuantityViewState();
 }
 
-class _InboundDeliveryQuantityViewState
-    extends State<_InboundDeliveryQuantityView> {
+class _ProductionReceiptQuantityViewState
+    extends State<_ProductionReceiptQuantityView> {
   final TextEditingController _quantityController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
@@ -110,32 +110,29 @@ class _InboundDeliveryQuantityViewState
   @override
   void initState() {
     super.initState();
-    _quantityController.text = widget.params.item.quantity.toString();
+    _quantityController.text = widget.params.item.trQuantity.toString();
     _updateRemainingQuantity();
   }
 
   void _updateRemainingQuantity() {
-    final actualQuantity = widget.params.item.quantity;
+    final actualQuantity = widget.params.item.trQuantity;
     final remaining = actualQuantity - _totalSelectedQuantity;
     _remainingQuantityController.text = remaining.formatWithCommas;
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<
-      InboundDeliveryPutAwayBloc,
-      InboundDeliveryPutAwayState
-    >(
+    return BlocConsumer<ProductionReceiptBloc, ProductionReceiptState>(
       listener: (context, state) {
-        if (state is CreatePutAwayFailure) {
-          CustomToast.error(context, state.message);
-        } else if (state is CreatePutAwaySuccess) {
-          CustomToast.success(context, state.response.message);
+        if (state.createError != null) {
+          CustomToast.error(context, state.createError!);
+        } else if (state.createResponse != null) {
+          CustomToast.success(context, state.createResponse!.message);
           context.pop(true);
         }
       },
       builder: (context, state) {
-        final isSubmitting = state is CreatePutAwayLoading;
+        final isSubmitting = state.isCreating;
         return Scaffold(
           appBar: CustomAppBar(title: "Add Quantity"),
           body: AbsorbPointer(
@@ -260,84 +257,78 @@ class _InboundDeliveryQuantityViewState
 
     showDialog(
       context: context,
-      builder:
-          (context) => BlocProvider.value(
-            value: binBloc,
-            child: BlocBuilder<BinBloc, BinState>(
-              builder: (context, state) {
-                List<BinEntity> bins = _dialogBins;
+      builder: (context) => BlocProvider.value(
+        value: binBloc,
+        child: BlocBuilder<BinBloc, BinState>(
+          builder: (context, state) {
+            List<BinEntity> bins = _dialogBins;
 
-                if (state is BinSuccess) {
-                  if (_dialogResetPending) {
-                    _dialogBins
-                      ..clear()
-                      ..addAll(state.bins);
-                    _dialogResetPending = false;
-                  } else {
-                    _dialogBins.addAll(state.bins);
-                  }
+            if (state is BinSuccess) {
+              if (_dialogResetPending) {
+                _dialogBins
+                  ..clear()
+                  ..addAll(state.bins);
+                _dialogResetPending = false;
+              } else {
+                _dialogBins.addAll(state.bins);
+              }
 
-                  bins = _dialogBins;
-                  _dialogHasMore = state.bins.length == _pageSize;
-                } else if (state is BinFailure) {
-                  _dialogHasMore = false;
-                }
+              bins = _dialogBins;
+              _dialogHasMore = state.bins.length == _pageSize;
+            } else if (state is BinFailure) {
+              _dialogHasMore = false;
+            }
 
-                final bool isInitialLoading =
-                    state is BinLoading && bins.isEmpty;
+            final bool isInitialLoading =
+                state is BinLoading && bins.isEmpty;
 
-                return GenericSelectionDialog<BinEntity>(
-                  items: bins,
-                  controller: _binSearchController,
-                  loading: isInitialLoading,
-                  isTable: true,
-                  tableHeaders: ["Storage Type", "Section", "Bin Code"],
-                  tableRowBuilder:
-                      (bin) => [
-                        bin.storageType,
-                        bin.storageSection,
-                        bin.binCode,
-                      ],
-                  noDataText:
-                      state is BinFailure
-                          ? state.message
-                          : AppErrors.noBinsFound,
-                  headingText: "Select Bin",
-                  searchLabel: "Search Bin Code",
-                  titleBuilder:
-                      (bin) => CustomText(
-                        text: bin.binCode,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                  subTitleBuilder:
-                      (bin) => CustomText(
-                        text: bin.storageType,
-                        fontSize: 12.sp,
-                        color: AppPalette.darkGreyColor,
-                      ),
-                  onChanged: (value) {
-                    _binSearchQuery = value;
-                    _loadBins(keyword: value, resetPagination: true);
-                  },
-                  onSelected: (bin) {
-                    Navigator.pop(context);
-                    _onBinSelected(bin);
-                    if (_scrollController.hasClients) {
-                      _scrollController.jumpTo(700);
-                    }
-                  },
-                  hasMore: _dialogHasMore,
-                  onPaginate:
-                      _dialogHasMore
-                          ? () {
-                            _loadBins(keyword: _binSearchQuery);
-                          }
-                          : null,
-                );
+            return GenericSelectionDialog<BinEntity>(
+              items: bins,
+              controller: _binSearchController,
+              loading: isInitialLoading,
+              isTable: true,
+              tableHeaders: ["Storage Type", "Section", "Bin Code"],
+              tableRowBuilder: (bin) => [
+                bin.storageType,
+                bin.storageSection,
+                bin.binCode,
+              ],
+              noDataText: state is BinFailure
+                  ? state.message
+                  : AppErrors.noBinsFound,
+              headingText: "Select Bin",
+              searchLabel: "Search Bin Code",
+              titleBuilder: (bin) => CustomText(
+                text: bin.binCode,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+              subTitleBuilder: (bin) => CustomText(
+                text: bin.storageType,
+                fontSize: 12.sp,
+                color: AppPalette.darkGreyColor,
+              ),
+              onChanged: (value) {
+                _binSearchQuery = value;
+                _loadBins(keyword: value, resetPagination: true);
               },
-            ),
-          ),
+              onSelected: (bin) {
+                Navigator.pop(context);
+                _onBinSelected(bin);
+                if (_scrollController.hasClients) {
+                  _scrollController.jumpTo(700);
+                }
+              },
+              hasMore: _dialogHasMore,
+              onPaginate: _dialogHasMore
+                  ? () {
+                      _loadBins(keyword: _binSearchQuery);
+                    }
+                  : null,
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -357,8 +348,9 @@ class _InboundDeliveryQuantityViewState
 
     final newBin = bin.copyWith(selectedQuantity: 0.0);
     final quantityController = TextEditingController(
-      text:
-          newBin.selectedQuantity > 0 ? newBin.selectedQuantity.toString() : '',
+      text: newBin.selectedQuantity > 0
+          ? newBin.selectedQuantity.toString()
+          : '',
     );
     final quantityFocusNode = FocusNode();
     _binQuantityFocusNodes.add(quantityFocusNode);
@@ -444,15 +436,15 @@ class _InboundDeliveryQuantityViewState
   }
 
   Widget _proceedButton() {
-    final bloc = context.watch<InboundDeliveryPutAwayBloc>();
-    final isSubmitting = bloc.state is CreatePutAwayLoading;
+    final bloc = context.watch<ProductionReceiptBloc>();
+    final isSubmitting = bloc.state.isCreating;
     return CustomButton(
       text: AppTexts.proceed,
       isLoading: isSubmitting,
       onPressed: () async {
         if (!_formKey.currentState!.validate()) return;
 
-        final actualQuantity = widget.params.item.quantity;
+        final actualQuantity = widget.params.item.trQuantity;
         final selectedQuantity = _totalSelectedQuantity;
 
         if (_selectedBins.isEmpty) {
@@ -477,18 +469,18 @@ class _InboundDeliveryQuantityViewState
           return;
         }
 
-        final request = CreatePutAwayInboundStoRequestModel.fromEntities(
-          inboundDelivery: widget.params.inboundDelivery,
+        final request = CreateProductionReceiptRequestModel.fromEntities(
+          header: widget.params.header,
           item: widget.params.item,
           bins: _selectedBins,
-          receivingPlant: widget.params.plant,
-          receivingStorageLocation: widget.params.storageLocation,
-          receivingWarehouse: widget.params.warehouseCode,
+          plant: widget.params.plant,
+          warehouse: widget.params.warehouseCode,
+          storageLocation: widget.params.storageLocation,
         );
 
-        context.read<InboundDeliveryPutAwayBloc>().add(
-          CreatePutAwayAgainstInboundDeliveryEvent(request: request),
-        );
+        context.read<ProductionReceiptBloc>().add(
+              CreateProductionReceiptEvent(request: request),
+            );
       },
       radius: 12.r,
     );
@@ -505,51 +497,43 @@ class _InboundDeliveryQuantityViewState
         spacing: 5.h,
         children: [
           CustomTextFormField(
-            label: "Material Name",
-            initialValue: widget.params.item.materialDescription ?? 'N/A',
-            readOnly: true,
-            isMarquee: true,
-            fillColor: AppPalette.lightGreyColor,
-            enabled: false,
-          ),
-          CustomTextFormField(
             label: "Material Number",
             readOnly: true,
-            initialValue: widget.params.item.materialNo ?? 'N/A',
+            initialValue: widget.params.item.material,
             fillColor: AppPalette.lightGreyColor,
             enabled: false,
           ),
-          if (widget.params.item.batchNo.isNotEmpty)
+          if (widget.params.item.batch.isNotEmpty)
             CustomTextFormField(
               label: "Batch",
               readOnly: true,
-              initialValue: widget.params.item.batchNo,
+              initialValue: widget.params.item.batch,
               fillColor: AppPalette.lightGreyColor,
               enabled: false,
             ),
-          // Row(
-          //   children: [
-          //     Expanded(
-          //       child: CustomTextFormField(
-          //         label: "Plant",
-          //         readOnly: true,
-          //         initialValue: widget.params.item.plant ?? 'N/A',
-          //         fillColor: AppPalette.lightGreyColor,
-          //         enabled: false,
-          //       ),
-          //     ),
-          //     SizedBox(width: 10.w),
-          //     Expanded(
-          //       child: CustomTextFormField(
-          //         label: "Storage Location",
-          //         readOnly: true,
-          //         initialValue: widget.params.item.storageLocation ?? 'N/A',
-          //         fillColor: AppPalette.lightGreyColor,
-          //         enabled: false,
-          //       ),
-          //     ),
-          //   ],
-          // ),
+          Row(
+            children: [
+              Expanded(
+                child: CustomTextFormField(
+                  label: "Plant",
+                  readOnly: true,
+                  initialValue: widget.params.item.plant,
+                  fillColor: AppPalette.lightGreyColor,
+                  enabled: false,
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: CustomTextFormField(
+                  label: "Storage Location",
+                  readOnly: true,
+                  initialValue: widget.params.item.storageLocation,
+                  fillColor: AppPalette.lightGreyColor,
+                  enabled: false,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -572,7 +556,7 @@ class _InboundDeliveryQuantityViewState
                 child: CustomTextFormField(
                   label: "Actual Quantity",
                   readOnly: true,
-                  initialValue: widget.params.item.quantity.formatWithCommas,
+                  initialValue: widget.params.item.trQuantity.formatWithCommas,
                   fillColor: AppPalette.lightGreyColor,
                   enabled: false,
                 ),
@@ -616,3 +600,4 @@ class _InboundDeliveryQuantityViewState
     }
   }
 }
+

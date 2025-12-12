@@ -13,7 +13,8 @@ class InboundDeliveryBloc
     extends Bloc<InboundDeliveryEvent, InboundDeliveryState> {
   final InboundDeliveryRepository repository;
 
-  InboundDeliveryBloc({required this.repository}) : super(InboundDeliveryInitial()) {
+  InboundDeliveryBloc({required this.repository})
+    : super(InboundDeliveryInitial()) {
     on<LoadPendingInboundDeliveryEvent>(_onLoadPendingInboundDelivery);
     on<LoadInboundDeliveryItemsEvent>(_onLoadInboundDeliveryItems);
     on<LoadCompletedInboundDeliveryItemsEvent>(
@@ -146,12 +147,15 @@ class InboundDeliveryBloc
         plant: event.params.plant,
         storageLocation: event.params.storageLocation,
         outboundDeliveryNo: event.params.outboundDeliveryNo,
+        warehouseNumber: event.params.warehouseNumber,
         stoNo: event.params.stoNo,
         lastCount: event.params.lastCount,
         skipRecords: 0,
       );
 
-      final result = await repository.listAllInboundDeliveryItemsFromSAP(params);
+      final result = await repository.listAllInboundDeliveryItemsFromSAP(
+        params,
+      );
 
       result.fold(
         (failure) {
@@ -201,11 +205,14 @@ class InboundDeliveryBloc
         storageLocation: event.params.storageLocation,
         outboundDeliveryNo: event.params.outboundDeliveryNo,
         stoNo: event.params.stoNo,
+        warehouseNumber: event.params.warehouseNumber,
         lastCount: event.params.lastCount,
         skipRecords: pendingState.skipRecords,
       );
 
-      final result = await repository.listAllInboundDeliveryItemsFromSAP(params);
+      final result = await repository.listAllInboundDeliveryItemsFromSAP(
+        params,
+      );
 
       result.fold(
         (failure) {
@@ -263,6 +270,7 @@ class InboundDeliveryBloc
         plant: event.params.plant,
         storageLocation: event.params.storageLocation,
         outboundDeliveryNo: event.params.outboundDeliveryNo,
+        warehouseNumber: event.params.warehouseNumber,
         stoNo: event.params.stoNo,
         lastCount: event.params.lastCount,
         skipRecords: 0,
@@ -318,6 +326,7 @@ class InboundDeliveryBloc
         storageLocation: event.params.storageLocation,
         outboundDeliveryNo: event.params.outboundDeliveryNo,
         stoNo: event.params.stoNo,
+        warehouseNumber: event.params.warehouseNumber,
         lastCount: event.params.lastCount,
         skipRecords: completedState.skipRecords,
       );
@@ -356,5 +365,3 @@ class InboundDeliveryBloc
     }
   }
 }
-
-

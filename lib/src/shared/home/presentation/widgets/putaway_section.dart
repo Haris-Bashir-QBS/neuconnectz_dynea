@@ -17,7 +17,7 @@ class PutawaySection extends StatelessWidget {
       title: AppTexts.putAway,
       actions: [
         HomeActionCardData(
-          title: "Purchase Receipts",
+          title: AppTexts.purchaseReceipts,
           iconBackgroundColor: AppPalette.d4Color,
           iconColor: AppPalette.lightGreenColor,
           onTap: () {
@@ -28,7 +28,7 @@ class PutawaySection extends StatelessWidget {
           },
         ),
         HomeActionCardData(
-          title: "Production Receipts",
+          title: AppTexts.productionReceipts,
           iconBackgroundColor: AppPalette.d3Color,
           iconColor: AppPalette.yellowColor,
           iconPath: AppAssets.pendingIcon,
@@ -40,7 +40,7 @@ class PutawaySection extends StatelessWidget {
           },
         ),
         HomeActionCardData(
-          title: "${AppTexts.inboundDelivery} (STO)",
+          title: AppTexts.stoInboundReceipts,
           iconBackgroundColor: AppPalette.d1Color,
           iconColor: AppPalette.yellowColor,
           iconPath: AppAssets.pendingIcon,
@@ -56,5 +56,3 @@ class PutawaySection extends StatelessWidget {
     );
   }
 }
-
-

@@ -146,11 +146,13 @@ class _StockCardState extends State<StockCard> {
 
   String _getMainFieldValue() {
     final priorityField = widget.priorityField;
-    
-    if (priorityField == null || priorityField == StockFilterType.all || priorityField == StockFilterType.material) {
+
+    if (priorityField == null ||
+        priorityField == StockFilterType.all ||
+        priorityField == StockFilterType.material) {
       return widget.item.material;
     }
-    
+
     switch (priorityField) {
       case StockFilterType.storageType:
         return widget.item.storageType;
@@ -165,27 +167,28 @@ class _StockCardState extends State<StockCard> {
 
   bool _shouldShowDescription() {
     final priorityField = widget.priorityField;
-    return priorityField == null || 
-           priorityField == StockFilterType.all || 
-           priorityField == StockFilterType.material;
+    return priorityField == null ||
+        priorityField == StockFilterType.all ||
+        priorityField == StockFilterType.material;
   }
 
   List<Widget> _buildDetailRows() {
     final item = widget.item;
     final priorityField = widget.priorityField;
 
-    // Define all detail rows - always include material
     final allRows = [
       _DetailRowData("Material:", item.material),
       _DetailRowData("Quant:", item.quant.toInt().toString()),
       _DetailRowData("Storage Type:", item.storageType),
-      _DetailRowData("Storage Section:", item.storageLocation),
+      _DetailRowData("Storage Section:", item.storageSection),
       _DetailRowData("Storage Bin:", item.storageBin),
       _DetailRowData("Batch No:", item.batch ?? "N/A"),
     ];
 
     // Reorder based on priority field - move priority field to first position
-    if (priorityField != null && priorityField != StockFilterType.all && priorityField != StockFilterType.material) {
+    if (priorityField != null &&
+        priorityField != StockFilterType.all &&
+        priorityField != StockFilterType.material) {
       int? priorityIndex;
       switch (priorityField) {
         case StockFilterType.storageType:
@@ -246,5 +249,3 @@ class _DetailRowData {
 
   _DetailRowData(this.label, this.value);
 }
-
-

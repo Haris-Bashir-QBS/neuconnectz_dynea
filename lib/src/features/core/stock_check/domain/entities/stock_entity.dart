@@ -8,6 +8,7 @@ class StockEntity extends Equatable {
   final String material;
   final String description;
   final String storageType;
+  final String storageSection;
   final String storageBin;
   final String stockCategory;
   final String batch;
@@ -22,6 +23,7 @@ class StockEntity extends Equatable {
     required this.material,
     required this.description,
     required this.storageType,
+    required this.storageSection,
     required this.storageBin,
     required this.stockCategory,
     required this.batch,
@@ -38,6 +40,7 @@ class StockEntity extends Equatable {
     material,
     description,
     storageType,
+    storageSection,
     storageBin,
     stockCategory,
     batch,
@@ -45,5 +48,3 @@ class StockEntity extends Equatable {
     availableStock,
   ];
 }
-
-

@@ -1,76 +1,209 @@
 part of 'production_receipt_bloc.dart';
 
-class ProductionReceiptState extends Equatable {
-  final bool isHeadersLoading;
-  final bool isItemsLoading;
-  final bool isLoadingMore;
-  final List<ProductionReceiptEntity> headers;
+class ProductionReceiptItemsSectionState extends Equatable {
   final List<ProductionReceiptItemEntity> items;
+  final int totalRows;
+  final int skipRecords;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final String? errorMessage;
+
+  const ProductionReceiptItemsSectionState({
+    this.items = const [],
+    this.totalRows = 0,
+    this.skipRecords = 0,
+    this.isLoading = false,
+    this.isLoadingMore = false,
+    this.errorMessage,
+  });
+
+  bool get hasMore => items.length < totalRows;
+
+  ProductionReceiptItemsSectionState copyWith({
+    List<ProductionReceiptItemEntity>? items,
+    int? totalRows,
+    int? skipRecords,
+    bool? isLoading,
+    bool? isLoadingMore,
+    String? errorMessage,
+  }) {
+    return ProductionReceiptItemsSectionState(
+      items: items ?? this.items,
+      totalRows: totalRows ?? this.totalRows,
+      skipRecords: skipRecords ?? this.skipRecords,
+      isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      errorMessage: errorMessage,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        items,
+        totalRows,
+        skipRecords,
+        isLoading,
+        isLoadingMore,
+        errorMessage,
+      ];
+}
+
+abstract class ProductionReceiptState extends Equatable {
+  final bool isHeadersLoading;
+  final List<ProductionReceiptEntity> headers;
   final int headersTotalRows;
-  final int itemsTotalRows;
   final String? headersError;
-  final String? itemsError;
+  final ProductionReceiptItemsSectionState pendingSection;
+  final ProductionReceiptItemsSectionState completedSection;
+  final bool isCreating;
+  final String? createError;
+  final ApiResponse<bool>? createResponse;
 
   const ProductionReceiptState({
     required this.isHeadersLoading,
-    required this.isItemsLoading,
-    this.isLoadingMore = false,
     required this.headers,
-    required this.items,
     required this.headersTotalRows,
-    required this.itemsTotalRows,
     this.headersError,
-    this.itemsError,
+    this.pendingSection = const ProductionReceiptItemsSectionState(),
+    this.completedSection = const ProductionReceiptItemsSectionState(),
+    this.isCreating = false,
+    this.createError,
+    this.createResponse,
   });
 
-  const ProductionReceiptState.initial()
-      : isHeadersLoading = false,
-        isItemsLoading = false,
-        isLoadingMore = false,
-        headers = const [],
-        items = const [],
-        headersTotalRows = 0,
-        itemsTotalRows = 0,
-        headersError = null,
-        itemsError = null;
+  List<Object?> get baseProps => [
+        isHeadersLoading,
+        headers,
+        headersTotalRows,
+        headersError,
+        pendingSection,
+        completedSection,
+        isCreating,
+        createError,
+        createResponse,
+      ];
 
-  ProductionReceiptState copyWith({
-    bool? isHeadersLoading,
-    bool? isItemsLoading,
-    bool? isLoadingMore,
-    List<ProductionReceiptEntity>? headers,
-    List<ProductionReceiptItemEntity>? items,
-    int? headersTotalRows,
-    int? itemsTotalRows,
-    String? headersError,
-    String? itemsError,
-  }) {
-    return ProductionReceiptState(
-      isHeadersLoading: isHeadersLoading ?? this.isHeadersLoading,
-      isItemsLoading: isItemsLoading ?? this.isItemsLoading,
-      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      headers: headers ?? this.headers,
-      items: items ?? this.items,
-      headersTotalRows: headersTotalRows ?? this.headersTotalRows,
-      itemsTotalRows: itemsTotalRows ?? this.itemsTotalRows,
-      headersError: headersError,
-      itemsError: itemsError,
-    );
-  }
+  @override
+  List<Object?> get props => baseProps;
+}
+
+class ProductionReceiptInitial extends ProductionReceiptState {
+  const ProductionReceiptInitial({
+    super.isHeadersLoading = false,
+    super.headers = const [],
+    super.headersTotalRows = 0,
+    super.headersError,
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  });
+}
+
+class ProductionReceiptHeaderListLoading extends ProductionReceiptState {
+  const ProductionReceiptHeaderListLoading({
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  }) : super(
+          isHeadersLoading: true,
+          headers: const [],
+          headersTotalRows: 0,
+        );
+}
+
+class ProductionReceiptHeaderListFetched extends ProductionReceiptState {
+  final int skipRecords;
+  final bool isLoadingMore;
+
+  const ProductionReceiptHeaderListFetched({
+    required super.headers,
+    required super.headersTotalRows,
+    required this.skipRecords,
+    this.isLoadingMore = false,
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  }) : super(isHeadersLoading: false);
 
   bool get hasMore => headers.length < headersTotalRows;
 
   @override
   List<Object?> get props => [
-        isHeadersLoading,
-        isItemsLoading,
+        ...baseProps,
+        skipRecords,
         isLoadingMore,
-        headers,
-        items,
-        headersTotalRows,
-        itemsTotalRows,
-        headersError,
-        itemsError,
       ];
+}
+
+class ProductionReceiptHeaderListFetchFailure extends ProductionReceiptState {
+  final String message;
+
+  const ProductionReceiptHeaderListFetchFailure({
+    required this.message,
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  }) : super(
+          isHeadersLoading: false,
+          headers: const [],
+          headersTotalRows: 0,
+          headersError: message,
+        );
+
+  @override
+  List<Object?> get props => [...baseProps, message];
+}
+
+class ProductionReceiptItemsLoading extends ProductionReceiptState {
+  const ProductionReceiptItemsLoading({
+    required super.isHeadersLoading,
+    required super.headers,
+    required super.headersTotalRows,
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  });
+}
+
+class ProductionReceiptItemsSuccess extends ProductionReceiptState {
+  const ProductionReceiptItemsSuccess({
+    required super.isHeadersLoading,
+    required super.headers,
+    required super.headersTotalRows,
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  });
+}
+
+class ProductionReceiptItemsFailure extends ProductionReceiptState {
+  final String message;
+
+  const ProductionReceiptItemsFailure({
+    required this.message,
+    required super.isHeadersLoading,
+    required super.headers,
+    required super.headersTotalRows,
+    super.pendingSection,
+    super.completedSection,
+    super.isCreating = false,
+    super.createError,
+    super.createResponse,
+  });
+
+  @override
+  List<Object?> get props => [...baseProps, message];
 }
 

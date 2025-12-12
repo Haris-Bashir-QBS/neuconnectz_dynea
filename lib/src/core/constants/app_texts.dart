@@ -155,7 +155,7 @@ final class AppTexts {
       'Select Plant,Warehouse & Movement Type';
   static const String selectPlant = 'Select Plant';
   static const String purchaseOrder = "Purchase Order";
-  static const String inboundDelivery = "Inbound Delivery";
+  static const String stoInboundReceipts = "STO Inbound Receipts";
   static const String stockTransferOrder = "Stock Transfer Order";
   static const String tapToProcess = "Tap to process";
   static const String addToList = "Add to List";
@@ -164,7 +164,10 @@ final class AppTexts {
   static const String scanAndType = "Scan/Type";
   static const String typeHere = "Type Here";
   static const String binCode = "Bin Code";
-  static const String goodReceiptNote = "Purchase Receipts";
+  static const String purchaseReceipts = "Purchase Receipts";
+  static const String productionReceipts = "Production Receipts";
+  static const String manageAndCreatePuttingAway =
+      "Manage & create putting away against";
   static const String itemName = "Item Name";
   static const String itemCode = "Item Code";
   static const String supplierName = "Supplier Name";
@@ -220,5 +223,3 @@ final class AppTexts {
   static const String proceedAll = "Proceed All";
   static const String changeBin = "Change Bin";
 }
-
-

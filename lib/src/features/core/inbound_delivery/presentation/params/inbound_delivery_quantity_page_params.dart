@@ -5,11 +5,15 @@ class InboundDeliveryQuantityPageParams {
   final InboundDeliveryEntity inboundDelivery;
   final InboundDeliveryItemEntity item;
   final String warehouseCode;
+  final String plant;
+  final String storageLocation;
 
   InboundDeliveryQuantityPageParams({
     required this.inboundDelivery,
     required this.item,
     required this.warehouseCode,
+    required this.plant,
+    required this.storageLocation,
   });
 }
 

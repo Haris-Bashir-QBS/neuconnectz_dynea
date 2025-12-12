@@ -68,11 +68,15 @@ class ProductionReceiptWidget extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 8.h),
-                  _detailRow("Requirement: ${item.requirementNumber.isEmpty ? 'N/A' : item.requirementNumber}"),
+                  _detailRow(
+                    "Requirement No: ${item.requirementNumber.isEmpty ? 'N/A' : item.requirementNumber}",
+                  ),
                   SizedBox(height: 4.h),
                   _detailRow("Material Doc: ${item.materialDocument}"),
                   SizedBox(height: 4.h),
-                  _detailRow("Created On: ${_formatDateTime(item.createdOn, item.timeOfCreation)}"),
+                  _detailRow(
+                    "Created On: ${_formatDateTime(item.createdOn, item.timeOfCreation)}",
+                  ),
                 ],
               ),
             ),
@@ -109,9 +113,8 @@ class ProductionReceiptWidget extends StatelessWidget {
   }
 
   Widget _detailRow(String text) => CustomText(
-        text: "• $text",
-        fontSize: 12.3.sp,
-        color: AppPalette.darkGreyColor,
-      );
+    text: "• $text",
+    fontSize: 12.3.sp,
+    color: AppPalette.darkGreyColor,
+  );
 }
-

@@ -16,7 +16,6 @@ import 'package:neuconnectz_dynea/src/widgets/custom_text.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neuconnectz_dynea/src/widgets/item_listing_header.dart';
 
-import '../../../../../core/constants/app_texts.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../widgets/custom_appbar.dart';
 import '../../../../../widgets/custom_toast.dart';
@@ -107,21 +106,23 @@ class __ProductionReceiptListingViewState
     if (pixels >= maxScroll - 200) {
       final state = context.read<ProductionReceiptBloc>().state;
 
-      if (!state.isHeadersLoading &&
-          !state.isLoadingMore &&
-          state.hasMore) {
-        final params = ProductionReceiptListParams(
-          plant: widget.params.plant.code,
-          warehouseNumber: widget.params.warehouse.code,
-          storageLocation: widget.params.warehouse.storageLocationCode ?? '',
-          lastCount: 10,
-          skipRecords: state.headers.length,
-          keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
-        );
+      if (state is ProductionReceiptHeaderListFetched) {
+        if (!state.isHeadersLoading &&
+            !state.isLoadingMore &&
+            state.hasMore) {
+          final params = ProductionReceiptListParams(
+            plant: widget.params.plant.code,
+            warehouseNumber: widget.params.warehouse.code,
+            storageLocation: widget.params.warehouse.storageLocationCode ?? '',
+            lastCount: 10,
+            skipRecords: state.headers.length,
+            keyword: _searchKeyword.isEmpty ? null : _searchKeyword,
+          );
 
-        context.read<ProductionReceiptBloc>().add(
-          LoadProductionReceiptsEvent(params: params, reset: false),
-        );
+          context.read<ProductionReceiptBloc>().add(
+            LoadProductionReceiptsEvent(params: params, reset: false),
+          );
+        }
       }
     }
   }
@@ -236,7 +237,8 @@ class __ProductionReceiptListingViewState
           );
         }
 
-        if (state.isHeadersLoading && !state.isLoadingMore) {
+        if (state.isHeadersLoading && 
+            !(state is ProductionReceiptHeaderListFetched && state.isLoadingMore)) {
           // Show shimmer when refreshing (not loading more)
           return Column(
             children: [
@@ -308,7 +310,8 @@ class __ProductionReceiptListingViewState
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: 15.w),
                   itemCount:
-                      state.headers.length + (state.isLoadingMore ? 1 : 0),
+                      state.headers.length + 
+                      (state is ProductionReceiptHeaderListFetched && state.isLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == state.headers.length) {
                       return Padding(
@@ -333,8 +336,6 @@ class __ProductionReceiptListingViewState
             ),
           ],
         );
-
-        return const SizedBox.shrink();
       },
     );
   }

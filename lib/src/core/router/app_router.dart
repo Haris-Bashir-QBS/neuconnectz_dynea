@@ -25,10 +25,14 @@ import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentatio
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/params/inbound_delivery_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/params/inbound_delivery_listing_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/inbound_delivery/presentation/params/inbound_delivery_quantity_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/domain/entities/production_receipt_item_entity.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/pages/completed_production_receipt_item_detail_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/pages/production_receipt_items_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/pages/production_receipt_listing_page.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/pages/production_receipt_quantity_page.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/params/production_receipt_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/params/production_receipt_listing_page_params.dart';
+import 'package:neuconnectz_dynea/src/features/core/production_receipts/presentation/params/production_receipt_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_items_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/outbound_delivery_sto/presentation/params/outbound_delivery_sto_quantity_page_params.dart';
 import 'package:neuconnectz_dynea/src/features/core/purchase_receipts/domain/entities/purchase_order_grn_item_entity.dart';
@@ -338,6 +342,28 @@ GoRoute _productionReceiptItems() {
   );
 }
 
+GoRoute _productionReceiptQuantity() {
+  return GoRoute(
+    path: '/${AppRoutes.productionReceiptQuantity}',
+    name: AppRoutes.productionReceiptQuantity,
+    builder: (context, state) {
+      final args = state.extra as ProductionReceiptQuantityPageParams;
+      return ProductionReceiptQuantityPage(params: args);
+    },
+  );
+}
+
+GoRoute _completedProductionReceiptItemDetail() {
+  return GoRoute(
+    path: '/${AppRoutes.completedProductionReceiptItemDetail}',
+    name: AppRoutes.completedProductionReceiptItemDetail,
+    builder: (context, state) {
+      final args = state.extra as ProductionReceiptItemEntity;
+      return CompletedProductionReceiptItemDetailPage(item: args);
+    },
+  );
+}
+
 GoRoute _binTransferReportListing() {
   return GoRoute(
     path: '/${AppRoutes.binTransferReportListing}',
@@ -540,4 +566,6 @@ List<GoRoute> putAwayRoutes = [
   _completedInboundDeliveryItemDetail(),
   _productionReceiptListing(),
   _productionReceiptItems(),
+  _productionReceiptQuantity(),
+  _completedProductionReceiptItemDetail(),
 ];
